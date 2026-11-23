@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="tron">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'">
+  <title>NEXUS</title>
+  <link rel="stylesheet" href="../../node_modules/@xterm/xterm/css/xterm.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="boot" aria-hidden="true"><pre id="boot-log"></pre></div>
+
+  <main id="ui" class="hidden">
+    <!-- Coluna esquerda -->
+    <section class="col col-left">
+      <header class="panel-head"><span>PAINEL</span><span>SISTEMA</span></header>
+
+      <div class="block">
+        <div id="clock" class="clock">00:00:00</div>
+      </div>
+
+      <div class="block info-grid">
+        <div><small id="year">----</small><b id="date">-- ---</b></div>
+        <div><small>UPTIME</small><b id="uptime">0:00:00</b></div>
+        <div><small>TIPO</small><b>LINUX</b></div>
+        <div><small>ENERGIA</small><b id="power">TOMADA</b></div>
+      </div>
+
+      <div class="block">
+        <div class="block-title"><span>USO DA CPU</span><span id="cpu-model" class="dim">—</span></div>
+        <div class="cpu-row"><div class="cpu-label"><b id="cpu-a-label"># 1</b><small id="cpu-a-avg">Méd. 0%</small></div><canvas id="cpu-a" class="graph"></canvas></div>
+        <div class="cpu-row"><div class="cpu-label"><b id="cpu-b-label"># 2</b><small id="cpu-b-avg">Méd. 0%</small></div><canvas id="cpu-b" class="graph"></canvas></div>
+        <div class="info-grid four">
+          <div><small>TEMP</small><b id="temp">--°C</b></div>
+          <div><small>CARGA</small><b id="load">0%</b></div>
+          <div><small>NÚCLEOS</small><b id="cores">--</b></div>
+          <div><small>TAREFAS</small><b id="tasks">--</b></div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="block-title"><span>MEMÓRIA</span><span id="mem-text" class="dim">—</span></div>
+        <div id="mem-grid" class="mem-grid"></div>
+        <div class="bar"><div id="swap-bar"></div></div>
+        <small class="dim" id="swap-text">SWAP 0 GiB</small>
+      </div>
+
+      <div class="block grow">
+        <div class="block-title"><span>TOP PROCESSOS</span><span class="dim">PID | NOME | CPU | MEM</span></div>
+        <table class="procs"><tbody id="procs"></tbody></table>
+      </div>
+    </section>
+
+    <!-- Terminal -->
+    <section class="col col-center">
+      <header class="panel-head"><span>TERMINAL</span><span id="term-title">SHELL PRINCIPAL</span></header>
+      <div class="term-frame"><div id="terminal"></div></div>
+    </section>
+
+    <!-- Coluna direita -->
+    <section class="col col-right">
+      <header class="panel-head"><span>PAINEL</span><span>REDE</span></header>
+
+      <div class="block">
+        <div class="block-title"><span>STATUS DA REDE</span><span id="iface" class="dim">—</span></div>
+        <div class="info-grid three">
+          <div><small>ESTADO</small><b id="net-state">—</b></div>
+          <div><small>IPv4</small><b id="ip4">—</b></div>
+          <div><small>PING GW</small><b id="ping">—</b></div>
+        </div>
+      </div>
+
+      <div class="block grow">
+        <div class="block-title"><span>VISÃO GLOBAL</span><span class="dim">REDE · NÓS ATIVOS</span></div>
+        <canvas id="globe"></canvas>
+        <small class="dim" id="host">—</small>
+      </div>
+
+      <div class="block">
+        <div class="block-title"><span>TRÁFEGO DE REDE</span><span class="dim">↓ DOWN / ↑ UP</span></div>
+        <div class="info-grid two">
+          <div><small>↓ AGORA</small><b id="rx">0 B/s</b></div>
+          <div><small>↑ AGORA</small><b id="tx">0 B/s</b></div>
+        </div>
+        <canvas id="net-graph" class="graph tall"></canvas>
+        <small class="dim" id="net-total">TOTAL —</small>
+      </div>
+    </section>
+
+    <!-- Arquivos -->
+    <section class="col col-files">
+      <header class="panel-head"><span>ARQUIVOS</span><span id="cwd">~</span></header>
+      <div id="files" class="files"></div>
+      <footer class="mount">
+        <span id="mount-text">Disco —</span>
+        <div class="bar"><div id="mount-bar"></div></div>
+        <button id="theme-btn" type="button" aria-label="Trocar tema">TEMA</button>
+      </footer>
+    </section>
+
+    <!-- Teclado -->
+    <section class="col col-kbd">
+      <div id="keyboard" class="keyboard" aria-label="Teclado na tela"></div>
+    </section>
+  </main>
+
+  <script src="../../node_modules/@xterm/xterm/lib/xterm.js"></script>
+  <script src="../../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
+  <script src="../../node_modules/@xterm/addon-webgl/lib/addon-webgl.js"></script>
+  <script src="graphs.js"></script>
+  <script src="globe.js"></script>
+  <script src="keyboard.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
