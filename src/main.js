@@ -13,12 +13,27 @@ try {
   pty = null; // sem node-pty o terminal mostra como instalar
 }
 
+// Modo demo (NEXUS_DEMO=1): troca usuário, máquina, IP e processos por valores fictícios.
+// Usado para gerar as capturas de tela do README sem expor dados de quem roda.
+const DEMO = process.env.NEXUS_DEMO === '1';
+const DEMO_HOME = process.env.NEXUS_DEMO_HOME || os.homedir();
+const DEMO_PROCS = [
+  { pid: 4182, name: 'nexus', cpu: 6.1, mem: 1.4 },
+  { pid: 2290, name: 'firefox', cpu: 4.3, mem: 6.2 },
+  { pid: 3317, name: 'node', cpu: 3.8, mem: 2.1 },
+  { pid: 1734, name: 'gnome-shell', cpu: 2.6, mem: 1.9 },
+  { pid: 2051, name: 'pipewire', cpu: 1.2, mem: 0.3 },
+  { pid: 3920, name: 'code', cpu: 0.9, mem: 3.7 },
+];
+const homeDir = () => (DEMO ? DEMO_HOME : os.homedir());
+
 let win = null;
 let term = null;
 let lastCwd = null;
 const timers = [];
 
 function createWindow() {
+  const snapshotMode = Boolean(process.env.NEXUS_SNAPSHOT);
   win = new BrowserWindow({
     width: 1600,
     height: 950,
@@ -34,16 +49,22 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: true,
       spellcheck: false,
+      offscreen: snapshotMode, // captura fora da tela: tamanho fixo, independente do monitor
     },
   });
 
   win.removeMenu();
-  win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+  const theme = process.env.NEXUS_THEME;
+  win.loadFile(path.join(__dirname, 'renderer', 'index.html'), theme ? { query: { theme } } : undefined);
   // página (re)carregada: reenvia a lista de arquivos
   win.webContents.on('did-finish-load', () => {
     lastCwd = null;
   });
   win.once('ready-to-show', () => {
+    if (snapshotMode) {
+      win.setContentSize(1600, 900);
+      return;
+    }
     win.maximize();
     win.show();
   });
@@ -103,12 +124,13 @@ function spawnShell(cols, rows) {
   }
   if (term) return;
   const shellPath = process.env.SHELL || '/bin/bash';
-  term = pty.spawn(shellPath, ['-l'], {
+  const args = DEMO ? ['--rcfile', path.join(DEMO_HOME, '.bashrc'), '-i'] : ['-l'];
+  term = pty.spawn(DEMO ? '/bin/bash' : shellPath, args, {
     name: 'xterm-256color',
     cols: Math.max(cols, 20),
     rows: Math.max(rows, 5),
-    cwd: os.homedir(),
-    env: { ...process.env, TERM: 'xterm-256color', COLORTERM: 'truecolor', TERM_PROGRAM: 'nexus' },
+    cwd: homeDir(),
+    env: { ...process.env, ...(DEMO ? { HOME: DEMO_HOME, USER: 'operator' } : {}), TERM: 'xterm-256color', COLORTERM: 'truecolor', TERM_PROGRAM: 'nexus' },
   });
   term.onData((d) => send('pty:data', d));
   term.onExit(() => {
@@ -133,11 +155,11 @@ ipcMain.on('pty:resize', (_e, size) => {
 
 // ---------- Pasta atual do shell e arquivos ----------
 async function shellCwd() {
-  if (!term) return os.homedir();
+  if (!term) return homeDir();
   try {
     return await fs.readlink(`/proc/${term.pid}/cwd`);
   } catch {
-    return lastCwd || os.homedir();
+    return lastCwd || homeDir();
   }
 }
 
@@ -156,9 +178,9 @@ async function pollCwd() {
   lastCwd = cwd;
   try {
     const { total, items } = await listDir(cwd);
-    send('fs:list', { cwd, home: os.homedir(), total, items });
+    send('fs:list', { cwd, home: homeDir(), total, items });
   } catch (err) {
-    send('fs:list', { cwd, home: os.homedir(), total: 0, items: [], error: err.code || 'erro' });
+    send('fs:list', { cwd, home: homeDir(), total: 0, items: [], error: err.code || 'erro' });
   }
 }
 
@@ -172,8 +194,8 @@ async function staticInfo() {
     cores: os.cpus().length,
     distro: `${osInfo.distro} ${osInfo.release}`,
     kernel: osInfo.kernel,
-    hostname: os.hostname(),
-    user: os.userInfo().username.split('@')[0],
+    hostname: DEMO ? 'nexus' : os.hostname(),
+    user: DEMO ? 'operator' : os.userInfo().username.split('@')[0],
     memTotal: mem.total,
     hasBattery: Boolean(battery.hasBattery),
   };
@@ -225,20 +247,20 @@ async function slowTick() {
   const main = list.find((i) => i.default) || list.find((i) => i.ip4 && !i.internal);
   // Ping só no gateway da rede local: nada sai para a internet.
   const ping = gw ? await si.inetLatency(gw).catch(() => null) : null;
-  const cwd = lastCwd || os.homedir();
+  const cwd = lastCwd || homeDir();
   const mount = fsSize
     .filter((f) => cwd.startsWith(f.mount))
     .sort((a, b) => b.mount.length - a.mount.length)[0];
 
   send('sys:slow', {
     tasks: procs.all,
-    top: procs.list
+    top: DEMO ? DEMO_PROCS : procs.list
       .filter((p) => p.name !== 'ps' && p.parentPid !== process.pid) // ps/sh da própria coleta
       .sort((a, b) => b.cpu - a.cpu)
       .slice(0, 6)
       .map((p) => ({ pid: p.pid, name: p.name, cpu: p.cpu, mem: p.mem })),
-    ip4: main?.ip4 || '—',
-    iface: main?.iface || '—',
+    ip4: DEMO ? '192.168.0.42' : main?.ip4 || '—',
+    iface: DEMO ? 'eth0' : main?.iface || '—',
     online: Boolean(main?.ip4),
     ping,
     mount: mount ? { mount: mount.mount, use: mount.use } : null,

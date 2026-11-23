@@ -21,6 +21,8 @@
     const saved = localStorage.getItem('nexus.theme');
     if (THEMES.includes(saved)) theme = saved;
   } catch { /* sem localStorage: fica o padrão */ }
+  const forced = new URLSearchParams(location.search).get('theme'); // NEXUS_THEME
+  if (THEMES.includes(forced)) theme = forced;
   document.documentElement.dataset.theme = theme;
 
   // ---------- Formatação ----------
