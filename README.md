@@ -40,6 +40,8 @@ reescrito do zero com dependências atuais e foco em segurança.
 - **Arquivos**: mostra a pasta onde o shell está (segue o `cd` sozinho). Clique numa pasta para entrar;
   num arquivo, o nome é colado no prompt.
 - **Teclado na tela (ABNT2)**: acende com o teclado físico e também digita no clique.
+- **Mini navegador**: botão **WEB** abre uma janela flutuante (arraste pela barra, redimensione pelo canto)
+  com endereço ou busca (DuckDuckGo), voltar, avançar e recarregar. Só http/https.
 - **3 temas**: Tron, Cyberpunk e Âmbar, trocados pelo botão **TEMA**.
 
 ## Instalar
@@ -74,7 +76,11 @@ Para ver os ícones do prompt, instale uma [Nerd Font](https://www.nerdfonts.com
 - A interface roda com `sandbox`, `contextIsolation` e sem `nodeIntegration`; só fala com o processo
   principal por uma ponte IPC mínima (`src/preload.js`).
 - A CSP bloqueia scripts e conexões externas, e a janela não navega para fora do app.
-- **Nenhuma chamada para a internet**: o ping vai só até o gateway da rede local e o globo não geolocaliza nada.
+- **Nenhuma chamada para a internet por conta própria**: o ping vai só até o gateway da rede local e o globo não
+  geolocaliza nada. A rede só é usada quando você abre uma página no mini navegador.
+- O mini navegador é uma view separada: sandbox, sem acesso ao Node nem à ponte do app, sessão só em memória
+  (cookies somem ao fechar), permissões (câmera, microfone, localização, notificações) e downloads negados,
+  e só aceita http/https.
 
 ## Como funciona
 
@@ -82,6 +88,7 @@ Para ver os ícones do prompt, instale uma [Nerd Font](https://www.nerdfonts.com
 src/
 ├── main.js          janela, shell (node-pty), métricas (systeminformation),
 │                    pasta atual do shell via /proc/<pid>/cwd
+├── web.js           mini navegador (WebContentsView isolada)
 ├── preload.js       ponte IPC exposta como window.nexus
 └── renderer/
     ├── index.html   layout dos painéis
@@ -89,7 +96,8 @@ src/
     ├── app.js       liga terminal, painéis e dados
     ├── graphs.js    gráficos de linha em canvas
     ├── globe.js     globo wireframe
-    └── keyboard.js  teclado ABNT2 na tela
+    ├── keyboard.js  teclado ABNT2 na tela
+    └── web.js       janela flutuante do mini navegador
 ```
 
 ## Capturas de tela

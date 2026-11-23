@@ -5,6 +5,7 @@ const path = require('node:path');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const si = require('systeminformation');
+const { setupWeb } = require('./web');
 
 let pty = null;
 try {
@@ -277,6 +278,7 @@ function loop(fn, ms) {
 }
 
 ipcMain.handle('sys:static', () => staticInfo());
+setupWeb(() => win);
 
 app.whenReady().then(() => {
   createWindow();

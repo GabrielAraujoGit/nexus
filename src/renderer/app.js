@@ -104,7 +104,8 @@
     new ResizeObserver(() => fit.fit()).observe($('terminal'));
     term.focus();
   }
-  document.addEventListener('mouseup', () => {
+  document.addEventListener('mouseup', (e) => {
+    if (e.target instanceof Element && e.target.closest('#web')) return; // mini navegador cuida do foco
     if (!window.getSelection()?.toString()) term.focus();
   });
 

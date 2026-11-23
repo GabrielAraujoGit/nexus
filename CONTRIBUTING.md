@@ -25,7 +25,9 @@ npm start
 
 - A interface continua com `sandbox`, `contextIsolation` e sem `nodeIntegration`.
 - Nada de `innerHTML` com dado externo (nome de arquivo, saída de comando, processo): use `textContent`.
-- O app não faz chamadas para a internet. Se uma feature precisar, ela deve ser opcional e desligada por padrão.
+- O app não faz chamadas para a internet por conta própria. Se uma feature precisar, ela deve ser opcional e
+  só agir quando o usuário pedir (como o mini navegador).
+- A página do mini navegador nunca ganha preload, Node ou acesso à ponte `window.nexus`.
 - Novos canais IPC validam o que recebem no `main.js`.
 
 ## Capturas de tela

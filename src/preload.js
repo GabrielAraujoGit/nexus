@@ -17,4 +17,11 @@ contextBridge.exposeInMainWorld('nexus', {
   onSlow: (cb) => on('sys:slow', cb),
   onFiles: (cb) => on('fs:list', cb),
   staticInfo: () => ipcRenderer.invoke('sys:static'),
+  web: {
+    open: (url) => ipcRenderer.send('web:open', String(url)),
+    bounds: (rect) => ipcRenderer.send('web:bounds', rect),
+    nav: (action) => ipcRenderer.send('web:nav', String(action)),
+    close: () => ipcRenderer.send('web:close'),
+    onState: (cb) => on('web:state', cb),
+  },
 });

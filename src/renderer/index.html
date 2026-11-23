@@ -95,7 +95,8 @@
       <footer class="mount">
         <span id="mount-text">Disco —</span>
         <div class="bar"><div id="mount-bar"></div></div>
-        <button id="theme-btn" type="button" aria-label="Trocar tema">TEMA</button>
+        <button id="web-btn" class="foot-btn" type="button" aria-pressed="false">WEB</button>
+        <button id="theme-btn" class="foot-btn" type="button" aria-label="Trocar tema">TEMA</button>
       </footer>
     </section>
 
@@ -105,6 +106,25 @@
     </section>
   </main>
 
+  <!-- Mini navegador: a página é uma view isolada que o processo principal desenha sobre #web-slot -->
+  <section id="web" class="webwin" hidden aria-label="Mini navegador">
+    <header id="web-bar" class="webwin-bar">
+      <span class="webwin-title">WEB</span>
+      <button id="web-back" type="button" aria-label="Voltar" disabled>&#9664;</button>
+      <button id="web-fwd" type="button" aria-label="Avançar" disabled>&#9654;</button>
+      <button id="web-reload" type="button" aria-label="Recarregar">&#10227;</button>
+      <form id="web-form" class="webwin-form">
+        <input id="web-url" type="text" spellcheck="false" autocomplete="off"
+               placeholder="endereço ou busca" aria-label="Endereço ou busca">
+      </form>
+      <button id="web-close" type="button" aria-label="Fechar">&#10005;</button>
+    </header>
+    <div id="web-slot" class="webwin-slot">
+      <p>Digite um endereço ou uma busca.<br><small>Nada é carregado até você pedir.</small></p>
+    </div>
+    <footer id="web-status" class="webwin-status">PRONTO</footer>
+  </section>
+
   <script src="../../node_modules/@xterm/xterm/lib/xterm.js"></script>
   <script src="../../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
   <script src="../../node_modules/@xterm/addon-webgl/lib/addon-webgl.js"></script>
@@ -112,5 +132,6 @@
   <script src="globe.js"></script>
   <script src="keyboard.js"></script>
   <script src="app.js"></script>
+  <script src="web.js"></script>
 </body>
 </html>
