@@ -62,7 +62,10 @@ function createWindow() {
   });
   win.once('ready-to-show', () => {
     if (snapshotMode) {
-      win.setContentSize(1600, 900);
+      // layout de 1600x900 renderizado em 2x (nítido em telas retina e no zoom do GitHub)
+      const scale = Number(process.env.NEXUS_SNAPSHOT_SCALE) || 2;
+      win.setContentSize(1600 * scale, 900 * scale);
+      win.webContents.setZoomFactor(scale);
       return;
     }
     win.maximize();
