@@ -2,10 +2,10 @@
 
 # NEXUS
 
-**Um terminal sci-fi para Linux, com painéis de sistema ao vivo em volta do seu shell.**
+**A sci-fi terminal for Linux, with live system panels around your shell.**
 
-Inspirado no visual de filmes e no [eDEX-UI](https://github.com/GitSquared/edex-ui) (arquivado em 2021),
-reescrito do zero com dependências atuais e foco em segurança.
+Inspired by movie interfaces and by [eDEX-UI](https://github.com/GitSquared/edex-ui) (archived in 2021),
+rewritten from scratch with current dependencies and a focus on security.
 
 ![repo](https://img.shields.io/badge/Repository-nexus-black?style=for-the-badge&logo=github)
 ![language](https://img.shields.io/badge/Language-JavaScript-blue?style=for-the-badge&logo=javascript&logoColor=white)
@@ -14,40 +14,44 @@ reescrito do zero com dependências atuais e foco em segurança.
 ![status](https://img.shields.io/badge/Status-Alpha-orange?style=for-the-badge)
 ![license](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
+**English · [Português (Brasil)](README.pt-BR.md)**
+
 </div>
 
-![NEXUS no tema Tron](docs/screenshots/nexus-tron.png)
+![NEXUS with the Tron theme](docs/screenshots/nexus-tron.png)
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/nexus-cyberpunk.png" alt="NEXUS no tema Cyberpunk"></td>
-    <td><img src="docs/screenshots/nexus-ambar.png" alt="NEXUS no tema Âmbar"></td>
+    <td><img src="docs/screenshots/nexus-cyberpunk.png" alt="NEXUS with the Cyberpunk theme"></td>
+    <td><img src="docs/screenshots/nexus-ambar.png" alt="NEXUS with the Amber theme"></td>
   </tr>
   <tr>
     <td align="center"><b>Cyberpunk</b></td>
-    <td align="center"><b>Âmbar</b></td>
+    <td align="center"><b>Amber</b></td>
   </tr>
 </table>
 
-## O que tem
+## Features
 
-- **Terminal de verdade**: seu shell (`$SHELL`) via `node-pty` + [xterm.js](https://xtermjs.org/), com WebGL,
-  cores 24 bits e Nerd Fonts. Seu prompt (Starship, Oh My Bash etc.) funciona igual.
-- **Sistema**: relógio, uptime, energia, CPU por grupo de núcleos, temperatura, carga, tarefas,
-  memória em grade de pontos e swap.
-- **Processos**: os 6 que mais usam CPU, atualizados a cada 3 s.
-- **Rede**: estado, IPv4, ping do gateway, tráfego de download/upload e totais.
-- **Globo**: wireframe girando com nós e conexões (decorativo).
-- **Arquivos**: mostra a pasta onde o shell está (segue o `cd` sozinho). Clique numa pasta para entrar;
-  num arquivo, o nome é colado no prompt.
-- **Teclado na tela (ABNT2)**: acende com o teclado físico e também digita no clique.
-- **Mini navegador**: botão **WEB** abre uma janela flutuante (arraste pela barra, redimensione pelo canto)
-  com endereço ou busca (DuckDuckGo), voltar, avançar e recarregar. Só http/https.
-- **3 temas**: Tron, Cyberpunk e Âmbar, trocados pelo botão **TEMA**.
+- **A real terminal**: your shell (`$SHELL`) through `node-pty` + [xterm.js](https://xtermjs.org/), with WebGL,
+  24-bit color and Nerd Fonts. Your prompt (Starship, Oh My Bash, etc.) works as usual.
+- **System**: clock, uptime, power, CPU per core group, temperature, load, tasks,
+  a dot-grid memory map and swap.
+- **Processes**: the top 6 by CPU, refreshed every 3 s.
+- **Network**: status, IPv4, gateway ping, download/upload traffic and totals.
+- **Globe**: a spinning wireframe with nodes and links (decorative).
+- **Files**: shows the shell's current folder (follows `cd` on its own). Click a folder to enter it;
+  click a file to paste its name into the prompt.
+- **On-screen keyboard (Brazilian ABNT2)**: lights up as you type and also types on click.
+- **Mini browser**: the **WEB** button opens a floating window (drag it by the bar, resize it from the corner)
+  with an address/search bar (DuckDuckGo), back, forward and reload. http/https only.
+- **3 themes**: Tron, Cyberpunk and Amber, switched with the **TEMA** button.
 
-## Instalar
+> The interface text is in Brazilian Portuguese for now.
 
-Pré-requisitos: Linux, Node.js 20+ e um compilador C/C++ para o `node-pty`.
+## Install
+
+Requirements: Linux, Node.js 20+ and a C/C++ compiler for `node-pty`.
 
 ```bash
 # Ubuntu/Debian
@@ -56,69 +60,71 @@ sudo apt install -y build-essential
 git clone https://github.com/GabrielAraujoGit/nexus.git
 cd nexus
 npm install
-npm run setup-pty    # compila o node-pty para o Electron
+npm run setup-pty    # builds node-pty for Electron
 npm start
 ```
 
-Para ver os ícones do prompt, instale uma [Nerd Font](https://www.nerdfonts.com/)
-(o NEXUS procura `MesloLGS NF` e depois `JetBrains Mono`).
+To see prompt icons, install a [Nerd Font](https://www.nerdfonts.com/)
+(NEXUS looks for `MesloLGS NF`, then `JetBrains Mono`).
 
-## Atalhos
+## Shortcuts
 
-| Tecla | Ação |
+| Key | Action |
 |---|---|
-| `F11` | Tela cheia |
-| `Ctrl+Shift+C` / `Ctrl+Shift+V` | Copiar / colar |
+| `F11` | Fullscreen |
+| `Ctrl+Shift+C` / `Ctrl+Shift+V` | Copy / paste |
 | `Ctrl+Shift+F12` | DevTools |
-| `exit` ou `Alt+F4` | Fechar |
+| `exit` or `Alt+F4` | Quit |
 
-## Segurança e privacidade
+## Security and privacy
 
-- A interface roda com `sandbox`, `contextIsolation` e sem `nodeIntegration`; só fala com o processo
-  principal por uma ponte IPC mínima (`src/preload.js`).
-- A CSP bloqueia scripts e conexões externas, e a janela não navega para fora do app.
-- **Nenhuma chamada para a internet por conta própria**: o ping vai só até o gateway da rede local e o globo não
-  geolocaliza nada. A rede só é usada quando você abre uma página no mini navegador.
-- O mini navegador é uma view separada: sandbox, sem acesso ao Node nem à ponte do app, sessão só em memória
-  (cookies somem ao fechar), permissões (câmera, microfone, localização, notificações) e downloads negados,
-  e só aceita http/https.
+- The UI runs with `sandbox` and `contextIsolation`, without `nodeIntegration`, and only talks to the main
+  process through a minimal IPC bridge (`src/preload.js`).
+- The CSP blocks external scripts and connections, and the window never navigates away from the app.
+- **No internet calls on its own**: the ping only goes to your local network gateway and the globe doesn't
+  geolocate anything. The network is only used when you open a page in the mini browser.
+- The mini browser is a separate view: sandboxed, with no access to Node or to the app's bridge, an in-memory
+  session (cookies are gone when you quit), permissions (camera, microphone, location, notifications) and
+  downloads denied, and http/https only.
 
-## Como funciona
+## How it works
 
 ```
 src/
-├── main.js          janela, shell (node-pty), métricas (systeminformation),
-│                    pasta atual do shell via /proc/<pid>/cwd
-├── web.js           mini navegador (WebContentsView isolada)
-├── preload.js       ponte IPC exposta como window.nexus
+├── main.js          window, shell (node-pty), metrics (systeminformation),
+│                    shell's current folder via /proc/<pid>/cwd
+├── web.js           mini browser (isolated WebContentsView)
+├── preload.js       IPC bridge exposed as window.nexus
 └── renderer/
-    ├── index.html   layout dos painéis
-    ├── style.css    temas (variáveis CSS) e grade
-    ├── app.js       liga terminal, painéis e dados
-    ├── graphs.js    gráficos de linha em canvas
-    ├── globe.js     globo wireframe
-    ├── keyboard.js  teclado ABNT2 na tela
-    └── web.js       janela flutuante do mini navegador
+    ├── index.html   panel layout
+    ├── style.css    themes (CSS variables) and grid
+    ├── app.js       wires terminal, panels and data
+    ├── graphs.js    canvas line charts
+    ├── globe.js     wireframe globe
+    ├── keyboard.js  on-screen ABNT2 keyboard
+    └── web.js       mini browser floating window
 ```
 
-## Capturas de tela
+## Screenshots
 
-As imagens acima são geradas por `npm run screenshots`, que roda o app em **modo demo**:
-usuário, máquina, IP, processos e pasta pessoal são fictícios, então dá para regerar sem expor nada seu.
+The images above are generated by `npm run screenshots`, which runs the app in **demo mode**:
+user, host, IP, processes and home folder are fake, so you can regenerate them without exposing anything of yours.
 
-## Próximos passos
+## Roadmap
 
-- [ ] Abas e divisão do terminal
-- [ ] Temas configuráveis por arquivo
-- [ ] Outros layouts de teclado (US, ISO)
-- [ ] Sons de interface (opcionais)
-- [ ] Painel de git (branch e mudanças da pasta atual)
-- [ ] Pacotes `.deb` e AppImage
+- [ ] Terminal tabs and splits
+- [ ] File-based custom themes
+- [ ] More keyboard layouts (US, ISO)
+- [ ] UI sounds (optional)
+- [ ] Git panel (branch and changes in the current folder)
+- [ ] English interface
+- [ ] `.deb` and AppImage packages
 
-## Contribuir
+## Contributing
 
-Contribuições são bem-vindas! Veja o [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) (in Portuguese for now;
+issues and PRs in English are fine).
 
-## Licença
+## License
 
 [MIT](LICENSE)
