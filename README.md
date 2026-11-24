@@ -7,11 +7,12 @@
 Inspirado no visual de filmes e no [eDEX-UI](https://github.com/GitSquared/edex-ui) (arquivado em 2021),
 reescrito do zero com dependências atuais e foco em segurança.
 
-![Electron](https://img.shields.io/badge/Electron-45-47848F?logo=electron&logoColor=white)
-![xterm.js](https://img.shields.io/badge/xterm.js-6-0A0A0A)
-![Linux](https://img.shields.io/badge/plataforma-Linux-FCC624?logo=linux&logoColor=black)
-![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Status](https://img.shields.io/badge/status-alpha-orange)
+![repo](https://img.shields.io/badge/Repository-nexus-black?style=for-the-badge&logo=github)
+![language](https://img.shields.io/badge/Language-JavaScript-blue?style=for-the-badge&logo=javascript&logoColor=white)
+![electron](https://img.shields.io/badge/Electron-45-47848F?style=for-the-badge&logo=electron&logoColor=white)
+![platform](https://img.shields.io/badge/Platform-Linux-black?style=for-the-badge&logo=linux&logoColor=white)
+![status](https://img.shields.io/badge/Status-Alpha-orange?style=for-the-badge)
+![license](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 </div>
 
