@@ -120,7 +120,7 @@ usuário, máquina, IP, processos e pasta pessoal são fictícios, então dá pa
 
 ## Contribuir
 
-Contribuições são bem-vindas! Veja o [CONTRIBUTING.md](CONTRIBUTING.md).
+Contribuições são bem-vindas! Veja o [CONTRIBUTING.pt-BR.md](CONTRIBUTING.pt-BR.md).
 
 ## Licença
 

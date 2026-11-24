@@ -122,8 +122,7 @@ user, host, IP, processes and home folder are fake, so you can regenerate them w
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) (in Portuguese for now;
-issues and PRs in English are fine).
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

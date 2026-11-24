@@ -1,8 +1,10 @@
-# Contribuindo com o NEXUS
+# Contributing to NEXUS
 
-Valeu pelo interesse! Algumas combinações para manter o projeto simples e seguro.
+**English · [Português (Brasil)](CONTRIBUTING.pt-BR.md)**
 
-## Rodando localmente
+Thanks for your interest! A few ground rules to keep the project simple and secure.
+
+## Running locally
 
 ```bash
 npm install
@@ -10,32 +12,33 @@ npm run setup-pty
 npm start
 ```
 
-`Ctrl+Shift+F12` abre o DevTools da interface.
+`Ctrl+Shift+F12` opens the UI's DevTools.
 
-## Antes de abrir um PR
+## Before opening a PR
 
-- **Uma mudança por PR**, com descrição do que muda e por quê. Mudança visual: inclua captura de tela.
-- Commits no formato [Conventional Commits](https://www.conventionalcommits.org/pt-br/)
+- **One change per PR**, describing what changes and why. Visual change: include a screenshot.
+- Commits follow [Conventional Commits](https://www.conventionalcommits.org/)
   (`feat: …`, `fix: …`, `docs: …`).
-- Sem bundler nem framework na interface: JavaScript puro em `src/renderer/`.
-- Dependência nova só se fizer falta de verdade, com versão exata (`npm install --save-exact`).
-- Rode `node --check` nos arquivos que mexeu e teste o app abrindo de verdade.
+- No bundler or framework in the UI: plain JavaScript in `src/renderer/`.
+- New dependencies only when truly needed, pinned to an exact version (`npm install --save-exact`).
+- Run `node --check` on the files you touched and test the app by actually opening it.
+- Issues and PRs in English or Portuguese are both fine.
 
-## Regras de segurança
+## Security rules
 
-- A interface continua com `sandbox`, `contextIsolation` e sem `nodeIntegration`.
-- Nada de `innerHTML` com dado externo (nome de arquivo, saída de comando, processo): use `textContent`.
-- O app não faz chamadas para a internet por conta própria. Se uma feature precisar, ela deve ser opcional e
-  só agir quando o usuário pedir (como o mini navegador).
-- A página do mini navegador nunca ganha preload, Node ou acesso à ponte `window.nexus`.
-- Novos canais IPC validam o que recebem no `main.js`.
+- The UI keeps `sandbox` and `contextIsolation`, without `nodeIntegration`.
+- No `innerHTML` with external data (file names, command output, processes): use `textContent`.
+- The app doesn't make internet calls on its own. If a feature needs the network, it must be optional and
+  only act when the user asks (like the mini browser).
+- The mini browser page never gets a preload, Node or access to the `window.nexus` bridge.
+- New IPC channels validate what they receive in `main.js`.
 
-## Capturas de tela
+## Screenshots
 
-Mudou o visual? Regere as imagens do README com:
+Changed the look? Regenerate the README images with:
 
 ```bash
 npm run screenshots
 ```
 
-Elas usam o modo demo, com dados fictícios. Nunca suba capturas com seu usuário, IP ou arquivos.
+They use demo mode, with fake data. Never commit screenshots showing your user, IP or files.
