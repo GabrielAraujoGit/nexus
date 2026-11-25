@@ -21,13 +21,12 @@
 
       <div class="block">
         <div id="clock" class="clock">00:00:00</div>
-      </div>
-
-      <div class="block info-grid">
-        <div><small id="year">----</small><b id="date">-- ---</b></div>
-        <div><small>Uptime</small><b id="uptime">0:00:00</b></div>
-        <div><small>Sistema</small><b>Linux</b></div>
-        <div><small>Energia</small><b id="power">Tomada</b></div>
+        <div class="info-grid">
+          <div><small id="year">----</small><b id="date">-- ---</b></div>
+          <div><small>Uptime</small><b id="uptime">0:00:00</b></div>
+          <div><small>Sistema</small><b>Linux</b></div>
+          <div><small>Energia</small><b id="power">Tomada</b></div>
+        </div>
       </div>
 
       <div class="block grow">
@@ -135,6 +134,8 @@
       <div id="keyboard" class="keyboard" aria-label="Teclado na tela"></div>
     </section>
   </main>
+
+  <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
 
   <!-- Mini navegador: a página é uma view isolada que o processo principal desenha sobre #web-slot -->
   <section id="web" class="webwin" hidden aria-label="Mini navegador">

@@ -281,8 +281,37 @@
       : 'Tomada';
   });
 
+  // ---------- Avisos (toasts) ----------
+  // tom: 'info' | 'ok' | 'warn' | 'crit'. Texto sempre por textContent. Até 3 na tela; somem em 6 s.
+  const TOAST_ICON = { info: 'i', ok: '✓', warn: '!', crit: '!' };
+  function toast(tone, title, text) {
+    const box = $('toasts');
+    const el = document.createElement('div');
+    el.className = `toast ${tone}`;
+    const icon = document.createElement('i');
+    icon.textContent = TOAST_ICON[tone] || 'i';
+    const t = document.createElement('b');
+    t.textContent = title;
+    const d = document.createElement('span');
+    d.textContent = text;
+    el.append(icon, t, d);
+    box.prepend(el);
+    while (box.children.length > 3) box.lastElementChild.remove();
+    setTimeout(() => {
+      el.classList.add('leaving');
+      el.addEventListener('animationend', () => el.remove(), { once: true });
+      setTimeout(() => el.remove(), 600); // sem animação (reduzir movimento): remove assim mesmo
+    }, 6000);
+  }
+  window.NexusToast = toast;
+
   // Alerta: painel pulsa e toca um aviso (no máximo uma vez por minuto para cada tipo).
   const ALERT_BLOCKS = { cpu: $('cpu-graph').closest('.block'), temp: $('temp').closest('span'), mem: $('mem-grid').closest('.block') };
+  const ALERT_TEXT = {
+    cpu: ['CPU no limite', 'Uso acima de 90%.'],
+    temp: ['Temperatura alta', 'Processador acima de 85 °C.'],
+    mem: ['Memória quase cheia', 'Mais de 90% da RAM em uso.'],
+  };
   const lastAlert = {};
   function alerts(state) {
     if (SNAPSHOT) return; // capturas de tela ficam sem alerta
@@ -291,6 +320,7 @@
       if (on && Date.now() - (lastAlert[kind] || 0) > 60000) {
         lastAlert[kind] = Date.now();
         sound.play('alert');
+        toast('crit', ...ALERT_TEXT[kind]);
       }
     }
   }
@@ -327,6 +357,7 @@
     }));
   }
 
+  let wasOnline = null;
   window.nexus.onSlow((s) => {
     $('tasks').textContent = s.tasks;
     const body = $('procs');
@@ -341,6 +372,11 @@
     }));
 
     const n = s.net;
+    if (wasOnline !== null && wasOnline !== n.online && !SNAPSHOT) {
+      if (n.online) toast('ok', 'Rede conectada', `${n.conn} · ${n.ip4}`);
+      else toast('warn', 'Rede desconectada', 'Sem endereço IPv4 na interface principal.');
+    }
+    wasOnline = n.online;
     $('net-state').textContent = n.online ? 'Online' : 'Offline';
     $('net-state').classList.toggle('lv-crit', !n.online);
     $('net-conn').textContent = n.conn;

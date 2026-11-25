@@ -74,12 +74,14 @@ class LineGraph {
     const step = w / (this.size - 1);
     this.data.forEach((series, i) => {
       const color = themeRGB(this.colors[i % this.colors.length]);
+      // curva suave: cada trecho vai até o ponto médio entre duas amostras (quadrática)
+      const ys = series.map((v) => h - (Math.min(v, max) / max) * (h - 2 * dpr) - dpr);
       ctx.beginPath();
-      series.forEach((v, x) => {
-        const y = h - (Math.min(v, max) / max) * (h - 2 * dpr) - dpr;
-        if (x === 0) ctx.moveTo(0, y);
-        else ctx.lineTo(x * step, y);
-      });
+      ctx.moveTo(0, ys[0]);
+      for (let x = 1; x < ys.length - 1; x++) {
+        ctx.quadraticCurveTo(x * step, ys[x], (x + 0.5) * step, (ys[x] + ys[x + 1]) / 2);
+      }
+      ctx.lineTo((ys.length - 1) * step, ys[ys.length - 1]);
       ctx.strokeStyle = `rgba(${color},0.95)`;
       ctx.lineWidth = 1.4 * dpr;
       ctx.shadowColor = `rgba(${color},0.7)`;
