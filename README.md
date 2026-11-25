@@ -1,11 +1,14 @@
 <div align="center">
 
+<img src="build/icon.png" width="96" height="96" alt="NEXUS icon">
+
 # NEXUS
 
-**A sci-fi terminal for Linux, with live system panels around your shell.**
+### Your shell, inside a sci-fi command center.
 
-Inspired by movie interfaces and by [eDEX-UI](https://github.com/GitSquared/edex-ui) (archived in 2021),
-rewritten from scratch with current dependencies and a focus on security.
+A Linux terminal wrapped in live panels for CPU, memory, network and files, plus a mini browser.<br>
+Inspired by movie interfaces and [eDEX-UI](https://github.com/GitSquared/edex-ui), rebuilt from scratch with
+security and performance in mind.
 
 ![repo](https://img.shields.io/badge/Repository-nexus-black?style=for-the-badge&logo=github)
 ![language](https://img.shields.io/badge/Language-JavaScript-blue?style=for-the-badge&logo=javascript&logoColor=white)
@@ -16,14 +19,77 @@ rewritten from scratch with current dependencies and a focus on security.
 
 **English · [Português (Brasil)](README.pt-BR.md)**
 
+[Download](https://github.com/GabrielAraujoGit/nexus/releases/latest) ·
+[Features](#features) ·
+[Screenshots](#screenshots) ·
+[Install](#install) ·
+[Security](#security-and-privacy) ·
+[Roadmap](#roadmap)
+
 </div>
 
-![NEXUS with the Tron theme](docs/screenshots/nexus-tron.png)
+<p align="center">
+  <img src="docs/demo.webp" width="100%" alt="NEXUS demo: boot, typing with the on-screen keyboard lighting up, a theme glitch and the mini browser opening like a CRT">
+</p>
+
+## Why NEXUS
+
+- **It's your real terminal.** Your `$SHELL` with your prompt, aliases, `tmux` and `vim`. The panels sit around it,
+  they don't replace it.
+- **eDEX-UI, rebuilt for today.** eDEX made sci-fi terminals famous but was archived in 2021. NEXUS starts fresh on
+  current Electron, with a sandboxed UI and no telemetry.
+- **Useful, not just pretty.** Per-core CPU, 1/5/15-minute averages, memory, disks, GPU, full network details,
+  latency and packet loss, all live and color-coded when something goes wrong.
+- **Light on your machine.** The globe renders in batches at 20 fps, slow metrics are cached, and nothing is
+  collected while the window is minimized.
+
+## Features
+
+**Terminal**
+- Your shell through `node-pty` + [xterm.js](https://xtermjs.org/): WebGL, 24-bit color, Nerd Fonts.
+- On-screen keyboard (Brazilian ABNT2) that lights up as you type and also types on click.
+- Files panel that follows your `cd`: click a folder to enter it, click a file to paste its name.
+
+**System panels**
+- **CPU**: 60 s area chart, per-core bars, 1/5/15 min averages, frequency and temperature
+  (yellow at 70 °C, red at 85 °C).
+- **Memory**: usage %, used, available, total and swap.
+- **Storage and GPU**: every real disk with used/total; GPU model and VRAM (usage and temperature on drivers that
+  expose them without root, such as NVIDIA).
+- **Processes**: top 6 by CPU and the task count.
+
+**Network**
+- Connection (Ethernet speed or Wi-Fi name), interface, full IPv4 and IPv6, gateway and DNS.
+- Latency and packet loss to your gateway (local network only).
+- 90 s download/upload chart with peaks and totals.
+
+**Mini browser**
+- A floating window (**Web** button) you can drag and resize, with address/search bar, back, forward and reload.
+- Runs isolated: sandboxed, no access to the app, in-memory session, permissions and downloads denied.
+
+**Look and feel**
+- 3 themes: **Tron**, **Cyberpunk** and **Amber**.
+- Synthesized UI sounds (no audio files), boot scan, theme glitch, CRT-style windows; all respect *reduce motion*,
+  and the **Som** button mutes them.
+- Alerts: panels turn red and a toast appears when CPU, temperature or memory hit the limit, or when the network
+  drops.
+
+> The interface text is in Brazilian Portuguese for now. An English UI is on the [roadmap](#roadmap).
+
+## Screenshots
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/nexus-cyberpunk.png" alt="NEXUS with the Cyberpunk theme"></td>
-    <td><img src="docs/screenshots/nexus-ambar.png" alt="NEXUS with the Amber theme"></td>
+    <td><img src="docs/screenshots/nexus-tron.png" alt="NEXUS with the Tron theme running fastfetch"></td>
+    <td><img src="docs/screenshots/nexus-web.png" alt="NEXUS with the mini browser open on this repository"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Tron</b></td>
+    <td align="center"><b>Mini browser</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/nexus-cyberpunk.png" alt="NEXUS with the Cyberpunk theme showing a file tree"></td>
+    <td><img src="docs/screenshots/nexus-ambar.png" alt="NEXUS with the Amber theme showing a README"></td>
   </tr>
   <tr>
     <td align="center"><b>Cyberpunk</b></td>
@@ -31,81 +97,55 @@ rewritten from scratch with current dependencies and a focus on security.
   </tr>
 </table>
 
-![NEXUS with the mini browser open on this repository](docs/screenshots/nexus-web.png)
-<p align="center"><b>Mini browser</b>: an isolated, sandboxed page floating over the panels</p>
-
-## Features
-
-- **A real terminal**: your shell (`$SHELL`) through `node-pty` + [xterm.js](https://xtermjs.org/), with WebGL,
-  24-bit color and Nerd Fonts. Your prompt (Starship, Oh My Bash, etc.) works as usual.
-- **CPU**: 60 s area chart, per-core bars, 1/5/15 min averages, frequency and temperature
-  (yellow ≥ 70 °C, red ≥ 85 °C).
-- **Memory, storage and GPU**: usage %, used/available/total and swap; each real disk with used/total;
-  GPU model and VRAM (usage and temperature on drivers that expose them without root, e.g. NVIDIA).
-- **Processes**: the top 6 by CPU and the task count, refreshed every 3 s.
-- **Network**: connection (Ethernet speed or Wi-Fi name), interface, full IPv4 and IPv6, gateway, DNS,
-  latency and packet loss to the gateway, and a 90 s download/upload chart with peaks and totals.
-- **Globe**: a spinning wireframe with nodes and links (decorative).
-- **Files**: shows the shell's current folder (follows `cd` on its own). Click a folder to enter it;
-  click a file to paste its name into the prompt.
-- **On-screen keyboard (Brazilian ABNT2)**: lights up as you type and also types on click.
-- **Mini browser**: the **WEB** button opens a floating window (drag it by the bar, resize it from the corner)
-  with an address/search bar (DuckDuckGo), back, forward and reload. http/https only.
-- **3 themes**: Tron, Cyberpunk and Amber, switched with the **TEMA** button.
-- **Sounds and animations**: typing clicks, boot chime, a scan sweep when the panels appear, a signal glitch when
-  switching themes, files cascading in after a `cd`, and the mini browser turning on like a CRT. Panels pulse red
-  when CPU ≥ 90%, temperature ≥ 85 °C or memory ≥ 90%. Sounds are synthesized live (no audio files) and the
-  **SOM** button mutes them; animations follow your system's *reduce motion* setting.
-
-> The interface text is in Brazilian Portuguese for now.
-
 ## Install
 
-### Download (x86_64)
+### Download (Linux x86_64)
 
-Grab the latest version from [Releases](https://github.com/GabrielAraujoGit/nexus/releases/latest):
+Get the latest `.deb` or AppImage from [Releases](https://github.com/GabrielAraujoGit/nexus/releases/latest):
 
 ```bash
 # Debian/Ubuntu: installs the "nexus" command and a menu entry
-sudo apt install ./nexus-0.1.0-amd64.deb
+sudo apt install ./nexus-*-amd64.deb
 
 # Any distro: AppImage (needs FUSE 2; on Ubuntu: sudo apt install libfuse2t64)
-chmod +x nexus-0.1.0-x86_64.AppImage
-./nexus-0.1.0-x86_64.AppImage
+chmod +x nexus-*-x86_64.AppImage && ./nexus-*-x86_64.AppImage
 ```
 
-Checksums are in `SHA256SUMS` (`sha256sum -c SHA256SUMS`).
+Verify downloads with `sha256sum -c SHA256SUMS`. On **Ubuntu 24.04+** prefer the `.deb`: it installs the
+AppArmor profile Chromium's sandbox needs, while the AppImage may be blocked by that restriction.
 
-On Ubuntu 24.04+, prefer the `.deb`: it installs the AppArmor profile the sandbox needs, while the AppImage
-may be blocked by the same restriction described below.
+For prompt icons, install a [Nerd Font](https://www.nerdfonts.com/) (NEXUS looks for `MesloLGS NF`, then
+`JetBrains Mono`).
 
 ### From source
 
 Requirements: Linux, Node.js 20+ and a C/C++ compiler for `node-pty`.
 
 ```bash
-# Ubuntu/Debian
-sudo apt install -y build-essential
-
-git clone https://github.com/GabrielAraujoGit/nexus.git
-cd nexus
+sudo apt install -y build-essential          # Debian/Ubuntu
+git clone https://github.com/GabrielAraujoGit/nexus.git && cd nexus
 npm install
-npm run setup-pty    # builds node-pty for Electron
+npm run setup-pty                            # builds node-pty for Electron
 npm start
-
-npm run dist          # optional: builds the AppImage and .deb into dist/
 ```
 
-On **Ubuntu 24.04+**, `npm start` may abort with *"The SUID sandbox helper binary was found, but is not
-configured correctly"*. Ubuntu restricts the user namespaces that Chromium's sandbox needs. Instead of turning the
-sandbox off, allow it just for this project's Electron with an AppArmor profile:
+<details>
+<summary><b>Ubuntu 24.04+: <code>npm start</code> aborts with "The SUID sandbox helper binary…"</b></summary>
+
+Ubuntu restricts the user namespaces Chromium's sandbox needs. Instead of turning the sandbox off, allow it
+only for this project's Electron with an AppArmor profile:
 
 ```bash
-sudo bash scripts/apparmor-dev.sh          # undo with: sudo bash scripts/apparmor-dev.sh remove
+sudo bash scripts/apparmor-dev.sh            # undo: sudo bash scripts/apparmor-dev.sh remove
 ```
+</details>
 
-To see prompt icons, install a [Nerd Font](https://www.nerdfonts.com/)
-(NEXUS looks for `MesloLGS NF`, then `JetBrains Mono`).
+| Command | What it does |
+|---|---|
+| `npm start` | Runs NEXUS |
+| `npm run dist` | Builds the AppImage and `.deb` into `dist/` |
+| `npm run screenshots` | Regenerates the README screenshots (demo mode) |
+| `npm run demo` | Records the animated demo (`docs/demo.webp` and `docs/demo.gif`) |
 
 ## Shortcuts
 
@@ -118,53 +158,58 @@ To see prompt icons, install a [Nerd Font](https://www.nerdfonts.com/)
 
 ## Security and privacy
 
-- The UI runs with `sandbox` and `contextIsolation`, without `nodeIntegration`, and only talks to the main
-  process through a minimal IPC bridge (`src/preload.js`).
-- The CSP blocks external scripts and connections, and the window never navigates away from the app.
-- **No internet calls on its own**: the ping only goes to your local network gateway and the globe doesn't
-  geolocate anything. The network is only used when you open a page in the mini browser.
-- The mini browser is a separate view: sandboxed, with no access to Node or to the app's bridge, an in-memory
-  session (cookies are gone when you quit), permissions (camera, microphone, location, notifications) and
-  downloads denied, and http/https only.
+- The UI runs with `sandbox` and `contextIsolation`, without `nodeIntegration`, and talks to the main process only
+  through a minimal IPC bridge (`src/preload.js`). A strict CSP blocks external scripts and connections.
+- **No internet calls on its own.** Ping and packet loss only go to your local gateway, fonts are bundled, and the
+  globe geolocates nothing. The network is only used when you open a page in the mini browser.
+- The mini browser is a separate, sandboxed view: no Node, no access to the app's bridge, in-memory session
+  (cookies are gone when you quit), permissions and downloads denied, http/https only.
+- Screenshots and the demo run in **demo mode** with fake user, host, network, processes, memory and files, in a
+  temporary profile, so nothing of yours ends up in an image.
 
 ## How it works
 
 ```
 src/
-├── main.js          window, shell (node-pty), metrics (systeminformation),
-│                    shell's current folder via /proc/<pid>/cwd
+├── main.js          window, shell (node-pty), metrics (systeminformation), capture modes
 ├── web.js           mini browser (isolated WebContentsView)
 ├── preload.js       IPC bridge exposed as window.nexus
 └── renderer/
     ├── index.html   panel layout
-    ├── style.css    themes (CSS variables) and grid
-    ├── app.js       wires terminal, panels and data
-    ├── graphs.js    canvas line charts
-    ├── globe.js     wireframe globe
+    ├── style.css    design tokens, themes and grid
+    ├── app.js       wires terminal, panels, alerts and toasts
+    ├── graphs.js    canvas charts
+    ├── globe.js     wireframe globe (batched rendering)
     ├── keyboard.js  on-screen ABNT2 keyboard
     ├── sound.js     synthesized UI sounds (Web Audio)
     └── web.js       mini browser floating window
 ```
 
-## Screenshots
-
-The images above are generated by `npm run screenshots`, which runs the app in **demo mode**: user, host, IP,
-network details, processes, memory, temperature and home folder are fake, and it uses its own temporary profile, so you
-can regenerate them without exposing anything of yours. The mini browser shot loads this repository's public page.
-
 ## Roadmap
 
-- [ ] Terminal tabs and splits
-- [ ] File-based custom themes
-- [ ] More keyboard layouts (US, ISO)
-- [x] UI sounds and animations
-- [ ] Git panel (branch and changes in the current folder)
-- [ ] English interface
+- [x] Live system and network panels, alerts and toasts
+- [x] Themes, sounds and animations
 - [x] `.deb` and AppImage packages
+- [ ] File explorer: path bar, search, list view, sorting, hidden files, right-click menu
+- [ ] Customization: theme picker, more themes, color intensity, panel transparency
+- [ ] English interface and more keyboard layouts (US, ISO)
+- [ ] Terminal tabs and splits
+- [ ] Process manager, sensors panel, notification center
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md). If you like NEXUS, a ⭐ helps other people
+find it.
+
+## Credits
+
+- Inspired by [eDEX-UI](https://github.com/GitSquared/edex-ui) by Gabriel Saillard (GPL-3.0); no code was reused.
+- Built with [Electron](https://www.electronjs.org/), [xterm.js](https://xtermjs.org/),
+  [node-pty](https://github.com/microsoft/node-pty) and
+  [systeminformation](https://systeminformation.io/).
+- Fonts [Rajdhani](https://fonts.google.com/specimen/Rajdhani) and
+  [Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono) via
+  [Fontsource](https://fontsource.org/), under the SIL Open Font License 1.1.
 
 ## License
 

@@ -68,9 +68,9 @@ function setupWeb(getWin) {
         nodeIntegration: false,
         webviewTag: false,
         spellcheck: false,
-        offscreen: Boolean(process.env.NEXUS_SNAPSHOT), // capturas: a página também renderiza fora da tela
+        offscreen: Boolean(process.env.NEXUS_CAPTURE), // capturas: a página também renderiza fora da tela
         // capturas em 2x: a página acompanha o zoom da interface (zoomFactor vale para toda navegação)
-        zoomFactor: process.env.NEXUS_SNAPSHOT ? Number(process.env.NEXUS_SNAPSHOT_SCALE) || 2 : 1,
+        zoomFactor: process.env.NEXUS_CAPTURE ? Number(process.env.NEXUS_SNAPSHOT_SCALE) || 2 : 1,
       },
     });
     view.setBackgroundColor('#ffffff');

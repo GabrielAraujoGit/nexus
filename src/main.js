@@ -36,7 +36,12 @@ let lastCwd = null;
 const timers = [];
 
 // Capturas de tela usam um perfil temporário: não leem nem gravam tema, som etc. de quem roda.
-if (process.env.NEXUS_SNAPSHOT) {
+// Modo de captura (fora da tela, tamanho fixo, dados demo): print (NEXUS_SNAPSHOT) ou gravação (NEXUS_RECORD).
+if (process.env.NEXUS_RECORD) process.env.NEXUS_CAPTURE = 'record';
+else if (process.env.NEXUS_SNAPSHOT) process.env.NEXUS_CAPTURE = 'snapshot';
+const CAPTURE = process.env.NEXUS_CAPTURE || '';
+
+if (CAPTURE) {
   // pasta fixa, zerada a cada captura (apagar na saída falha: o Chromium ainda grava depois do quit)
   const profile = path.join(os.tmpdir(), `nexus-snapshot-${process.getuid?.() ?? 'user'}`);
   require('node:fs').rmSync(profile, { recursive: true, force: true });
@@ -44,7 +49,7 @@ if (process.env.NEXUS_SNAPSHOT) {
 }
 
 function createWindow() {
-  const snapshotMode = Boolean(process.env.NEXUS_SNAPSHOT);
+  const snapshotMode = Boolean(CAPTURE);
   win = new BrowserWindow({
     width: 1600,
     height: 950,
@@ -69,7 +74,8 @@ function createWindow() {
   const theme = process.env.NEXUS_THEME;
   const query = {};
   if (theme) query.theme = theme;
-  if (snapshotMode) query.snapshot = '1'; // capturas: sem som e sem animações
+  if (snapshotMode) query.snapshot = '1'; // capturas: sem som, sem alertas, com histórico fictício
+  if (CAPTURE === 'record') query.record = '1'; // gravação: animações ligadas
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'), { query });
   // página (re)carregada: reenvia a lista de arquivos
   win.webContents.on('did-finish-load', () => {
@@ -88,6 +94,40 @@ function createWindow() {
     win.maximize();
     win.show();
   });
+
+  // NEXUS_RECORD=/pasta: grava quadros PNG (NEXUS_RECORD_FPS, NEXUS_RECORD_SECONDS) enquanto o
+  // roteiro NEXUS_SNAPSHOT_JS roda; scripts/demo.sh junta os quadros em GIF/WebP.
+  if (CAPTURE === 'record') {
+    // Offscreen: o Electron entrega cada quadro pintado no evento 'paint'. Guardamos o último e o
+    // amostramos no ritmo do vídeo (quadro repetido quando nada mudou), em JPEG por ser rápido.
+    const dir = process.env.NEXUS_RECORD;
+    const fps = Number(process.env.NEXUS_RECORD_FPS) || 10;
+    const total = Math.round((Number(process.env.NEXUS_RECORD_SECONDS) || 12) * fps);
+    let latest = null;
+    win.webContents.setFrameRate(Math.max(fps * 2, 30));
+    win.webContents.on('paint', (_e, _dirty, image) => { latest = image; });
+    win.webContents.once('did-finish-load', async () => {
+      await fs.mkdir(dir, { recursive: true });
+      if (process.env.NEXUS_SNAPSHOT_JS) {
+        win.webContents.executeJavaScript(process.env.NEXUS_SNAPSHOT_JS).catch((err) => console.error(err.message));
+      }
+      // página do mini navegador dentro da moldura (a view não entra nos quadros da janela)
+      const webTimer = setInterval(async () => {
+        const page = await web.capture().catch(() => null);
+        if (page) send('web:snapshot', page.toDataURL());
+      }, 1000);
+      const writes = [];
+      const start = Date.now();
+      for (let i = 0; i < total; i++) {
+        const due = start + (i * 1000) / fps;
+        await new Promise((r) => setTimeout(r, Math.max(0, due - Date.now())));
+        if (latest) writes.push(fs.writeFile(path.join(dir, `frame-${String(i).padStart(4, '0')}.jpg`), latest.toJPEG(90)));
+      }
+      clearInterval(webTimer);
+      await Promise.all(writes);
+      app.quit();
+    });
+  }
 
   // NEXUS_SNAPSHOT=/caminho.png: tira um print da janela e fecha (para testes).
   const snapshot = process.env.NEXUS_SNAPSHOT;
@@ -385,7 +425,7 @@ async function slowTick() { // 3 s: processos
 }
 
 // Janela minimizada ou escondida: não coleta nada (as capturas usam janela fora da tela, então seguem).
-const idle = () => !process.env.NEXUS_SNAPSHOT && (!win || win.isDestroyed() || win.isMinimized() || !win.isVisible());
+const idle = () => !CAPTURE && (!win || win.isDestroyed() || win.isMinimized() || !win.isVisible());
 
 function loop(fn, ms) {
   let busy = false; // não empilha chamadas se uma coleta demorar mais que o intervalo

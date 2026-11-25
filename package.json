@@ -8,7 +8,8 @@
     "start": "electron .",
     "setup-pty": "npm install --save-exact node-pty@1.1.0 && npx --yes @electron/rebuild@4.2.1 -f -w node-pty",
     "screenshots": "bash scripts/screenshots.sh",
-    "dist": "electron-builder --linux AppImage deb"
+    "dist": "electron-builder --linux AppImage deb",
+    "demo": "bash scripts/demo.sh"
   },
   "license": "MIT",
   "dependencies": {

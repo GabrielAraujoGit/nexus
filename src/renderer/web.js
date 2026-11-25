@@ -12,7 +12,8 @@
   let hasPage = false;
   let animating = false; // durante a animação a view nativa fica escondida (ela não anima)
   const sound = window.NexusSound;
-  const noMotion = () => document.documentElement.classList.contains('snapshot')
+  const RECORD = new URLSearchParams(location.search).has('record');
+  const noMotion = () => (document.documentElement.classList.contains('snapshot') && !RECORD)
     || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function sync() {
