@@ -33,6 +33,11 @@ em segurança e desempenho.
   <img src="docs/demo.webp" width="100%" alt="Demo do NEXUS: inicialização, digitação com o teclado na tela acendendo, falha de sinal ao trocar de tema e o mini navegador abrindo como um monitor CRT">
 </p>
 
+<p align="center">
+  <a href="https://github.com/gabterm/nexus/blob/main/docs/promo-pt.mp4"><img src="docs/promo-poster-pt.jpg" width="640" alt="Assista ao trailer do NEXUS (vídeo de 18 segundos)"></a><br>
+  <sub><b>Trailer</b> (18 s) · <a href="https://github.com/gabterm/nexus/blob/main/docs/promo-pt.mp4">assistir</a> · <a href="https://github.com/gabterm/nexus/raw/main/docs/promo-pt.mp4">baixar MP4</a></sub>
+</p>
+
 ## Por que o NEXUS
 
 - **É o seu terminal de verdade.** Seu `$SHELL` com prompt, aliases, `tmux` e `vim`. Os painéis ficam em volta,

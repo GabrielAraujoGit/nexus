@@ -33,6 +33,11 @@ security and performance in mind.
   <img src="docs/demo.webp" width="100%" alt="NEXUS demo: boot, typing with the on-screen keyboard lighting up, a theme glitch and the mini browser opening like a CRT">
 </p>
 
+<p align="center">
+  <a href="https://github.com/gabterm/nexus/blob/main/docs/promo-en.mp4"><img src="docs/promo-poster-en.jpg" width="640" alt="Watch the NEXUS trailer (18-second video)"></a><br>
+  <sub><b>Trailer</b> (18 s) · <a href="https://github.com/gabterm/nexus/blob/main/docs/promo-en.mp4">watch</a> · <a href="https://github.com/gabterm/nexus/raw/main/docs/promo-en.mp4">download MP4</a></sub>
+</p>
+
 ## Why NEXUS
 
 - **It's your real terminal.** Your `$SHELL` with your prompt, aliases, `tmux` and `vim`. The panels sit around it,
