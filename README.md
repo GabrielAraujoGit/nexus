@@ -21,7 +21,7 @@ security and performance in mind.
 
 [Download](https://github.com/gabterm/nexus/releases/latest) ·
 [Features](#features) ·
-[Screenshots](#screenshots) ·
+[Visual tour](#visual-tour) ·
 [Install](#install) ·
 [Security](#security-and-privacy) ·
 [Roadmap](#roadmap)
@@ -68,7 +68,8 @@ security and performance in mind.
 - Runs isolated: sandboxed, no access to the app, in-memory session, permissions and downloads denied.
 
 **Look and feel**
-- 3 themes: **Tron**, **Cyberpunk** and **Amber**.
+- HUD-style layout: thin rules instead of boxes, a dot-grid backdrop, an angled terminal tab and floating keys.
+- 3 themes with muted, monitor-like palettes: **Tron**, **Cyberpunk** and **Amber**.
 - An opening sequence: the screen switches on like a CRT, the icon draws itself and the name decodes (any key skips it).
 - Synthesized UI sounds (no audio files), boot scan, theme glitch, CRT-style windows; all respect *reduce motion*,
   and the **Som** button mutes them.
@@ -77,7 +78,40 @@ security and performance in mind.
 
 > The interface text is in Brazilian Portuguese for now. An English UI is on the [roadmap](#roadmap).
 
-## Screenshots
+## Visual tour
+
+<table>
+  <tr>
+    <td colspan="2" align="center">
+      <img src="docs/intro.webp" width="640" alt="NEXUS opening: the screen switches on like a CRT, the icon draws itself and the name decodes"><br>
+      <sub><b>The opening</b>: CRT switch-on, the icon draws itself, the name decodes and the boot log fills the bar</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <img src="docs/screenshots/detail-system.png" alt="System panel: clock, CPU chart with per-core bars and 1/5/15 min averages, memory and storage"><br>
+      <sub><b>System</b>: CPU history, per-core bars, 1/5/15 min averages, memory dot grid, disks and GPU</sub>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <img src="docs/screenshots/detail-network.png" alt="Network panel: connection, IPv4, IPv6, gateway, DNS, latency, top processes and traffic chart"><br>
+      <sub><b>Network</b>: full addresses, DNS, latency and packet loss, top processes and live traffic</sub>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <img src="docs/screenshots/detail-keyboard.png" alt="On-screen keyboard with floating keys in the Amber theme"><br>
+      <sub><b>On-screen keyboard</b>: floating keys that light up as you type and type on click</sub>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <img src="docs/screenshots/themes.png" alt="The same screen in the Tron, Cyberpunk and Amber themes"><br>
+      <sub><b>Tron · Cyberpunk · Amber</b>: muted, monitor-like palettes; strong color only for details and alerts</sub>
+    </td>
+  </tr>
+</table>
+
+### Full screens
 
 <table>
   <tr>

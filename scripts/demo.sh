@@ -73,4 +73,19 @@ gif = [f.resize((960, 540), Image.LANCZOS).quantize(colors=128, method=Image.Qua
 gif[0].save("docs/demo.gif", save_all=True, append_images=gif[1:], duration=ms, loop=0, optimize=True)
 print(f"{len(frames)} quadros")
 PY
-ls -lh docs/demo.webp docs/demo.gif
+echo "==> gravando a abertura"
+INTRO=$(mktemp -d)
+NEXUS_DEMO=1 NEXUS_DEMO_HOME="$DEMO_HOME" NEXUS_THEME=cyberpunk \
+NEXUS_RECORD="$INTRO" NEXUS_RECORD_FPS=15 NEXUS_RECORD_SECONDS=3.4 NEXUS_SNAPSHOT_SCALE=1 \
+  ./node_modules/.bin/electron . >/dev/null 2>&1
+python3 - "$INTRO" <<'PY'
+import glob, sys
+from PIL import Image
+files = sorted(glob.glob(f"{sys.argv[1]}/frame-*.jpg"))
+# recorte central (a abertura acontece no meio da tela) em 960x540
+frames = [Image.open(f).convert("RGB").crop((320, 180, 1280, 720)) for f in files]
+frames[0].save("docs/intro.webp", save_all=True, append_images=frames[1:], duration=int(1000 / 15), loop=0, quality=80, method=6)
+print(f"abertura: {len(frames)} quadros")
+PY
+rm -rf "${INTRO:?}"
+ls -lh docs/demo.webp docs/demo.gif docs/intro.webp

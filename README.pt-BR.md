@@ -21,7 +21,7 @@ em segurança e desempenho.
 
 [Baixar](https://github.com/gabterm/nexus/releases/latest) ·
 [Recursos](#recursos) ·
-[Capturas](#capturas-de-tela) ·
+[Tour visual](#tour-visual) ·
 [Instalar](#instalar) ·
 [Segurança](#segurança-e-privacidade) ·
 [Próximos passos](#próximos-passos)
@@ -69,14 +69,48 @@ em segurança e desempenho.
 - Roda isolado: sandbox, sem acesso ao app, sessão só em memória, permissões e downloads negados.
 
 **Visual**
-- 3 temas: **Tron**, **Cyberpunk** e **Âmbar**.
+- Visual de HUD: linhas finas no lugar de caixas, fundo com grade de pontos, aba angulada no terminal e teclas flutuantes.
+- 3 temas com paletas suaves, de monitor: **Tron**, **Cyberpunk** e **Âmbar**.
 - Abertura: a tela liga como um monitor CRT, o ícone se desenha e o nome é decodificado (qualquer tecla pula).
 - Sons sintetizados (sem arquivos de áudio), varredura no boot, falha de sinal ao trocar de tema e janelas estilo CRT;
   tudo respeita *reduzir movimento* e o botão **Som** desliga.
 - Alertas: o painel fica vermelho e aparece um aviso quando CPU, temperatura ou memória chegam ao limite, ou quando a
   rede cai.
 
-## Capturas de tela
+## Tour visual
+
+<table>
+  <tr>
+    <td colspan="2" align="center">
+      <img src="docs/intro.webp" width="640" alt="Abertura do NEXUS: a tela liga como um CRT, o ícone se desenha e o nome é decodificado"><br>
+      <sub><b>A abertura</b>: a tela liga como um CRT, o ícone se desenha, o nome é decodificado e o log enche a barra</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <img src="docs/screenshots/detail-system.png" alt="Painel de sistema: relógio, gráfico de CPU com barra por núcleo e médias de 1/5/15 min, memória e armazenamento"><br>
+      <sub><b>Sistema</b>: histórico de CPU, barra por núcleo, médias de 1/5/15 min, grade de memória, discos e GPU</sub>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <img src="docs/screenshots/detail-network.png" alt="Painel de rede: conexão, IPv4, IPv6, gateway, DNS, latência, processos e gráfico de tráfego"><br>
+      <sub><b>Rede</b>: endereços completos, DNS, latência e perda de pacotes, processos e tráfego ao vivo</sub>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <img src="docs/screenshots/detail-keyboard.png" alt="Teclado na tela com teclas flutuantes no tema Âmbar"><br>
+      <sub><b>Teclado na tela</b>: teclas flutuantes que acendem enquanto você digita e digitam no clique</sub>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <img src="docs/screenshots/themes.png" alt="A mesma tela nos temas Tron, Cyberpunk e Âmbar"><br>
+      <sub><b>Tron · Cyberpunk · Âmbar</b>: paletas suaves, de monitor; cor forte só em detalhes e alertas</sub>
+    </td>
+  </tr>
+</table>
+
+### Telas completas
 
 <table>
   <tr>

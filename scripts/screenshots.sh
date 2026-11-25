@@ -36,3 +36,6 @@ shot ambar     nexus-ambar.png     "clear && cd ~/projetos/nexus && $BAT --pagin
 shot tron      nexus-web.png       "clear && cd ~/projetos/nexus" "$WEB_JS" 8000
 
 echo "Pronto: $(ls "$OUT")"
+
+# Recortes de detalhe e faixa dos temas para o tour do README
+python3 scripts/details.py
