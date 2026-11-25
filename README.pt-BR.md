@@ -69,6 +69,9 @@ chmod +x nexus-0.1.0-x86_64.AppImage
 
 Os checksums estão em `SHA256SUMS` (`sha256sum -c SHA256SUMS`).
 
+No Ubuntu 24.04+, prefira o `.deb`: ele instala o perfil AppArmor que o sandbox precisa, enquanto o AppImage
+pode ser bloqueado pela mesma restrição descrita abaixo.
+
 ### Pelo código-fonte
 
 Pré-requisitos: Linux, Node.js 20+ e um compilador C/C++ para o `node-pty`.
@@ -84,6 +87,14 @@ npm run setup-pty    # compila o node-pty para o Electron
 npm start
 
 npm run dist          # opcional: gera o AppImage e o .deb em dist/
+```
+
+No **Ubuntu 24.04+**, o `npm start` pode abortar com *"The SUID sandbox helper binary was found, but is not
+configured correctly"*. O Ubuntu restringe os user namespaces que o sandbox do Chromium usa. Em vez de desligar o
+sandbox, libere só o Electron deste projeto com um perfil AppArmor:
+
+```bash
+sudo bash scripts/apparmor-dev.sh          # para desfazer: sudo bash scripts/apparmor-dev.sh remove
 ```
 
 Para ver os ícones do prompt, instale uma [Nerd Font](https://www.nerdfonts.com/)
