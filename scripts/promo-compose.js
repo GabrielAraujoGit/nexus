@@ -1,25 +1,44 @@
 'use strict';
 // Monta o vídeo de divulgação: quadros gravados do NEXUS + legendas em estilo HUD + cartela final,
 // gravados de um canvas com o MediaRecorder do Electron em MP4 (H.264), formato aceito pelo X.
-//   electron scripts/promo-compose.js <pasta-dos-quadros> <saida.mp4>
+//   electron scripts/promo-compose.js <pasta-dos-quadros> <saida.mp4> [en|pt]
 // Ferramenta local: a página só carrega arquivos deste projeto.
 const { app, BrowserWindow, ipcMain } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const [framesDir, outFile] = process.argv.slice(-2).map((p) => path.resolve(p));
+const args = process.argv.slice(-3);
+const LANG = ['en', 'pt'].includes(args[2]) ? args[2] : 'en';
+const [framesDir, outFile] = (LANG === args[2] ? args.slice(0, 2) : process.argv.slice(-2)).map((p) => path.resolve(p));
 const ROOT = path.resolve(__dirname, '..');
 const FPS = 30;
 const W = 1920;
 const H = 1080;
 
-// Legendas: [início s, fim s, título, subtítulo]
-const CAPTIONS = [
-  [3.9, 6.6, 'Your real shell.', 'Starship, aliases, tmux, vim: it all just works.'],
-  [6.8, 8.9, 'Live system panels.', 'CPU per core, memory, disks, network, latency.'],
-  [9.0, 12.7, 'Three themes.', 'Tron · Cyberpunk · Amber'],
-  [13.1, 17.6, 'A sandboxed mini browser.', 'Isolated, in-memory session. No telemetry.'],
-];
+// Legendas: [início s, fim s, título, subtítulo] e textos da cartela final, por idioma
+const TEXT = {
+  en: {
+    captions: [
+      [3.9, 6.6, 'Your real shell.', 'Starship, aliases, tmux, vim: it all just works.'],
+      [6.8, 8.9, 'Live system panels.', 'CPU per core, memory, disks, network, latency.'],
+      [9.0, 12.7, 'Three themes.', 'Tron · Cyberpunk · Amber'],
+      [13.1, 17.6, 'A sandboxed mini browser.', 'Isolated, in-memory session. No telemetry.'],
+    ],
+    tagline: 'A sci-fi terminal for Linux',
+    meta: 'Open source · MIT · Free',
+  },
+  pt: {
+    captions: [
+      [3.9, 6.6, 'O seu shell de verdade.', 'Starship, aliases, tmux, vim: tudo funciona igual.'],
+      [6.8, 8.9, 'Painéis ao vivo.', 'CPU por núcleo, memória, discos, rede, latência.'],
+      [9.0, 12.7, 'Três temas.', 'Tron · Cyberpunk · Âmbar'],
+      [13.1, 17.6, 'Mini navegador isolado.', 'Sandbox, sessão só em memória. Sem telemetria.'],
+    ],
+    tagline: 'Um terminal sci-fi para Linux',
+    meta: 'Código aberto · MIT · Grátis',
+  },
+}[LANG];
+const CAPTIONS = TEXT.captions;
 const END_CARD = 4; // segundos
 const CROSSFADE = 0.6;
 
@@ -123,10 +142,10 @@ async function loadImg(p) { const i = new Image(); i.src = url(p); await i.decod
     ctx.letterSpacing = '0px';
     ctx.fillStyle = 'rgba(170,207,209,0.9)';
     ctx.font = '500 48px Rajdhani';
-    ctx.fillText('A sci-fi terminal for Linux', 0, 90);
+    ctx.fillText(${JSON.stringify(TEXT.tagline)}, 0, 90);
     ctx.fillStyle = 'rgba(170,207,209,0.6)';
     ctx.font = '500 34px Rajdhani';
-    ctx.fillText('Open source · MIT · Free', 0, 150);
+    ctx.fillText(${JSON.stringify(TEXT.meta)}, 0, 150);
     ctx.fillStyle = 'rgb(120,220,235)';
     ctx.font = '400 40px ShareTech';
     ctx.fillText('github.com/gabterm/nexus', 0, 250);
