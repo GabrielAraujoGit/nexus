@@ -452,7 +452,22 @@ function loop(fn, ms) {
 ipcMain.handle('sys:static', () => staticInfo());
 const web = setupWeb(() => win);
 
+// Uma janela só: rodar `nexus` de novo traz a janela aberta para a frente (e a restaura se minimizada).
+// Capturas usam perfil próprio, então não esbarram na janela de quem está usando o app.
+const primary = Boolean(CAPTURE) || app.requestSingleInstanceLock();
+if (!primary) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (!win || win.isDestroyed()) return;
+    if (win.isMinimized()) win.restore();
+    win.show();
+    win.focus();
+  });
+}
+
 app.whenReady().then(() => {
+  if (!primary) return; // segunda instância: só avisou a primeira e está saindo
   createWindow();
   loop(sensorsTick, 5000);
   loop(diskTick, 30000);
