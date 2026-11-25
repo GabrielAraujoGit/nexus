@@ -19,7 +19,7 @@ em segurança e desempenho.
 
 **[English](README.md) · Português (Brasil)**
 
-[Baixar](https://github.com/GabrielAraujoGit/nexus/releases/latest) ·
+[Baixar](https://github.com/gabterm/nexus/releases/latest) ·
 [Recursos](#recursos) ·
 [Capturas](#capturas-de-tela) ·
 [Instalar](#instalar) ·
@@ -100,7 +100,7 @@ em segurança e desempenho.
 
 ### Baixar (Linux x86_64)
 
-Pegue o `.deb` ou o AppImage mais recente em [Releases](https://github.com/GabrielAraujoGit/nexus/releases/latest):
+Pegue o `.deb` ou o AppImage mais recente em [Releases](https://github.com/gabterm/nexus/releases/latest):
 
 ```bash
 # Debian/Ubuntu: instala o comando "nexus" e o atalho no menu
@@ -122,7 +122,7 @@ Pré-requisitos: Linux, Node.js 20+ e um compilador C/C++ para o `node-pty`.
 
 ```bash
 sudo apt install -y build-essential          # Debian/Ubuntu
-git clone https://github.com/GabrielAraujoGit/nexus.git && cd nexus
+git clone https://github.com/gabterm/nexus.git && cd nexus
 npm install
 npm run setup-pty                            # compila o node-pty para o Electron
 npm start

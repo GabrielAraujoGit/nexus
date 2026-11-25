@@ -23,19 +23,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/GabrielAraujoGit/nexus.git"
+    "url": "https://github.com/gabterm/nexus.git"
   },
   "devDependencies": {
     "electron": "45.4.1",
     "electron-builder": "26.0.12"
   },
   "author": {
-    "name": "Gabriel Araujo",
-    "email": "86240279+GabrielAraujoGit@users.noreply.github.com"
+    "name": "gabterm",
+    "email": "86240279+gabterm@users.noreply.github.com"
   },
-  "homepage": "https://github.com/GabrielAraujoGit/nexus",
+  "homepage": "https://github.com/gabterm/nexus",
   "build": {
-    "appId": "io.github.gabrielaraujogit.nexus",
+    "appId": "io.github.gabterm.nexus",
     "productName": "NEXUS",
     "artifactName": "nexus-${version}-${arch}.${ext}",
     "directories": {
@@ -55,7 +55,7 @@
       "icon": "build/icon.png",
       "executableName": "nexus",
       "synopsis": "Sci-fi terminal with live system panels",
-      "maintainer": "Gabriel Araujo <86240279+GabrielAraujoGit@users.noreply.github.com>"
+      "maintainer": "gabterm <86240279+gabterm@users.noreply.github.com>"
     },
     "deb": {
       "depends": [

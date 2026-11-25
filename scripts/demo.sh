@@ -43,7 +43,7 @@ read -r -d '' SCENE <<'JS' || true
   Object.assign($('web').style, { left: '560px', top: '90px', width: '720px', height: '430px', right: 'auto' });
   $('web-btn').click();
   await sleep(500);
-  $('web-url').value = 'github.com/GabrielAraujoGit/nexus';
+  $('web-url').value = 'github.com/gabterm/nexus';
   $('web-form').requestSubmit();
   await sleep(3600);
   $('web-close').click();
