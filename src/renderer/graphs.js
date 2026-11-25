@@ -31,6 +31,7 @@ class LineGraph {
     this.colors = opts.colors || ['--rgb', '--accent-rgb'];
     this.area = Boolean(opts.area);
     this.yLabels = Boolean(opts.yLabels);
+    this.format = opts.format || ((v) => `${Math.round(v)}%`);
     this.data = Array.from({ length: opts.series }, () => new Array(this.size).fill(0));
   }
 
@@ -101,14 +102,14 @@ class LineGraph {
       }
     });
 
-    if (this.yLabels && this.max) {
+    if (this.yLabels) {
       ctx.font = `${9 * dpr}px "Share Tech Mono", monospace`;
       ctx.fillStyle = `rgba(${rgb},0.55)`;
       ctx.textAlign = 'right';
       ctx.textBaseline = 'top';
-      ctx.fillText(`${this.max}%`, w - 2 * dpr, 2 * dpr);
+      ctx.fillText(this.format(max), w - 2 * dpr, 2 * dpr);
       ctx.textBaseline = 'middle';
-      ctx.fillText(`${this.max / 2}%`, w - 2 * dpr, h / 2);
+      ctx.fillText(this.format(max / 2), w - 2 * dpr, h / 2);
     }
   }
 }

@@ -145,20 +145,36 @@
   setInterval(clock, 1000);
 
   // ---------- Memória (grade de pontos) ----------
-  const MEM_DOTS = 40 * 6;
+  const MEM_DOTS = 40 * 4;
   const memGrid = $('mem-grid');
   for (let i = 0; i < MEM_DOTS; i++) memGrid.append(document.createElement('i'));
   const memCells = [...memGrid.children];
 
-  // ---------- Gráficos ----------
-  // CPU: 60 s de histórico em área, com escala; barras por núcleo logo abaixo
-  const cpuGraph = new LineGraph($('cpu-graph'), { series: 1, max: 100, size: 60, area: true, yLabels: true });
-  const coreBars = [];
-  let cpuSamples = 0;
-  if (SNAPSHOT) { // capturas do README: histórico fictício e suave, para o gráfico não sair vazio
-    cpuGraph.data[0] = cpuGraph.data[0].map((_, i) => 28 + 14 * Math.sin(i / 6) + 6 * Math.sin(i / 2.3));
-    cpuSamples = cpuGraph.size;
+  // Cor por faixa: normal, atenção e crítico (temperatura, memória, disco).
+  function level(el, value, warn, crit) {
+    el.classList.toggle('lv-warn', value >= warn && value < crit);
+    el.classList.toggle('lv-crit', value >= crit);
   }
+
+  // ---------- CPU ----------
+  // 60 s de histórico em área, com escala; barras por núcleo; médias de 1, 5 e 15 min
+  const cpuGraph = new LineGraph($('cpu-graph'), { series: 1, max: 100, size: 60, area: true, yLabels: true });
+  const CPU_HISTORY = 15 * 60; // 15 min de amostras de 1 s para as médias
+  const cpuHistory = [];
+  if (SNAPSHOT) { // capturas do README: histórico fictício e suave, para os gráficos não saírem vazios
+    cpuGraph.data[0] = cpuGraph.data[0].map((_, i) => 28 + 14 * Math.sin(i / 6) + 6 * Math.sin(i / 2.3));
+    for (let i = 0; i < CPU_HISTORY; i++) cpuHistory.push(24 + 10 * Math.sin(i / 40));
+  }
+  const average = (arr) => arr.reduce((x, y) => x + y, 0) / arr.length;
+  function cpuAverages() {
+    // até a janela encher, a média usa o que tem e o rótulo ganha "~"
+    [[1, 'cpu-1'], [5, 'cpu-5'], [15, 'cpu-15']].forEach(([min, id]) => {
+      const n = min * 60;
+      const part = cpuHistory.slice(-n);
+      $(id).textContent = part.length ? `${part.length < n ? '~' : ''}${average(part).toFixed(0)}%` : '—';
+    });
+  }
+  const coreBars = [];
   function ensureCoreBars(n) {
     if (coreBars.length === n) return;
     const box = $('core-bars');
@@ -176,42 +192,88 @@
       coreBars.push(bar);
     }
   }
-  const netGraph = new LineGraph($('net-graph'), { series: 2, size: 90 });
+
+  // ---------- Rede (gráfico) ----------
+  const netGraph = new LineGraph($('net-graph'), { series: 2, size: 90, area: true, yLabels: true, format: (v) => bytes(v, '/s') });
+  if (SNAPSHOT) {
+    netGraph.data[0] = netGraph.data[0].map((_, i) => 180e3 + 140e3 * Math.max(0, Math.sin(i / 7)) + 40e3 * Math.sin(i * 1.7));
+    netGraph.data[1] = netGraph.data[1].map((_, i) => 30e3 + 25e3 * Math.max(0, Math.sin(i / 5 + 1)));
+  }
   new window.NexusGlobe($('globe'));
 
+  // ---------- Dados fixos ----------
+  // "CoffeeLake-S GT2 [UHD Graphics 630]" → "UHD Graphics 630"
+  const gpuName = (g) => (g.model.match(/\[([^\]]+)\]/)?.[1] || g.model).trim();
+  let gpuStatic = null;
   window.nexus.staticInfo().then((info) => {
     $('cpu-model').textContent = info.cpu;
-    $('cores').textContent = info.cores;
+    $('cpu-model').title = `${info.cpu} · ${info.cores} núcleos`;
     $('host').textContent = `${info.user}@${info.hostname} · ${info.distro} · kernel ${info.kernel}`;
     ensureCoreBars(info.cores);
+    gpuStatic = info.gpus[0] || null;
+    $('gpu-model').textContent = gpuStatic ? `GPU ${gpuName(gpuStatic)}` : 'sem GPU detectada';
+    $('gpu-model').title = gpuStatic ? `${gpuStatic.vendor} ${gpuStatic.model}` : '';
+    renderGpu(null);
   }).catch(() => {});
 
+  function renderGpu(live) {
+    if (!gpuStatic) {
+      $('gpu-info').textContent = '—';
+      return;
+    }
+    const vram = gpuStatic.vram ? `${gpuStatic.vram >= 1024 ? `${(gpuStatic.vram / 1024).toFixed(0)} GB` : `${gpuStatic.vram} MB`} VRAM` : '';
+    if (live && Number.isFinite(live.util)) {
+      const parts = [`uso ${Math.round(live.util)}%`];
+      if (Number.isFinite(live.temp)) parts.push(`${Math.round(live.temp)}°C`);
+      if (live.memUsed && live.memTotal) parts.push(`${(live.memUsed / 1024).toFixed(1)}/${(live.memTotal / 1024).toFixed(0)} GB`);
+      $('gpu-info').textContent = parts.join(' · ');
+    } else {
+      // Intel/AMD não expõem uso sem root
+      $('gpu-info').textContent = [vram, 'uso n/d'].filter(Boolean).join(' · ');
+      $('gpu-info').title = 'O driver desta GPU não informa uso sem permissão de root';
+    }
+  }
+
+  // ---------- Tick rápido (1 s) ----------
+  let rxPeak = 0;
+  let txPeak = 0;
   window.nexus.onTick((t) => {
     cpuGraph.push(t.load);
-    cpuSamples = Math.min(cpuSamples + 1, cpuGraph.size);
-    const recent = cpuGraph.data[0].slice(-cpuSamples); // só amostras reais, sem os zeros iniciais
+    cpuHistory.push(t.load);
+    if (cpuHistory.length > CPU_HISTORY) cpuHistory.shift();
+    cpuAverages();
+    $('cpu-avgs').title = `Carga do sistema (load average 1/5/15 min): ${t.loadavg.map((v) => v.toFixed(2)).join(' / ')}`;
     $('cpu-now').textContent = `${t.load.toFixed(0)}%`;
-    $('cpu-avg').textContent = `${(recent.reduce((x, y) => x + y, 0) / recent.length).toFixed(0)}%`;
+    level($('cpu-now'), t.load, 70, 90);
+    $('cpu-freq').textContent = Number.isFinite(t.ghz) && t.ghz > 0 ? `${t.ghz.toFixed(2)} GHz` : '—';
     ensureCoreBars(t.cores.length);
     t.cores.forEach((v, i) => {
       coreBars[i].style.setProperty('--h', `${Math.max(2, Math.min(100, v))}%`);
       coreBars[i].classList.toggle('hot', v >= 90);
     });
     $('temp').textContent = t.temp ? `${t.temp.toFixed(0)}°C` : '--°C';
+    level($('temp'), t.temp || 0, 70, 85);
     $('uptime').textContent = duration(t.uptime);
 
     const ratio = t.memUsed / t.memTotal;
     const on = Math.round(ratio * MEM_DOTS);
     memCells.forEach((c, i) => c.classList.toggle('on', i < on));
-    $('mem-text').textContent = `usando ${bytes(t.memUsed)} de ${bytes(t.memTotal)}`;
-    $('swap-text').textContent = `Swap ${bytes(t.swapUsed)}`;
-    $('swap-bar').style.width = `${Math.min(100, (t.swapUsed / t.memTotal) * 100)}%`;
+    $('mem-pct').textContent = `${Math.round(ratio * 100)}%`;
+    level($('mem-pct'), ratio * 100, 75, 90);
+    $('mem-used').textContent = bytes(t.memUsed);
+    $('mem-avail').textContent = bytes(t.memAvailable);
+    $('mem-total').textContent = bytes(t.memTotal);
+    $('swap-text').textContent = bytes(t.swapUsed);
 
     if (t.net) {
       netGraph.push(t.net.rx, t.net.tx);
+      rxPeak = Math.max(...netGraph.data[0]);
+      txPeak = Math.max(...netGraph.data[1]);
       $('rx').textContent = bytes(t.net.rx, '/s');
       $('tx').textContent = bytes(t.net.tx, '/s');
-      $('net-total').textContent = `Total ↓ ${bytes(t.net.rxTotal)} · ↑ ${bytes(t.net.txTotal)}`;
+      $('rx-peak').textContent = bytes(rxPeak, '/s');
+      $('tx-peak').textContent = bytes(txPeak, '/s');
+      $('net-total').textContent = `Total desde o boot ↓ ${bytes(t.net.rxTotal)} · ↑ ${bytes(t.net.txTotal)}`;
     }
     alerts({ cpu: t.load >= 90, temp: t.temp >= 85, mem: ratio >= 0.9 });
     $('power').textContent = t.battery
@@ -220,7 +282,7 @@
   });
 
   // Alerta: painel pulsa e toca um aviso (no máximo uma vez por minuto para cada tipo).
-  const ALERT_BLOCKS = { cpu: $('cpu-graph').closest('.block'), temp: $('temp').closest('div'), mem: $('mem-grid').closest('.block') };
+  const ALERT_BLOCKS = { cpu: $('cpu-graph').closest('.block'), temp: $('temp').closest('span'), mem: $('mem-grid').closest('.block') };
   const lastAlert = {};
   function alerts(state) {
     if (SNAPSHOT) return; // capturas de tela ficam sem alerta
@@ -231,6 +293,38 @@
         sound.play('alert');
       }
     }
+  }
+
+  // ---------- Tick lento (3 s) ----------
+  const ms = (v) => (!Number.isFinite(v) || v < 0 ? '—' : v < 1 ? '<1 ms' : `${Math.round(v)} ms`);
+  function renderDisks(disks) {
+    const box = $('disks');
+    if (!disks.length) {
+      box.textContent = 'Nenhum disco encontrado';
+      return;
+    }
+    box.replaceChildren(...disks.map((d) => {
+      const row = document.createElement('div');
+      row.className = 'disk';
+      const name = document.createElement('span');
+      name.className = 'num';
+      name.textContent = d.mount;
+      const detail = document.createElement('small');
+      detail.className = 'dim';
+      detail.textContent = `${bytes(d.used)} de ${bytes(d.size)}`;
+      const pct = document.createElement('b');
+      pct.className = 'num';
+      pct.textContent = `${Math.round(d.use)}%`;
+      level(pct, d.use, 80, 95);
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      const fill = document.createElement('div');
+      fill.style.width = `${Math.min(100, d.use)}%`;
+      level(fill, d.use, 80, 95);
+      bar.append(fill);
+      row.append(name, detail, pct, bar);
+      return row;
+    }));
   }
 
   window.nexus.onSlow((s) => {
@@ -245,10 +339,22 @@
       });
       return tr;
     }));
-    $('net-state').textContent = s.online ? 'Online' : 'Offline';
-    $('ip4').textContent = s.ip4;
-    $('iface').textContent = `interface ${s.iface}`;
-    $('ping').textContent = !Number.isFinite(s.ping) || s.ping < 0 ? '—' : s.ping < 1 ? '<1ms' : `${Math.round(s.ping)}ms`;
+
+    const n = s.net;
+    $('net-state').textContent = n.online ? 'Online' : 'Offline';
+    $('net-state').classList.toggle('lv-crit', !n.online);
+    $('net-conn').textContent = n.conn;
+    $('iface').textContent = n.iface;
+    $('ip4').textContent = n.ip4;
+    $('ip6').textContent = n.ip6 ? `${n.ip6}${n.ip6.toLowerCase().startsWith('fe80') ? ' (local)' : ''}` : '—';
+    $('gw').textContent = n.gw || '—';
+    $('dns').textContent = n.dns.length ? n.dns.join(' · ') : '—';
+    $('ping').textContent = ms(n.ping);
+    $('loss').textContent = Number.isFinite(n.loss) ? `${n.loss.toFixed(0)}%` : '—';
+    level($('loss'), n.loss || 0, 1, 10);
+
+    renderDisks(s.disks);
+    renderGpu(s.gpu);
     if (s.mount) {
       $('mount-text').textContent = `Disco ${s.mount.mount}: ${Math.round(s.mount.use)}% usado`;
       $('mount-bar').style.width = `${s.mount.use}%`;

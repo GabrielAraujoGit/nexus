@@ -30,29 +30,41 @@
         <div><small>Energia</small><b id="power">Tomada</b></div>
       </div>
 
-      <div class="block">
+      <div class="block grow">
         <div class="block-title"><span>Uso da CPU</span><span id="cpu-model" class="dim">—</span></div>
-        <div class="cpu-head"><b id="cpu-now" class="num">0%</b><small class="dim">média 1 min <span id="cpu-avg" class="num">0%</span></small></div>
-        <canvas id="cpu-graph" class="graph chart" aria-label="Histórico de uso da CPU"></canvas>
+        <div class="cpu-head">
+          <b id="cpu-now" class="num">0%</b>
+          <div class="cpu-meta">
+            <span><small>freq</small> <b id="cpu-freq" class="num">—</b></span>
+            <span><small>temp</small> <b id="temp" class="num">--°C</b></span>
+          </div>
+        </div>
+        <canvas id="cpu-graph" class="graph chart" aria-label="Histórico de uso da CPU (60 s)"></canvas>
         <div id="core-bars" class="core-bars" aria-label="Uso por núcleo"></div>
-        <div class="info-grid three">
-          <div><small>Temp</small><b id="temp">--°C</b></div>
-          <div><small>Núcleos</small><b id="cores">--</b></div>
-          <div><small>Tarefas</small><b id="tasks">--</b></div>
+        <div id="cpu-avgs" class="info-grid three">
+          <div><small>média 1 min</small><b id="cpu-1">—</b></div>
+          <div><small>5 min</small><b id="cpu-5">—</b></div>
+          <div><small>15 min</small><b id="cpu-15">—</b></div>
         </div>
       </div>
 
       <div class="block">
-        <div class="block-title"><span>Memória</span><span id="mem-text" class="dim">—</span></div>
+        <div class="block-title"><span>Memória</span><b id="mem-pct" class="num pct">0%</b></div>
         <div id="mem-grid" class="mem-grid"></div>
-        <div class="bar"><div id="swap-bar"></div></div>
-        <small class="dim" id="swap-text">Swap 0 GiB</small>
+        <div class="info-grid four">
+          <div><small>usada</small><b id="mem-used">—</b></div>
+          <div><small>disponível</small><b id="mem-avail">—</b></div>
+          <div><small>total</small><b id="mem-total">—</b></div>
+          <div><small>swap</small><b id="swap-text">—</b></div>
+        </div>
       </div>
 
-      <div class="block grow">
-        <div class="block-title"><span>Top processos</span><span class="dim">pid · nome · cpu · mem</span></div>
-        <table class="procs"><tbody id="procs"></tbody></table>
+      <div class="block">
+        <div class="block-title"><span>Armazenamento</span><span id="gpu-model" class="dim">—</span></div>
+        <div id="disks" class="disks"></div>
+        <div class="kv-row"><small>GPU</small><span id="gpu-info" class="num">—</span></div>
       </div>
+
     </section>
 
     <!-- Terminal -->
@@ -66,27 +78,41 @@
       <header class="panel-head"><span>PAINEL</span><span>REDE</span></header>
 
       <div class="block">
-        <div class="block-title"><span>Status da rede</span><span id="iface" class="dim">—</span></div>
-        <div class="info-grid three">
-          <div><small>Estado</small><b id="net-state">—</b></div>
-          <div><small>IPv4</small><b id="ip4">—</b></div>
-          <div><small>Ping GW</small><b id="ping">—</b></div>
-        </div>
+        <div class="block-title"><span>Status da rede</span><b id="net-state" class="badge">—</b></div>
+        <dl class="kv">
+          <dt>Conexão</dt><dd id="net-conn">—</dd>
+          <dt>Interface</dt><dd id="iface" class="num">—</dd>
+          <dt>IPv4</dt><dd id="ip4" class="num">—</dd>
+          <dt>IPv6</dt><dd id="ip6" class="num">—</dd>
+          <dt>Gateway</dt><dd id="gw" class="num">—</dd>
+          <dt>DNS</dt><dd id="dns" class="num">—</dd>
+          <dt>Latência</dt><dd><span id="ping" class="num">—</span> <small class="dim">perda</small> <span id="loss" class="num">—</span></dd>
+        </dl>
       </div>
 
-      <div class="block grow">
+      <div class="block">
+        <div class="block-title"><span>Top processos</span><span class="dim"><span id="tasks">--</span> tarefas</span></div>
+        <table class="procs">
+          <thead><tr><th>pid</th><th>nome</th><th>cpu</th><th>mem</th></tr></thead>
+          <tbody id="procs"></tbody>
+        </table>
+      </div>
+
+      <div class="block grow globe-block">
         <div class="block-title"><span>Visão global</span><span class="dim">rede · nós ativos</span></div>
         <canvas id="globe"></canvas>
         <small class="dim" id="host">—</small>
       </div>
 
       <div class="block">
-        <div class="block-title"><span>Tráfego de rede</span><span class="dim">↓ down · ↑ up</span></div>
-        <div class="info-grid two">
-          <div><small>↓ agora</small><b id="rx">0 B/s</b></div>
-          <div><small>↑ agora</small><b id="tx">0 B/s</b></div>
+        <div class="block-title"><span>Tráfego de rede</span><span class="dim">últimos 90 s</span></div>
+        <div class="info-grid four">
+          <div><small class="down">↓ agora</small><b id="rx">0 B/s</b></div>
+          <div><small class="up">↑ agora</small><b id="tx">0 B/s</b></div>
+          <div><small>↓ pico</small><b id="rx-peak">—</b></div>
+          <div><small>↑ pico</small><b id="tx-peak">—</b></div>
         </div>
-        <canvas id="net-graph" class="graph tall"></canvas>
+        <canvas id="net-graph" class="graph tall" aria-label="Tráfego de rede: download e upload"></canvas>
         <small class="dim" id="net-total">Total —</small>
       </div>
     </section>

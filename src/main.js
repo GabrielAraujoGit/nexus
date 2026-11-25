@@ -4,6 +4,8 @@ const { app, BrowserWindow, ipcMain, shell: electronShell } = require('electron'
 const path = require('node:path');
 const fs = require('node:fs/promises');
 const os = require('node:os');
+const net = require('node:net');
+const { execFile } = require('node:child_process');
 const si = require('systeminformation');
 const { setupWeb } = require('./web');
 
@@ -32,6 +34,14 @@ let win = null;
 let term = null;
 let lastCwd = null;
 const timers = [];
+
+// Capturas de tela usam um perfil temporário: não leem nem gravam tema, som etc. de quem roda.
+if (process.env.NEXUS_SNAPSHOT) {
+  // pasta fixa, zerada a cada captura (apagar na saída falha: o Chromium ainda grava depois do quit)
+  const profile = path.join(os.tmpdir(), `nexus-snapshot-${process.getuid?.() ?? 'user'}`);
+  require('node:fs').rmSync(profile, { recursive: true, force: true });
+  app.setPath('userData', profile);
+}
 
 function createWindow() {
   const snapshotMode = Boolean(process.env.NEXUS_SNAPSHOT);
@@ -69,7 +79,9 @@ function createWindow() {
     if (snapshotMode) {
       // layout de 1600x900 renderizado em 2x (nítido em telas retina e no zoom do GitHub)
       const scale = Number(process.env.NEXUS_SNAPSHOT_SCALE) || 2;
-      win.setContentSize(1600 * scale, 900 * scale);
+      // NEXUS_SNAPSHOT_SIZE=1920x1080 testa outras resoluções (padrão 1600x900)
+      const [sw, sh] = (process.env.NEXUS_SNAPSHOT_SIZE || '1600x900').split('x').map(Number);
+      win.setContentSize((sw || 1600) * scale, (sh || 900) * scale);
       win.webContents.setZoomFactor(scale);
       return;
     }
@@ -194,9 +206,13 @@ async function pollCwd() {
 
 // ---------- Métricas ----------
 async function staticInfo() {
-  const [cpu, osInfo, mem, battery] = await Promise.all([
+  const [cpu, osInfo, mem, battery, graphics] = await Promise.all([
     si.cpu(), si.osInfo(), si.mem(), si.battery().catch(() => ({ hasBattery: false })),
+    si.graphics().catch(() => ({ controllers: [] })),
   ]);
+  const gpus = graphics.controllers.filter((c) => c.model).map((c) => ({ model: c.model, vendor: c.vendor || '', vram: c.vram || null }));
+  // uso/temperatura de GPU só vêm de drivers que expõem isso sem root (ex.: NVIDIA); Intel/AMD ficam sem
+  gpuPollable = graphics.controllers.some((c) => Number.isFinite(c.utilizationGpu));
   return {
     cpu: `${cpu.manufacturer} ${cpu.brand}`.trim(),
     cores: os.cpus().length,
@@ -206,15 +222,17 @@ async function staticInfo() {
     user: DEMO ? 'operator' : os.userInfo().username.split('@')[0],
     memTotal: mem.total,
     hasBattery: Boolean(battery.hasBattery),
+    gpus,
   };
 }
 
 let netPrev = null;
 async function fastTick() {
-  const [load, mem, net] = await Promise.all([
+  const [load, mem, net, speed] = await Promise.all([
     si.currentLoad(),
     si.mem(),
     si.networkStats().catch(() => []),
+    si.cpuCurrentSpeed().catch(() => ({ avg: null })),
   ]);
   const iface = net.find((n) => n.operstate === 'up') || net[0];
   let rx = 0;
@@ -233,7 +251,10 @@ async function fastTick() {
     load: load.currentLoad,
     temp: cache.temp,
     memUsed: mem.active,
+    memAvailable: mem.available,
     memTotal: mem.total,
+    ghz: speed.avg,
+    loadavg: os.loadavg(),
     swapUsed: mem.swapused,
     net: iface ? {
       iface: iface.iface, rx, tx, rxTotal: iface.rx_bytes, txTotal: iface.tx_bytes,
@@ -244,44 +265,100 @@ async function fastTick() {
 
 // Dados que mudam pouco ficam em cache e são atualizados em ritmo próprio (alguns disparam
 // comandos do sistema e custam centenas de ms, como a lista de interfaces de rede).
-const cache = { temp: null, battery: null, ip4: '—', iface: '—', online: false, gw: '', ping: null, fs: [] };
+const cache = {
+  temp: null, battery: null, gpu: null,
+  ip4: '—', ip6: '', iface: '—', online: false, conn: '—', gw: '', dns: [],
+  ping: null, loss: null, disks: [],
+};
+let gpuPollable = false;
+const DEMO_NET = { ip4: '192.168.0.42', ip6: 'fe80::a8c0:42ff:fe00:42', iface: 'eth0', conn: 'Ethernet · 1000 Mb/s', gw: '192.168.0.1', dns: ['1.1.1.1', '9.9.9.9'] };
 
 async function sensorsTick() { // 5 s
-  const [temp, battery] = await Promise.all([
+  const [temp, battery, graphics] = await Promise.all([
     si.cpuTemperature().catch(() => ({ main: null })),
     si.battery().catch(() => ({ hasBattery: false })),
+    gpuPollable ? si.graphics().catch(() => null) : null,
   ]);
   cache.temp = temp.main;
   cache.battery = battery.hasBattery ? { percent: battery.percent, charging: battery.isCharging } : null;
+  const g = graphics?.controllers.find((c) => Number.isFinite(c.utilizationGpu));
+  cache.gpu = g ? { util: g.utilizationGpu, temp: g.temperatureGpu ?? null, memUsed: g.memoryUsed ?? null, memTotal: g.memoryTotal ?? null } : null;
+}
+
+// DNS em uso: o arquivo do systemd-resolved lista os servidores reais (o /etc/resolv.conf costuma ter só o 127.0.0.53).
+async function readDns() {
+  for (const file of ['/run/systemd/resolve/resolv.conf', '/etc/resolv.conf']) {
+    try {
+      const text = await fs.readFile(file, 'utf8');
+      const list = [...text.matchAll(/^nameserver\s+(\S+)/gm)].map((m) => m[1]).filter((ip) => net.isIP(ip));
+      if (list.length) return list.slice(0, 3);
+    } catch { /* tenta o próximo */ }
+  }
+  return [];
 }
 
 async function networkInfoTick() { // 30 s
-  const [ifaces, gw] = await Promise.all([
+  const [ifaces, gw, dns] = await Promise.all([
     si.networkInterfaces().catch(() => []),
     si.networkGatewayDefault().catch(() => ''),
+    readDns(),
   ]);
   const list = Array.isArray(ifaces) ? ifaces : [ifaces];
   const main = list.find((i) => i.default) || list.find((i) => i.ip4 && !i.internal);
   cache.ip4 = main?.ip4 || '—';
+  cache.ip6 = main?.ip6 || '';
   cache.iface = main?.iface || '—';
   cache.online = Boolean(main?.ip4);
-  cache.gw = gw;
+  cache.gw = net.isIP(gw) ? gw : '';
+  cache.dns = dns;
+  if (main?.type === 'wireless') {
+    const wifi = (await si.wifiConnections().catch(() => []))[0];
+    cache.conn = wifi?.ssid ? `Wi-Fi · ${wifi.ssid}${wifi.quality ? ` · ${wifi.quality}%` : ''}` : 'Wi-Fi';
+  } else if (main) {
+    cache.conn = `Ethernet${main.speed ? ` · ${main.speed} Mb/s` : ''}`;
+  } else {
+    cache.conn = '—';
+  }
 }
 
-async function pingTick() { // 10 s. Ping só no gateway da rede local: nada sai para a internet.
-  cache.ping = cache.gw ? await si.inetLatency(cache.gw).catch(() => null) : null;
+// Latência e perda: 4 pings rápidos só no gateway da rede local (nada sai para a internet).
+// O IP é validado e vai como argumento (execFile, sem shell).
+function pingTick() { // 10 s
+  if (!cache.gw || !net.isIP(cache.gw)) {
+    cache.ping = null;
+    cache.loss = null;
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => {
+    execFile('ping', ['-n', '-q', '-c', '4', '-i', '0.25', '-W', '1', cache.gw], { timeout: 5000, env: { ...process.env, LC_ALL: 'C' } }, (_err, stdout) => {
+      const out = String(stdout || '');
+      const loss = out.match(/([\d.]+)% packet loss/);
+      const rtt = out.match(/= [\d.]+\/([\d.]+)\//);
+      cache.loss = loss ? Number(loss[1]) : null;
+      cache.ping = rtt ? Number(rtt[1]) : null;
+      resolve();
+    });
+  });
 }
 
+// Discos de verdade (sem tmpfs, efivars, snaps...), maiores primeiro.
+const PSEUDO_FS = /^(tmpfs|devtmpfs|efivarfs|squashfs|overlay|proc|sysfs|ramfs|fuse\..*)$/;
 async function diskTick() { // 30 s
-  cache.fs = await si.fsSize().catch(() => []);
+  const list = await si.fsSize().catch(() => []);
+  cache.disks = list
+    .filter((f) => !PSEUDO_FS.test(f.type) && f.size > 2e9 && !/^\/(snap|boot)(\/|$)/.test(f.mount))
+    .sort((a, b) => b.size - a.size)
+    .slice(0, 3)
+    .map((f) => ({ mount: f.mount, size: f.size, used: f.used, use: f.use }));
 }
 
 async function slowTick() { // 3 s: processos
   const procs = await si.processes();
   const cwd = lastCwd || homeDir();
-  const mount = cache.fs
+  const mount = cache.disks
     .filter((f) => cwd.startsWith(f.mount))
     .sort((a, b) => b.mount.length - a.mount.length)[0];
+  const n = DEMO ? DEMO_NET : cache;
 
   send('sys:slow', {
     tasks: procs.all,
@@ -290,10 +367,12 @@ async function slowTick() { // 3 s: processos
       .sort((a, b) => b.cpu - a.cpu)
       .slice(0, 6)
       .map((p) => ({ pid: p.pid, name: p.name, cpu: p.cpu, mem: p.mem })),
-    ip4: DEMO ? '192.168.0.42' : cache.ip4,
-    iface: DEMO ? 'eth0' : cache.iface,
-    online: cache.online,
-    ping: cache.ping,
+    net: {
+      online: cache.online, ip4: n.ip4, ip6: n.ip6, iface: n.iface, conn: n.conn, gw: n.gw, dns: n.dns,
+      ping: cache.ping, loss: cache.loss,
+    },
+    gpu: cache.gpu,
+    disks: cache.disks,
     mount: mount ? { mount: mount.mount, use: mount.use } : null,
   });
 }

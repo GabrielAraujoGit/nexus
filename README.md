@@ -35,10 +35,13 @@ rewritten from scratch with current dependencies and a focus on security.
 
 - **A real terminal**: your shell (`$SHELL`) through `node-pty` + [xterm.js](https://xtermjs.org/), with WebGL,
   24-bit color and Nerd Fonts. Your prompt (Starship, Oh My Bash, etc.) works as usual.
-- **System**: clock, uptime, power, CPU per core group, temperature, load, tasks,
-  a dot-grid memory map and swap.
-- **Processes**: the top 6 by CPU, refreshed every 3 s.
-- **Network**: status, IPv4, gateway ping, download/upload traffic and totals.
+- **CPU**: 60 s area chart, per-core bars, 1/5/15 min averages, frequency and temperature
+  (yellow ≥ 70 °C, red ≥ 85 °C).
+- **Memory, storage and GPU**: usage %, used/available/total and swap; each real disk with used/total;
+  GPU model and VRAM (usage and temperature on drivers that expose them without root, e.g. NVIDIA).
+- **Processes**: the top 6 by CPU and the task count, refreshed every 3 s.
+- **Network**: connection (Ethernet speed or Wi-Fi name), interface, full IPv4 and IPv6, gateway, DNS,
+  latency and packet loss to the gateway, and a 90 s download/upload chart with peaks and totals.
 - **Globe**: a spinning wireframe with nodes and links (decorative).
 - **Files**: shows the shell's current folder (follows `cd` on its own). Click a folder to enter it;
   click a file to paste its name into the prompt.

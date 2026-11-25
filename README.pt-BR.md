@@ -35,10 +35,13 @@ reescrito do zero com dependências atuais e foco em segurança.
 
 - **Terminal de verdade**: seu shell (`$SHELL`) via `node-pty` + [xterm.js](https://xtermjs.org/), com WebGL,
   cores 24 bits e Nerd Fonts. Seu prompt (Starship, Oh My Bash etc.) funciona igual.
-- **Sistema**: relógio, uptime, energia, CPU por grupo de núcleos, temperatura, carga, tarefas,
-  memória em grade de pontos e swap.
-- **Processos**: os 6 que mais usam CPU, atualizados a cada 3 s.
-- **Rede**: estado, IPv4, ping do gateway, tráfego de download/upload e totais.
+- **CPU**: gráfico de área de 60 s, barra por núcleo, médias de 1/5/15 min, frequência e temperatura
+  (amarelo ≥ 70 °C, vermelho ≥ 85 °C).
+- **Memória, armazenamento e GPU**: % de uso, usada/disponível/total e swap; cada disco real com usado/total;
+  modelo e VRAM da GPU (uso e temperatura nos drivers que informam isso sem root, como NVIDIA).
+- **Processos**: os 6 que mais usam CPU e o total de tarefas, atualizados a cada 3 s.
+- **Rede**: conexão (velocidade da Ethernet ou nome do Wi-Fi), interface, IPv4 e IPv6 completos, gateway, DNS,
+  latência e perda de pacotes até o gateway, e gráfico de 90 s de download/upload com picos e totais.
 - **Globo**: wireframe girando com nós e conexões (decorativo).
 - **Arquivos**: mostra a pasta onde o shell está (segue o `cd` sozinho). Clique numa pasta para entrar;
   num arquivo, o nome é colado no prompt.
