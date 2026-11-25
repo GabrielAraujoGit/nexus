@@ -131,7 +131,9 @@ function createWindow() {
       for (let i = 0; i < total; i++) {
         const due = start + (i * 1000) / fps;
         await new Promise((r) => setTimeout(r, Math.max(0, due - Date.now())));
-        if (latest) writes.push(fs.writeFile(path.join(dir, `frame-${String(i).padStart(4, '0')}.jpg`), latest.toJPEG(90)));
+        // o nome leva o instante real (ms): se a captura atrasar, quem monta o vídeo usa o tempo certo
+        const ms = String(Date.now() - start).padStart(6, '0');
+        if (latest) writes.push(fs.writeFile(path.join(dir, `frame-${String(i).padStart(4, '0')}-${ms}.jpg`), latest.toJPEG(90)));
       }
       clearInterval(webTimer);
       await Promise.all(writes);
@@ -301,11 +303,14 @@ async function fastTick() {
   }
   if (iface) netPrev = iface;
 
+  // modo demo: carga de CPU fictícia e suave (a gravação em si pesa e mostraria a máquina no limite)
+  const demoT = Date.now() / 1000;
+  const demoCores = load.cpus.map((_, i) => 22 + 14 * Math.sin(demoT / 3 + i) + 6 * Math.sin(demoT * 1.7 + i * 2));
   send('sys:tick', {
     now: Date.now(),
     uptime: os.uptime(),
-    cores: load.cpus.map((c) => c.load),
-    load: load.currentLoad,
+    cores: DEMO ? demoCores : load.cpus.map((c) => c.load),
+    load: DEMO ? demoCores.reduce((a, b) => a + b, 0) / demoCores.length : load.currentLoad,
     // modo demo (capturas do README): memória e temperatura fictícias, não as da máquina de quem roda
     temp: DEMO ? 54 : cache.temp,
     memUsed: DEMO ? mem.total * 0.42 : mem.active,
