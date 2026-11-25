@@ -51,6 +51,23 @@ rewritten from scratch with current dependencies and a focus on security.
 
 ## Install
 
+### Download (x86_64)
+
+Grab the latest version from [Releases](https://github.com/GabrielAraujoGit/nexus/releases/latest):
+
+```bash
+# Debian/Ubuntu: installs the "nexus" command and a menu entry
+sudo apt install ./nexus-0.1.0-amd64.deb
+
+# Any distro: AppImage (needs FUSE 2; on Ubuntu: sudo apt install libfuse2t64)
+chmod +x nexus-0.1.0-x86_64.AppImage
+./nexus-0.1.0-x86_64.AppImage
+```
+
+Checksums are in `SHA256SUMS` (`sha256sum -c SHA256SUMS`).
+
+### From source
+
 Requirements: Linux, Node.js 20+ and a C/C++ compiler for `node-pty`.
 
 ```bash
@@ -62,6 +79,8 @@ cd nexus
 npm install
 npm run setup-pty    # builds node-pty for Electron
 npm start
+
+npm run dist          # optional: builds the AppImage and .deb into dist/
 ```
 
 To see prompt icons, install a [Nerd Font](https://www.nerdfonts.com/)
@@ -118,7 +137,7 @@ user, host, IP, processes and home folder are fake, so you can regenerate them w
 - [ ] UI sounds (optional)
 - [ ] Git panel (branch and changes in the current folder)
 - [ ] English interface
-- [ ] `.deb` and AppImage packages
+- [x] `.deb` and AppImage packages
 
 ## Contributing
 

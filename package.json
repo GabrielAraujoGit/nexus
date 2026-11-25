@@ -1,25 +1,65 @@
 {
   "name": "nexus-term",
   "version": "0.1.0",
-  "description": "Terminal sci-fi com painéis de sistema",
+  "description": "A sci-fi terminal for Linux with live system panels",
   "main": "src/main.js",
   "private": true,
   "scripts": {
     "start": "electron .",
     "setup-pty": "npm install --save-exact node-pty@1.1.0 && npx --yes @electron/rebuild@4.2.1 -f -w node-pty",
-    "screenshots": "bash scripts/screenshots.sh"
+    "screenshots": "bash scripts/screenshots.sh",
+    "dist": "electron-builder --linux AppImage deb"
   },
   "license": "MIT",
   "dependencies": {
     "@xterm/addon-fit": "0.11.0",
     "@xterm/addon-webgl": "0.19.0",
     "@xterm/xterm": "6.0.0",
-    "electron": "45.4.1",
     "node-pty": "1.1.0",
     "systeminformation": "5.33.23"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/GabrielAraujoGit/nexus.git"
+  },
+  "devDependencies": {
+    "electron": "45.4.1",
+    "electron-builder": "26.0.12"
+  },
+  "author": {
+    "name": "Gabriel Araujo",
+    "email": "86240279+GabrielAraujoGit@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/GabrielAraujoGit/nexus",
+  "build": {
+    "appId": "io.github.gabrielaraujogit.nexus",
+    "productName": "NEXUS",
+    "artifactName": "nexus-${version}-${arch}.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "System",
+      "icon": "build/icon.png",
+      "executableName": "nexus",
+      "synopsis": "Sci-fi terminal with live system panels",
+      "maintainer": "Gabriel Araujo <86240279+GabrielAraujoGit@users.noreply.github.com>"
+    },
+    "deb": {
+      "depends": [
+        "libnotify4",
+        "libxtst6",
+        "libnss3"
+      ]
+    }
   }
 }
