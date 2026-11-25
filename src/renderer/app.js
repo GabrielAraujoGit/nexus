@@ -117,7 +117,13 @@
     window.nexus.onData((d) => term.write(d));
     term.onData((d) => window.nexus.write(d));
     term.onResize(({ cols, rows }) => window.nexus.resize(cols, rows));
-    term.onTitleChange((t) => { $('term-title').textContent = t || 'SHELL PRINCIPAL'; });
+    term.onTitleChange((t) => {
+      $('term-title').textContent = t || 'SHELL PRINCIPAL';
+      $('term-tab').textContent = t || 'shell';
+    });
+    const showSize = () => { $('term-size').textContent = `${term.cols}×${term.rows}`; };
+    term.onResize(showSize);
+    showSize();
     window.nexus.spawn(term.cols, term.rows);
     new ResizeObserver(() => fit.fit()).observe($('terminal'));
     term.focus();

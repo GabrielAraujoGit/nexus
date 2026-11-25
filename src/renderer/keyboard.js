@@ -37,6 +37,7 @@
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = `key ${width}`.trim();
+          btn.dataset.code = code;
           btn.tabIndex = -1;
           btn.setAttribute('aria-label', label || (code === 'Space' ? 'espaço' : code));
           if (shifted) {

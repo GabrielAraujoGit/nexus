@@ -80,7 +80,17 @@ function createWindow() {
   // página (re)carregada: reenvia a lista de arquivos
   win.webContents.on('did-finish-load', () => {
     lastCwd = null;
+    // Zoom sempre em 100% fora das capturas: o Chromium salva o zoom por página no perfil, e um zoom
+    // antigo (ou um Ctrl+roda acidental) deixava a interface enorme e o terminal com poucas colunas.
+    if (!snapshotMode) {
+      win.webContents.setZoomFactor(1);
+      win.webContents.setVisualZoomLevelLimits(1, 1).catch(() => {});
+    }
   });
+  if (!snapshotMode) {
+    // Ctrl+roda do mouse não muda o zoom
+    win.webContents.on('zoom-changed', () => win.webContents.setZoomFactor(1));
+  }
   win.once('ready-to-show', () => {
     if (snapshotMode) {
       // layout de 1600x900 renderizado em 2x (nítido em telas retina e no zoom do GitHub)
