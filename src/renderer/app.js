@@ -5,6 +5,7 @@
   const { LineGraph, themeRGB } = window.NexusGraphs;
 
   const THEMES = ['tron', 'cyberpunk', 'ambar'];
+  const THEME_NAMES = { tron: 'Tron', cyberpunk: 'Cyberpunk', ambar: 'Âmbar' };
   const ANSI = {
     tron: ['#0b1418', '#ff5f6d', '#5cf0a0', '#ffd479', '#5cb8ff', '#c792ea', '#5cf0ff', '#aacfd1',
       '#3a5560', '#ff8a94', '#8bffc0', '#ffe4a3', '#8fd0ff', '#ddb6ff', '#9ff6ff', '#e6fbfc'],
@@ -37,7 +38,7 @@
 
   // ---------- Formatação ----------
   const pad = (n) => String(n).padStart(2, '0');
-  const MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+  const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
   function bytes(n, suffix = '') {
     const u = ['B', 'KB', 'MB', 'GB', 'TB'];
     let i = 0;
@@ -55,13 +56,20 @@
   const shellQuote = (s) => `'${s.replace(/'/g, "'\\''")}'`;
 
   // ---------- Terminal ----------
+  // Mistura a cor do tema com o fundo (0..1): texto do terminal menos gritante que a cor pura.
+  function soften(rgb, bgHex, amount) {
+    const fg = rgb.split(',').map(Number);
+    const bg = [1, 3, 5].map((i) => parseInt(bgHex.slice(i, i + 2), 16));
+    const mix = fg.map((c, i) => Math.round(c * amount + bg[i] * (1 - amount)));
+    return `rgb(${mix.join(',')})`;
+  }
   function termTheme() {
     const rgb = themeRGB();
     const acc = themeRGB('--accent-rgb');
     const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
     const t = {
       background: bg,
-      foreground: `rgb(${rgb})`,
+      foreground: soften(rgb, bg, 0.86),
       cursor: `rgb(${acc})`,
       cursorAccent: bg,
       selectionBackground: `rgba(${rgb},0.3)`,
@@ -143,8 +151,31 @@
   const memCells = [...memGrid.children];
 
   // ---------- Gráficos ----------
-  const cpuA = new LineGraph($('cpu-a'), { series: 1, max: 100 });
-  const cpuB = new LineGraph($('cpu-b'), { series: 1, max: 100 });
+  // CPU: 60 s de histórico em área, com escala; barras por núcleo logo abaixo
+  const cpuGraph = new LineGraph($('cpu-graph'), { series: 1, max: 100, size: 60, area: true, yLabels: true });
+  const coreBars = [];
+  let cpuSamples = 0;
+  if (SNAPSHOT) { // capturas do README: histórico fictício e suave, para o gráfico não sair vazio
+    cpuGraph.data[0] = cpuGraph.data[0].map((_, i) => 28 + 14 * Math.sin(i / 6) + 6 * Math.sin(i / 2.3));
+    cpuSamples = cpuGraph.size;
+  }
+  function ensureCoreBars(n) {
+    if (coreBars.length === n) return;
+    const box = $('core-bars');
+    box.replaceChildren();
+    coreBars.length = 0;
+    for (let i = 0; i < n; i++) {
+      const col = document.createElement('div');
+      col.className = 'core';
+      const bar = document.createElement('i');
+      const label = document.createElement('small');
+      label.textContent = i + 1;
+      col.append(bar, label);
+      col.title = `Núcleo ${i + 1}`;
+      box.append(col);
+      coreBars.push(bar);
+    }
+  }
   const netGraph = new LineGraph($('net-graph'), { series: 2, size: 90 });
   new window.NexusGlobe($('globe'));
 
@@ -152,45 +183,44 @@
     $('cpu-model').textContent = info.cpu;
     $('cores').textContent = info.cores;
     $('host').textContent = `${info.user}@${info.hostname} · ${info.distro} · kernel ${info.kernel}`;
-    const half = Math.ceil(info.cores / 2);
-    $('cpu-a-label').textContent = `# 1-${half}`;
-    $('cpu-b-label').textContent = `# ${half + 1}-${info.cores}`;
+    ensureCoreBars(info.cores);
   }).catch(() => {});
 
   window.nexus.onTick((t) => {
-    const half = Math.ceil(t.cores.length / 2);
-    const avg = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
-    const a = avg(t.cores.slice(0, half));
-    const b = avg(t.cores.slice(half));
-    cpuA.push(a);
-    cpuB.push(b);
-    $('cpu-a-avg').textContent = `Méd. ${a.toFixed(0)}%`;
-    $('cpu-b-avg').textContent = `Méd. ${b.toFixed(0)}%`;
-    $('load').textContent = `${t.load.toFixed(0)}%`;
+    cpuGraph.push(t.load);
+    cpuSamples = Math.min(cpuSamples + 1, cpuGraph.size);
+    const recent = cpuGraph.data[0].slice(-cpuSamples); // só amostras reais, sem os zeros iniciais
+    $('cpu-now').textContent = `${t.load.toFixed(0)}%`;
+    $('cpu-avg').textContent = `${(recent.reduce((x, y) => x + y, 0) / recent.length).toFixed(0)}%`;
+    ensureCoreBars(t.cores.length);
+    t.cores.forEach((v, i) => {
+      coreBars[i].style.setProperty('--h', `${Math.max(2, Math.min(100, v))}%`);
+      coreBars[i].classList.toggle('hot', v >= 90);
+    });
     $('temp').textContent = t.temp ? `${t.temp.toFixed(0)}°C` : '--°C';
     $('uptime').textContent = duration(t.uptime);
 
     const ratio = t.memUsed / t.memTotal;
     const on = Math.round(ratio * MEM_DOTS);
     memCells.forEach((c, i) => c.classList.toggle('on', i < on));
-    $('mem-text').textContent = `USANDO ${bytes(t.memUsed)} DE ${bytes(t.memTotal)}`;
-    $('swap-text').textContent = `SWAP ${bytes(t.swapUsed)}`;
+    $('mem-text').textContent = `usando ${bytes(t.memUsed)} de ${bytes(t.memTotal)}`;
+    $('swap-text').textContent = `Swap ${bytes(t.swapUsed)}`;
     $('swap-bar').style.width = `${Math.min(100, (t.swapUsed / t.memTotal) * 100)}%`;
 
     if (t.net) {
       netGraph.push(t.net.rx, t.net.tx);
       $('rx').textContent = bytes(t.net.rx, '/s');
       $('tx').textContent = bytes(t.net.tx, '/s');
-      $('net-total').textContent = `TOTAL ↓ ${bytes(t.net.rxTotal)} · ↑ ${bytes(t.net.txTotal)}`;
+      $('net-total').textContent = `Total ↓ ${bytes(t.net.rxTotal)} · ↑ ${bytes(t.net.txTotal)}`;
     }
     alerts({ cpu: t.load >= 90, temp: t.temp >= 85, mem: ratio >= 0.9 });
     $('power').textContent = t.battery
       ? `${Math.round(t.battery.percent)}%${t.battery.charging ? ' ⚡' : ''}`
-      : 'TOMADA';
+      : 'Tomada';
   });
 
   // Alerta: painel pulsa e toca um aviso (no máximo uma vez por minuto para cada tipo).
-  const ALERT_BLOCKS = { cpu: $('cpu-a').closest('.block'), temp: $('temp').closest('div'), mem: $('mem-grid').closest('.block') };
+  const ALERT_BLOCKS = { cpu: $('cpu-graph').closest('.block'), temp: $('temp').closest('div'), mem: $('mem-grid').closest('.block') };
   const lastAlert = {};
   function alerts(state) {
     if (SNAPSHOT) return; // capturas de tela ficam sem alerta
@@ -215,12 +245,12 @@
       });
       return tr;
     }));
-    $('net-state').textContent = s.online ? 'ONLINE' : 'OFFLINE';
+    $('net-state').textContent = s.online ? 'Online' : 'Offline';
     $('ip4').textContent = s.ip4;
-    $('iface').textContent = `INTERFACE ${s.iface}`;
+    $('iface').textContent = `interface ${s.iface}`;
     $('ping').textContent = !Number.isFinite(s.ping) || s.ping < 0 ? '—' : s.ping < 1 ? '<1ms' : `${Math.round(s.ping)}ms`;
     if (s.mount) {
-      $('mount-text').textContent = `Disco ${s.mount.mount} usado ${Math.round(s.mount.use)}%`;
+      $('mount-text').textContent = `Disco ${s.mount.mount}: ${Math.round(s.mount.use)}% usado`;
       $('mount-bar').style.width = `${s.mount.use}%`;
     }
   });
@@ -295,7 +325,7 @@
     document.documentElement.dataset.theme = theme;
     try { localStorage.setItem('nexus.theme', theme); } catch { /* ignora */ }
     term.options.theme = termTheme();
-    $('theme-btn').textContent = `TEMA: ${theme.toUpperCase()}`;
+    $('theme-btn').textContent = `Tema: ${THEME_NAMES[theme]}`;
     replay($('ui'), 'glitch');
     sound.play('theme');
     term.focus();
@@ -307,7 +337,7 @@
   // ---------- Som ----------
   const soundBtn = $('sound-btn');
   function paintSound() {
-    soundBtn.textContent = `SOM: ${sound.enabled ? 'ON' : 'OFF'}`;
+    soundBtn.textContent = `Som: ${sound.enabled ? 'on' : 'off'}`;
     soundBtn.setAttribute('aria-pressed', String(sound.enabled));
   }
   soundBtn.addEventListener('click', () => {
@@ -317,7 +347,7 @@
     term.focus();
   });
   paintSound();
-  $('theme-btn').textContent = `TEMA: ${theme.toUpperCase()}`;
+  $('theme-btn').textContent = `Tema: ${THEME_NAMES[theme]}`;
 
   // ---------- Boot ----------
   const BOOT = [

@@ -6,6 +6,9 @@
         content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'">
   <title>NEXUS</title>
   <link rel="stylesheet" href="../../node_modules/@xterm/xterm/css/xterm.css">
+  <link rel="stylesheet" href="../../node_modules/@fontsource/rajdhani/latin-500.css">
+  <link rel="stylesheet" href="../../node_modules/@fontsource/rajdhani/latin-600.css">
+  <link rel="stylesheet" href="../../node_modules/@fontsource/share-tech-mono/latin-400.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,32 +25,32 @@
 
       <div class="block info-grid">
         <div><small id="year">----</small><b id="date">-- ---</b></div>
-        <div><small>UPTIME</small><b id="uptime">0:00:00</b></div>
-        <div><small>TIPO</small><b>LINUX</b></div>
-        <div><small>ENERGIA</small><b id="power">TOMADA</b></div>
+        <div><small>Uptime</small><b id="uptime">0:00:00</b></div>
+        <div><small>Sistema</small><b>Linux</b></div>
+        <div><small>Energia</small><b id="power">Tomada</b></div>
       </div>
 
       <div class="block">
-        <div class="block-title"><span>USO DA CPU</span><span id="cpu-model" class="dim">—</span></div>
-        <div class="cpu-row"><div class="cpu-label"><b id="cpu-a-label"># 1</b><small id="cpu-a-avg">Méd. 0%</small></div><canvas id="cpu-a" class="graph"></canvas></div>
-        <div class="cpu-row"><div class="cpu-label"><b id="cpu-b-label"># 2</b><small id="cpu-b-avg">Méd. 0%</small></div><canvas id="cpu-b" class="graph"></canvas></div>
-        <div class="info-grid four">
-          <div><small>TEMP</small><b id="temp">--°C</b></div>
-          <div><small>CARGA</small><b id="load">0%</b></div>
-          <div><small>NÚCLEOS</small><b id="cores">--</b></div>
-          <div><small>TAREFAS</small><b id="tasks">--</b></div>
+        <div class="block-title"><span>Uso da CPU</span><span id="cpu-model" class="dim">—</span></div>
+        <div class="cpu-head"><b id="cpu-now" class="num">0%</b><small class="dim">média 1 min <span id="cpu-avg" class="num">0%</span></small></div>
+        <canvas id="cpu-graph" class="graph chart" aria-label="Histórico de uso da CPU"></canvas>
+        <div id="core-bars" class="core-bars" aria-label="Uso por núcleo"></div>
+        <div class="info-grid three">
+          <div><small>Temp</small><b id="temp">--°C</b></div>
+          <div><small>Núcleos</small><b id="cores">--</b></div>
+          <div><small>Tarefas</small><b id="tasks">--</b></div>
         </div>
       </div>
 
       <div class="block">
-        <div class="block-title"><span>MEMÓRIA</span><span id="mem-text" class="dim">—</span></div>
+        <div class="block-title"><span>Memória</span><span id="mem-text" class="dim">—</span></div>
         <div id="mem-grid" class="mem-grid"></div>
         <div class="bar"><div id="swap-bar"></div></div>
-        <small class="dim" id="swap-text">SWAP 0 GiB</small>
+        <small class="dim" id="swap-text">Swap 0 GiB</small>
       </div>
 
       <div class="block grow">
-        <div class="block-title"><span>TOP PROCESSOS</span><span class="dim">PID | NOME | CPU | MEM</span></div>
+        <div class="block-title"><span>Top processos</span><span class="dim">pid · nome · cpu · mem</span></div>
         <table class="procs"><tbody id="procs"></tbody></table>
       </div>
     </section>
@@ -63,28 +66,28 @@
       <header class="panel-head"><span>PAINEL</span><span>REDE</span></header>
 
       <div class="block">
-        <div class="block-title"><span>STATUS DA REDE</span><span id="iface" class="dim">—</span></div>
+        <div class="block-title"><span>Status da rede</span><span id="iface" class="dim">—</span></div>
         <div class="info-grid three">
-          <div><small>ESTADO</small><b id="net-state">—</b></div>
+          <div><small>Estado</small><b id="net-state">—</b></div>
           <div><small>IPv4</small><b id="ip4">—</b></div>
-          <div><small>PING GW</small><b id="ping">—</b></div>
+          <div><small>Ping GW</small><b id="ping">—</b></div>
         </div>
       </div>
 
       <div class="block grow">
-        <div class="block-title"><span>VISÃO GLOBAL</span><span class="dim">REDE · NÓS ATIVOS</span></div>
+        <div class="block-title"><span>Visão global</span><span class="dim">rede · nós ativos</span></div>
         <canvas id="globe"></canvas>
         <small class="dim" id="host">—</small>
       </div>
 
       <div class="block">
-        <div class="block-title"><span>TRÁFEGO DE REDE</span><span class="dim">↓ DOWN / ↑ UP</span></div>
+        <div class="block-title"><span>Tráfego de rede</span><span class="dim">↓ down · ↑ up</span></div>
         <div class="info-grid two">
-          <div><small>↓ AGORA</small><b id="rx">0 B/s</b></div>
-          <div><small>↑ AGORA</small><b id="tx">0 B/s</b></div>
+          <div><small>↓ agora</small><b id="rx">0 B/s</b></div>
+          <div><small>↑ agora</small><b id="tx">0 B/s</b></div>
         </div>
         <canvas id="net-graph" class="graph tall"></canvas>
-        <small class="dim" id="net-total">TOTAL —</small>
+        <small class="dim" id="net-total">Total —</small>
       </div>
     </section>
 
@@ -95,9 +98,9 @@
       <footer class="mount">
         <span id="mount-text">Disco —</span>
         <div class="bar"><div id="mount-bar"></div></div>
-        <button id="sound-btn" class="foot-btn" type="button" aria-pressed="true">SOM</button>
-        <button id="web-btn" class="foot-btn" type="button" aria-pressed="false">WEB</button>
-        <button id="theme-btn" class="foot-btn" type="button" aria-label="Trocar tema">TEMA</button>
+        <button id="sound-btn" class="foot-btn" type="button" aria-pressed="true">Som</button>
+        <button id="web-btn" class="foot-btn" type="button" aria-pressed="false">Web</button>
+        <button id="theme-btn" class="foot-btn" type="button" aria-label="Trocar tema">Tema</button>
       </footer>
     </section>
 
@@ -110,7 +113,7 @@
   <!-- Mini navegador: a página é uma view isolada que o processo principal desenha sobre #web-slot -->
   <section id="web" class="webwin" hidden aria-label="Mini navegador">
     <header id="web-bar" class="webwin-bar">
-      <span class="webwin-title">WEB</span>
+      <span class="webwin-title">Web</span>
       <button id="web-back" type="button" aria-label="Voltar" disabled>&#9664;</button>
       <button id="web-fwd" type="button" aria-label="Avançar" disabled>&#9654;</button>
       <button id="web-reload" type="button" aria-label="Recarregar">&#10227;</button>
@@ -123,7 +126,7 @@
     <div id="web-slot" class="webwin-slot">
       <p>Digite um endereço ou uma busca.<br><small>Nada é carregado até você pedir.</small></p>
     </div>
-    <footer id="web-status" class="webwin-status">PRONTO</footer>
+    <footer id="web-status" class="webwin-status">Pronto</footer>
   </section>
 
   <script src="../../node_modules/@xterm/xterm/lib/xterm.js"></script>

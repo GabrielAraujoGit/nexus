@@ -114,7 +114,7 @@
     if (s.closed) {
       hasPage = false;
       if (!s.error) input.value = '';
-      status.textContent = s.error ? `ERRO: ${s.error}` : 'PRONTO';
+      status.textContent = s.error ? `Erro: ${s.error}` : 'Pronto';
       status.dataset.loading = '0';
       $('web-back').disabled = true;
       $('web-fwd').disabled = true;
@@ -130,7 +130,7 @@
     status.dataset.loading = s.loading ? '1' : '0';
     $('web-reload').textContent = s.loading ? '✕' : '⟳';
     $('web-reload').setAttribute('aria-label', s.loading ? 'Parar' : 'Recarregar');
-    if (s.error) status.textContent = `ERRO: ${s.error}`;
-    else status.textContent = s.loading ? 'CARREGANDO…' : (s.title || s.url || 'PRONTO');
+    if (s.error) status.textContent = `Erro: ${s.error}`;
+    else status.textContent = s.loading ? 'Carregando…' : (s.title || s.url || 'Pronto');
   });
 })();

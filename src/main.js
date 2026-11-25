@@ -211,12 +211,10 @@ async function staticInfo() {
 
 let netPrev = null;
 async function fastTick() {
-  const [load, mem, temp, net, battery] = await Promise.all([
+  const [load, mem, net] = await Promise.all([
     si.currentLoad(),
     si.mem(),
-    si.cpuTemperature().catch(() => ({ main: null })),
     si.networkStats().catch(() => []),
-    si.battery().catch(() => ({ hasBattery: false })),
   ]);
   const iface = net.find((n) => n.operstate === 'up') || net[0];
   let rx = 0;
@@ -233,30 +231,55 @@ async function fastTick() {
     uptime: os.uptime(),
     cores: load.cpus.map((c) => c.load),
     load: load.currentLoad,
-    temp: temp.main,
+    temp: cache.temp,
     memUsed: mem.active,
     memTotal: mem.total,
     swapUsed: mem.swapused,
     net: iface ? {
       iface: iface.iface, rx, tx, rxTotal: iface.rx_bytes, txTotal: iface.tx_bytes,
     } : null,
-    battery: battery.hasBattery ? { percent: battery.percent, charging: battery.isCharging } : null,
+    battery: cache.battery,
   });
 }
 
-async function slowTick() {
-  const [procs, ifaces, gw, fsSize] = await Promise.all([
-    si.processes(),
+// Dados que mudam pouco ficam em cache e são atualizados em ritmo próprio (alguns disparam
+// comandos do sistema e custam centenas de ms, como a lista de interfaces de rede).
+const cache = { temp: null, battery: null, ip4: '—', iface: '—', online: false, gw: '', ping: null, fs: [] };
+
+async function sensorsTick() { // 5 s
+  const [temp, battery] = await Promise.all([
+    si.cpuTemperature().catch(() => ({ main: null })),
+    si.battery().catch(() => ({ hasBattery: false })),
+  ]);
+  cache.temp = temp.main;
+  cache.battery = battery.hasBattery ? { percent: battery.percent, charging: battery.isCharging } : null;
+}
+
+async function networkInfoTick() { // 30 s
+  const [ifaces, gw] = await Promise.all([
     si.networkInterfaces().catch(() => []),
     si.networkGatewayDefault().catch(() => ''),
-    si.fsSize().catch(() => []),
   ]);
   const list = Array.isArray(ifaces) ? ifaces : [ifaces];
   const main = list.find((i) => i.default) || list.find((i) => i.ip4 && !i.internal);
-  // Ping só no gateway da rede local: nada sai para a internet.
-  const ping = gw ? await si.inetLatency(gw).catch(() => null) : null;
+  cache.ip4 = main?.ip4 || '—';
+  cache.iface = main?.iface || '—';
+  cache.online = Boolean(main?.ip4);
+  cache.gw = gw;
+}
+
+async function pingTick() { // 10 s. Ping só no gateway da rede local: nada sai para a internet.
+  cache.ping = cache.gw ? await si.inetLatency(cache.gw).catch(() => null) : null;
+}
+
+async function diskTick() { // 30 s
+  cache.fs = await si.fsSize().catch(() => []);
+}
+
+async function slowTick() { // 3 s: processos
+  const procs = await si.processes();
   const cwd = lastCwd || homeDir();
-  const mount = fsSize
+  const mount = cache.fs
     .filter((f) => cwd.startsWith(f.mount))
     .sort((a, b) => b.mount.length - a.mount.length)[0];
 
@@ -267,18 +290,26 @@ async function slowTick() {
       .sort((a, b) => b.cpu - a.cpu)
       .slice(0, 6)
       .map((p) => ({ pid: p.pid, name: p.name, cpu: p.cpu, mem: p.mem })),
-    ip4: DEMO ? '192.168.0.42' : main?.ip4 || '—',
-    iface: DEMO ? 'eth0' : main?.iface || '—',
-    online: Boolean(main?.ip4),
-    ping,
+    ip4: DEMO ? '192.168.0.42' : cache.ip4,
+    iface: DEMO ? 'eth0' : cache.iface,
+    online: cache.online,
+    ping: cache.ping,
     mount: mount ? { mount: mount.mount, use: mount.use } : null,
   });
 }
 
+// Janela minimizada ou escondida: não coleta nada (as capturas usam janela fora da tela, então seguem).
+const idle = () => !process.env.NEXUS_SNAPSHOT && (!win || win.isDestroyed() || win.isMinimized() || !win.isVisible());
+
 function loop(fn, ms) {
-  const run = () => fn().catch((err) => console.error(`[nexus] ${fn.name}:`, err.message));
-  run();
+  let busy = false; // não empilha chamadas se uma coleta demorar mais que o intervalo
+  const run = (force = false) => {
+    if (busy || (!force && idle())) return Promise.resolve();
+    busy = true;
+    return fn().catch((err) => console.error(`[nexus] ${fn.name}:`, err.message)).finally(() => { busy = false; });
+  };
   timers.push(setInterval(run, ms));
+  return run(true); // primeira coleta já na abertura, mesmo antes da janela aparecer
 }
 
 ipcMain.handle('sys:static', () => staticInfo());
@@ -286,6 +317,9 @@ setupWeb(() => win);
 
 app.whenReady().then(() => {
   createWindow();
+  loop(sensorsTick, 5000);
+  loop(diskTick, 30000);
+  loop(networkInfoTick, 30000).then(() => loop(pingTick, 10000)); // ping precisa do gateway
   loop(fastTick, 1000);
   loop(slowTick, 3000);
   loop(pollCwd, 800);

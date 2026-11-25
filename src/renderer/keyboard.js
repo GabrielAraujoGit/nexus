@@ -3,18 +3,18 @@
 (function () {
   // [code, rótulo, rótulo com shift, classe de largura, sequência enviada no clique]
   const ROWS = [
-    [['Escape', 'ESC', '', 'w15', '\x1b'], ['Backquote', "'", '"'], ['Digit1', '1', '!'], ['Digit2', '2', '@'], ['Digit3', '3', '#'],
+    [['Escape', 'Esc', '', 'w15', '\x1b'], ['Backquote', "'", '"'], ['Digit1', '1', '!'], ['Digit2', '2', '@'], ['Digit3', '3', '#'],
       ['Digit4', '4', '$'], ['Digit5', '5', '%'], ['Digit6', '6', '¨'], ['Digit7', '7', '&'], ['Digit8', '8', '*'],
-      ['Digit9', '9', '('], ['Digit0', '0', ')'], ['Minus', '-', '_'], ['Equal', '=', '+'], ['Backspace', 'APAGAR', '', 'w2', '\x7f']],
-    [['Tab', 'TAB', '', 'w15', '\t'], ['KeyQ', 'Q'], ['KeyW', 'W'], ['KeyE', 'E'], ['KeyR', 'R'], ['KeyT', 'T'], ['KeyY', 'Y'],
-      ['KeyU', 'U'], ['KeyI', 'I'], ['KeyO', 'O'], ['KeyP', 'P'], ['BracketLeft', '´', '`'], ['BracketRight', '[', '{'], ['Enter', 'ENTER', '', 'w15', '\r']],
-    [['CapsLock', 'CAPS', '', 'w175', ''], ['KeyA', 'A'], ['KeyS', 'S'], ['KeyD', 'D'], ['KeyF', 'F'], ['KeyG', 'G'], ['KeyH', 'H'],
+      ['Digit9', '9', '('], ['Digit0', '0', ')'], ['Minus', '-', '_'], ['Equal', '=', '+'], ['Backspace', 'Apagar', '', 'w2', '\x7f']],
+    [['Tab', 'Tab', '', 'w15', '\t'], ['KeyQ', 'Q'], ['KeyW', 'W'], ['KeyE', 'E'], ['KeyR', 'R'], ['KeyT', 'T'], ['KeyY', 'Y'],
+      ['KeyU', 'U'], ['KeyI', 'I'], ['KeyO', 'O'], ['KeyP', 'P'], ['BracketLeft', '´', '`'], ['BracketRight', '[', '{'], ['Enter', 'Enter', '', 'w15', '\r']],
+    [['CapsLock', 'Caps', '', 'w175', ''], ['KeyA', 'A'], ['KeyS', 'S'], ['KeyD', 'D'], ['KeyF', 'F'], ['KeyG', 'G'], ['KeyH', 'H'],
       ['KeyJ', 'J'], ['KeyK', 'K'], ['KeyL', 'L'], ['Semicolon', 'Ç'], ['Quote', '~', '^'], ['Backslash', ']', '}']],
-    [['ShiftLeft', 'SHIFT', '', 'w15', ''], ['IntlBackslash', '\\', '|'], ['KeyZ', 'Z'], ['KeyX', 'X'], ['KeyC', 'C'], ['KeyV', 'V'],
-      ['KeyB', 'B'], ['KeyN', 'N'], ['KeyM', 'M'], ['Comma', ',', '<'], ['Period', '.', '>'], ['Slash', ';', ':'], ['IntlRo', '/', '?'], ['ShiftRight', 'SHIFT', '', 'w2', '']],
-    [['ControlLeft', 'CTRL', '', 'w15', ''], ['MetaLeft', 'SUPER', '', 'w15', ''], ['AltLeft', 'ALT', '', 'w15', ''], ['Space', '', '', 'space', ' '],
-      ['AltRight', 'ALT GR', '', 'w15', ''], ['ArrowLeft', '←', '', '', '\x1b[D'], ['ArrowUp', '↑', '', '', '\x1b[A'], ['ArrowDown', '↓', '', '', '\x1b[B'],
-      ['ArrowRight', '→', '', '', '\x1b[C'], ['ControlRight', 'CTRL', '', 'w15', '']],
+    [['ShiftLeft', 'Shift', '', 'w15', ''], ['IntlBackslash', '\\', '|'], ['KeyZ', 'Z'], ['KeyX', 'X'], ['KeyC', 'C'], ['KeyV', 'V'],
+      ['KeyB', 'B'], ['KeyN', 'N'], ['KeyM', 'M'], ['Comma', ',', '<'], ['Period', '.', '>'], ['Slash', ';', ':'], ['IntlRo', '/', '?'], ['ShiftRight', 'Shift', '', 'w2', '']],
+    [['ControlLeft', 'Ctrl', '', 'w15', ''], ['MetaLeft', 'Super', '', 'w15', ''], ['AltLeft', 'Alt', '', 'w15', ''], ['Space', '', '', 'space', ' '],
+      ['AltRight', 'Alt Gr', '', 'w15', ''], ['ArrowLeft', '←', '', '', '\x1b[D'], ['ArrowUp', '↑', '', '', '\x1b[A'], ['ArrowDown', '↓', '', '', '\x1b[B'],
+      ['ArrowRight', '→', '', '', '\x1b[C'], ['ControlRight', 'Ctrl', '', 'w15', '']],
   ];
 
   class Keyboard {
