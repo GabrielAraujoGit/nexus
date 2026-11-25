@@ -2,9 +2,9 @@
 :root,
 [data-theme="tron"] {
   --alert-rgb: 255, 70, 90;
-  --warn-rgb: 255, 196, 0;
+  --warn-rgb: 235, 190, 80;
   --rgb: 170, 207, 209;
-  --accent-rgb: 92, 240, 255;
+  --accent-rgb: 120, 220, 235;
   --bg: #05080d;
   --panel: rgba(var(--rgb), 0.035);
   --font: "MesloLGS NF", "JetBrains Mono", "Fira Mono", monospace;
@@ -30,14 +30,15 @@
   --ok-rgb: var(--rgb);
   --info-rgb: var(--accent-rgb);
 }
+/* Cores dessaturadas (tom de monitor, não de LED); saturação forte só em detalhes e alertas */
 [data-theme="cyberpunk"] {
-  --rgb: 0, 255, 65;
-  --accent-rgb: 255, 43, 214;
+  --rgb: 120, 232, 160;
+  --accent-rgb: 240, 90, 190;
   --bg: #0a0612;
 }
 [data-theme="ambar"] {
-  --rgb: 255, 176, 0;
-  --accent-rgb: 255, 214, 120;
+  --rgb: 235, 170, 85;
+  --accent-rgb: 245, 205, 140;
   --bg: #0b0700;
 }
 

@@ -151,7 +151,9 @@ function setupWeb(getWin) {
   return {
     async capture() {
       if (!view || !view.getVisible()) return null;
-      return view.webContents.capturePage();
+      // página que nunca termina de pintar não pode travar a captura: desiste em 5 s
+      const timeout = new Promise((resolve) => { setTimeout(() => resolve(null), 5000); });
+      return Promise.race([view.webContents.capturePage(), timeout]);
     },
   };
 }

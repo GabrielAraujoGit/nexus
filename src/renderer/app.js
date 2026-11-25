@@ -7,12 +7,13 @@
   const THEMES = ['tron', 'cyberpunk', 'ambar'];
   const THEME_NAMES = { tron: 'Tron', cyberpunk: 'Cyberpunk', ambar: 'Âmbar' };
   const ANSI = {
-    tron: ['#0b1418', '#ff5f6d', '#5cf0a0', '#ffd479', '#5cb8ff', '#c792ea', '#5cf0ff', '#aacfd1',
-      '#3a5560', '#ff8a94', '#8bffc0', '#ffe4a3', '#8fd0ff', '#ddb6ff', '#9ff6ff', '#e6fbfc'],
-    cyberpunk: ['#1a1030', '#ff2b6d', '#00ff41', '#ffd700', '#b026ff', '#ff2bd6', '#00e5ff', '#c8facc',
-      '#4a3b6b', '#ff5c8a', '#5cff7a', '#ffe45c', '#c566ff', '#ff6be3', '#5cf0ff', '#ffffff'],
-    ambar: ['#1a1200', '#ff6b3d', '#c8d64a', '#ffb000', '#d9a440', '#ff9a5c', '#ffd078', '#ffcc66',
-      '#4d3a10', '#ff8f6b', '#e0ec7a', '#ffc94d', '#ecc070', '#ffb88a', '#ffe0a3', '#fff2d6'],
+    // cores ANSI do terminal no mesmo tom dessaturado da interface
+    tron: ['#0b1418', '#e8727c', '#7fdcaa', '#e8c98a', '#7ab4e8', '#b99ad8', '#7fd8e6', '#aacfd1',
+      '#3a5560', '#f0959c', '#a4ecc6', '#f0dcaa', '#a0cbf0', '#d2bdea', '#a8e8f0', '#e6f4f5'],
+    cyberpunk: ['#1a1030', '#e8557e', '#78e8a0', '#e8cf6a', '#9a6ee0', '#f05abe', '#5ccfe0', '#cfe8d8',
+      '#4a3b6b', '#f07a98', '#a0f2c0', '#f0dc8c', '#b490f0', '#f586d0', '#8ae0ec', '#f2f7f4'],
+    ambar: ['#1a1200', '#e07a50', '#c2c86a', '#ebaa55', '#c9a060', '#e09470', '#e8c88a', '#e6c48a',
+      '#4d3a10', '#eb9878', '#d6dc8c', '#f0c27a', '#dcb880', '#f0b090', '#f0dcaa', '#f6ead2'],
   };
   const ANSI_KEYS = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white',
     'brightBlack', 'brightRed', 'brightGreen', 'brightYellow', 'brightBlue', 'brightMagenta', 'brightCyan', 'brightWhite'];
