@@ -279,6 +279,7 @@ async function staticInfo() {
     memTotal: mem.total,
     hasBattery: Boolean(battery.hasBattery),
     gpus,
+    version: app.getVersion(),
   };
 }
 

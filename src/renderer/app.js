@@ -497,33 +497,101 @@
   paintSound();
   $('theme-btn').textContent = `Tema: ${THEME_NAMES[theme]}`;
 
-  // ---------- Boot ----------
+  // ---------- Abertura ----------
+  // 1) CRT ligando  2) ícone traçado  3) nome decodificado  4) slogan + log com barra  5) revelação.
+  // ~2,5 s; qualquer tecla ou clique pula. Reduzir movimento: logo parado por meio segundo.
+  // Capturas de tela pulam a abertura; a gravação da demo mostra.
   const BOOT = [
-    'NEXUS kernel interface v0.1.0',
     'Inicializando módulos de telemetria ............ OK',
     'Conectando ao barramento do sistema ............ OK',
     'Mapeando interfaces de rede .................... OK',
     'Carregando matriz de memória ................... OK',
     'Renderizando globo ............................. OK',
     'Abrindo shell seguro ........................... OK',
-    '',
-    'BEM-VINDO.',
   ];
-  const log = $('boot-log');
-  let i = 0;
+  const RECORD = new URLSearchParams(location.search).has('record');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const timer = setInterval(() => {
-    if (i < BOOT.length) {
-      log.textContent += `${BOOT[i]}\n`;
-      if (BOOT[i]) sound.play('line');
-      i++;
-      return;
-    }
-    clearInterval(timer);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&*<>/\\';
+  let introDone = false;
+
+  function finishIntro() {
+    if (introDone) return;
+    introDone = true;
+    window.removeEventListener('keydown', skipIntro, true);
+    window.removeEventListener('pointerdown', skipIntro, true);
     $('boot').classList.add('done');
     $('ui').classList.remove('hidden');
     $('ui').classList.add('scan');
     sound.play('boot');
-    requestAnimationFrame(startTerminal);
-  }, reduce ? 0 : 110);
+    if (term.element) { // o terminal já abriu (startTerminal roda no próximo quadro)
+      fit.fit();
+      term.focus();
+    }
+  }
+  // a tecla que pula a abertura não vai para o shell
+  function skipIntro(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    finishIntro();
+  }
+
+  // letras trocando até cada uma travar no lugar, da esquerda para a direita
+  async function decode(el, word, ms) {
+    const start = performance.now();
+    while (!introDone) {
+      const t = (performance.now() - start) / ms;
+      const locked = Math.min(word.length, Math.floor(t * word.length));
+      el.textContent = word.slice(0, locked)
+        + [...word.slice(locked)].map(() => GLYPHS[Math.floor(Math.random() * GLYPHS.length)]).join('');
+      if (locked >= word.length) return;
+      if (Math.random() < 0.5) sound.play('line');
+      await sleep(40);
+    }
+  }
+
+  async function typeText(el, text, perChar) {
+    for (let k = 1; k <= text.length && !introDone; k++) {
+      el.textContent = text.slice(0, k);
+      await sleep(perChar);
+    }
+  }
+
+  async function intro() {
+    const box = $('intro');
+    const version = await window.nexus.staticInfo().then((i) => i.version).catch(() => '');
+    const tag = `SISTEMA DE COMANDO${version ? ` · v${version}` : ''}`;
+    if (SNAPSHOT && !RECORD) return finishIntro();
+    if (reduce) {
+      box.classList.add('on');
+      $('intro-word').textContent = 'NEXUS';
+      $('intro-tag').textContent = tag;
+      await sleep(500);
+      return finishIntro();
+    }
+    window.addEventListener('keydown', skipIntro, true);
+    window.addEventListener('pointerdown', skipIntro, true);
+
+    $('boot').classList.add('crt');
+    sound.play('open');
+    await sleep(450);
+    if (introDone) return;
+    box.classList.add('on');
+    await sleep(200);
+    await decode($('intro-word'), 'NEXUS', 650);
+    await typeText($('intro-tag'), tag, 14);
+    const log = $('boot-log');
+    for (let k = 0; k < BOOT.length && !introDone; k++) {
+      log.textContent += `${BOOT[k]}\n`;
+      $('intro-bar').style.width = `${((k + 1) / BOOT.length) * 100}%`;
+      sound.play('line');
+      await sleep(70);
+    }
+    await sleep(220);
+    finishIntro();
+  }
+
+  // o shell abre já, por trás da abertura
+  requestAnimationFrame(startTerminal);
+  intro().catch(() => finishIntro());
 })();

@@ -70,6 +70,7 @@ em segurança e desempenho.
 
 **Visual**
 - 3 temas: **Tron**, **Cyberpunk** e **Âmbar**.
+- Abertura: a tela liga como um monitor CRT, o ícone se desenha e o nome é decodificado (qualquer tecla pula).
 - Sons sintetizados (sem arquivos de áudio), varredura no boot, falha de sinal ao trocar de tema e janelas estilo CRT;
   tudo respeita *reduzir movimento* e o botão **Som** desliga.
 - Alertas: o painel fica vermelho e aparece um aviso quando CPU, temperatura ou memória chegam ao limite, ou quando a

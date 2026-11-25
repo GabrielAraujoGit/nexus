@@ -12,7 +12,23 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="boot" aria-hidden="true"><pre id="boot-log"></pre></div>
+  <!-- Abertura: CRT ligando, ícone traçado, nome decodificado e log de inicialização -->
+  <div id="boot" aria-hidden="true">
+    <div class="intro" id="intro">
+      <svg class="intro-mark" viewBox="0 0 124 96">
+        <path class="draw frame" pathLength="100" d="M8 8 H116 V88 H8 Z"/>
+        <path class="draw corner" pathLength="100" d="M2 24 V2 H24"/>
+        <path class="draw corner c2" pathLength="100" d="M100 94 H122 V72"/>
+        <path class="draw chevron" pathLength="100" d="M34 32 L54 48 L34 64"/>
+        <path class="draw cursor" pathLength="100" d="M62 64 H88"/>
+      </svg>
+      <div class="intro-word" id="intro-word"></div>
+      <div class="intro-tag"><span id="intro-tag"></span><i class="intro-caret"></i></div>
+      <div class="intro-bar"><div id="intro-bar"></div></div>
+      <pre id="boot-log"></pre>
+    </div>
+    <div class="intro-skip">qualquer tecla para pular</div>
+  </div>
 
   <main id="ui" class="hidden">
     <!-- Coluna esquerda -->

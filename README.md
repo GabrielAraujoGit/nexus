@@ -69,6 +69,7 @@ security and performance in mind.
 
 **Look and feel**
 - 3 themes: **Tron**, **Cyberpunk** and **Amber**.
+- An opening sequence: the screen switches on like a CRT, the icon draws itself and the name decodes (any key skips it).
 - Synthesized UI sounds (no audio files), boot scan, theme glitch, CRT-style windows; all respect *reduce motion*,
   and the **Som** button mutes them.
 - Alerts: panels turn red and a toast appears when CPU, temperature or memory hit the limit, or when the network

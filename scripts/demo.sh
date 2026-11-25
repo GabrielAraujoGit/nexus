@@ -11,7 +11,7 @@ source scripts/demo-home.sh
 FRAMES=$(mktemp -d)
 trap 'rm -rf "$DEMO_HOME" "$FRAMES"' EXIT
 FPS=10
-SECONDS_TOTAL=16
+SECONDS_TOTAL=17
 
 read -r -d '' SCENE <<'JS' || true
 (async () => {
@@ -33,7 +33,7 @@ read -r -d '' SCENE <<'JS' || true
     await sleep(90);
     window.dispatchEvent(new KeyboardEvent('keyup', { code: 'Enter' }));
   };
-  await sleep(2600);
+  await sleep(3500); // depois da abertura (uma tecla antes disso pularia a abertura)
   await type('cd ~/projetos/nexus');
   await sleep(900);
   await type('eza --tree --level=2 --icons=always');
