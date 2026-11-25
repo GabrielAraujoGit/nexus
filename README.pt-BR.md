@@ -46,6 +46,11 @@ reescrito do zero com dependências atuais e foco em segurança.
 - **Mini navegador**: botão **WEB** abre uma janela flutuante (arraste pela barra, redimensione pelo canto)
   com endereço ou busca (DuckDuckGo), voltar, avançar e recarregar. Só http/https.
 - **3 temas**: Tron, Cyberpunk e Âmbar, trocados pelo botão **TEMA**.
+- **Sons e animações**: clique de tecla ao digitar, som de inicialização, varredura quando os painéis aparecem,
+  falha de sinal ao trocar de tema, arquivos entrando em sequência depois de um `cd` e o mini navegador ligando como
+  um monitor CRT. Os painéis pulsam em vermelho com CPU ≥ 90%, temperatura ≥ 85 °C ou memória ≥ 90%. Os sons são
+  sintetizados na hora (sem arquivos de áudio) e o botão **SOM** desliga; as animações respeitam a opção
+  *reduzir movimento* do sistema.
 
 ## Instalar
 
@@ -119,6 +124,7 @@ src/
     ├── graphs.js    gráficos de linha em canvas
     ├── globe.js     globo wireframe
     ├── keyboard.js  teclado ABNT2 na tela
+    ├── sound.js     sons de interface sintetizados (Web Audio)
     └── web.js       janela flutuante do mini navegador
 ```
 
@@ -132,7 +138,7 @@ usuário, máquina, IP, processos e pasta pessoal são fictícios, então dá pa
 - [ ] Abas e divisão do terminal
 - [ ] Temas configuráveis por arquivo
 - [ ] Outros layouts de teclado (US, ISO)
-- [ ] Sons de interface (opcionais)
+- [x] Sons e animações de interface
 - [ ] Painel de git (branch e mudanças da pasta atual)
 - [ ] Interface em inglês
 - [x] Pacotes `.deb` e AppImage

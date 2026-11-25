@@ -46,6 +46,10 @@ rewritten from scratch with current dependencies and a focus on security.
 - **Mini browser**: the **WEB** button opens a floating window (drag it by the bar, resize it from the corner)
   with an address/search bar (DuckDuckGo), back, forward and reload. http/https only.
 - **3 themes**: Tron, Cyberpunk and Amber, switched with the **TEMA** button.
+- **Sounds and animations**: typing clicks, boot chime, a scan sweep when the panels appear, a signal glitch when
+  switching themes, files cascading in after a `cd`, and the mini browser turning on like a CRT. Panels pulse red
+  when CPU ≥ 90%, temperature ≥ 85 °C or memory ≥ 90%. Sounds are synthesized live (no audio files) and the
+  **SOM** button mutes them; animations follow your system's *reduce motion* setting.
 
 > The interface text is in Brazilian Portuguese for now.
 
@@ -121,6 +125,7 @@ src/
     ├── graphs.js    canvas line charts
     ├── globe.js     wireframe globe
     ├── keyboard.js  on-screen ABNT2 keyboard
+    ├── sound.js     synthesized UI sounds (Web Audio)
     └── web.js       mini browser floating window
 ```
 
@@ -134,7 +139,7 @@ user, host, IP, processes and home folder are fake, so you can regenerate them w
 - [ ] Terminal tabs and splits
 - [ ] File-based custom themes
 - [ ] More keyboard layouts (US, ISO)
-- [ ] UI sounds (optional)
+- [x] UI sounds and animations
 - [ ] Git panel (branch and changes in the current folder)
 - [ ] English interface
 - [x] `.deb` and AppImage packages

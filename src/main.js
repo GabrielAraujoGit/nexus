@@ -50,13 +50,17 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: true,
       spellcheck: false,
+      autoplayPolicy: 'no-user-gesture-required', // som do boot
       offscreen: snapshotMode, // captura fora da tela: tamanho fixo, independente do monitor
     },
   });
 
   win.removeMenu();
   const theme = process.env.NEXUS_THEME;
-  win.loadFile(path.join(__dirname, 'renderer', 'index.html'), theme ? { query: { theme } } : undefined);
+  const query = {};
+  if (theme) query.theme = theme;
+  if (snapshotMode) query.snapshot = '1'; // capturas: sem som e sem animações
+  win.loadFile(path.join(__dirname, 'renderer', 'index.html'), { query });
   // página (re)carregada: reenvia a lista de arquivos
   win.webContents.on('did-finish-load', () => {
     lastCwd = null;

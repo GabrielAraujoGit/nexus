@@ -25,6 +25,16 @@
   if (THEMES.includes(forced)) theme = forced;
   document.documentElement.dataset.theme = theme;
 
+  const sound = window.NexusSound;
+  const SNAPSHOT = new URLSearchParams(location.search).has('snapshot');
+  if (SNAPSHOT) document.documentElement.classList.add('snapshot');
+  // Reinicia uma animação CSS: tira a classe, força o reflow e põe de novo.
+  function replay(el, cls) {
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
+
   // ---------- Formatação ----------
   const pad = (n) => String(n).padStart(2, '0');
   const MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
@@ -109,6 +119,13 @@
     if (!window.getSelection()?.toString()) term.focus();
   });
 
+  // ---------- Som de digitação ----------
+  window.addEventListener('keydown', (e) => {
+    if (e.repeat || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'Enter') sound.play('enter');
+    else if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Tab') sound.play('key');
+  }, true);
+
   // ---------- Relógio ----------
   function clock() {
     const d = new Date();
@@ -166,10 +183,25 @@
       $('tx').textContent = bytes(t.net.tx, '/s');
       $('net-total').textContent = `TOTAL ↓ ${bytes(t.net.rxTotal)} · ↑ ${bytes(t.net.txTotal)}`;
     }
+    alerts({ cpu: t.load >= 90, temp: t.temp >= 85, mem: ratio >= 0.9 });
     $('power').textContent = t.battery
       ? `${Math.round(t.battery.percent)}%${t.battery.charging ? ' ⚡' : ''}`
       : 'TOMADA';
   });
+
+  // Alerta: painel pulsa e toca um aviso (no máximo uma vez por minuto para cada tipo).
+  const ALERT_BLOCKS = { cpu: $('cpu-a').closest('.block'), temp: $('temp').closest('div'), mem: $('mem-grid').closest('.block') };
+  const lastAlert = {};
+  function alerts(state) {
+    if (SNAPSHOT) return; // capturas de tela ficam sem alerta
+    for (const [kind, on] of Object.entries(state)) {
+      ALERT_BLOCKS[kind].classList.toggle('alert', on);
+      if (on && Date.now() - (lastAlert[kind] || 0) > 60000) {
+        lastAlert[kind] = Date.now();
+        sound.play('alert');
+      }
+    }
+  }
 
   window.nexus.onSlow((s) => {
     $('tasks').textContent = s.tasks;
@@ -212,7 +244,10 @@
     return btn;
   }
 
+  let lastFilesCwd = null;
   window.nexus.onFiles((f) => {
+    const changed = f.cwd !== lastFilesCwd;
+    lastFilesCwd = f.cwd;
     const shown = f.cwd.startsWith(f.home) ? `~${f.cwd.slice(f.home.length)}` : f.cwd;
     $('cwd').textContent = shown || '~';
     const box = $('files');
@@ -239,11 +274,17 @@
       p.textContent = `… e mais ${f.total - f.items.length} itens`;
       nodes.push(p);
     }
+    nodes.forEach((n, i) => n.style.setProperty('--i', Math.min(i, 30)));
     box.replaceChildren(...nodes);
+    if (changed) {
+      replay(box, 'enter');
+      sound.play('files');
+    }
   });
 
   // ---------- Teclado ----------
   new window.NexusKeyboard($('keyboard'), (seq) => {
+    sound.play(seq === '\r' ? 'enter' : 'key');
     window.nexus.write(seq);
     term.focus();
   });
@@ -255,8 +296,27 @@
     try { localStorage.setItem('nexus.theme', theme); } catch { /* ignora */ }
     term.options.theme = termTheme();
     $('theme-btn').textContent = `TEMA: ${theme.toUpperCase()}`;
+    replay($('ui'), 'glitch');
+    sound.play('theme');
     term.focus();
   });
+  $('ui').addEventListener('animationend', (e) => {
+    if (e.animationName === 'glitch') $('ui').classList.remove('glitch');
+  });
+
+  // ---------- Som ----------
+  const soundBtn = $('sound-btn');
+  function paintSound() {
+    soundBtn.textContent = `SOM: ${sound.enabled ? 'ON' : 'OFF'}`;
+    soundBtn.setAttribute('aria-pressed', String(sound.enabled));
+  }
+  soundBtn.addEventListener('click', () => {
+    sound.setEnabled(!sound.enabled);
+    sound.play('toggle');
+    paintSound();
+    term.focus();
+  });
+  paintSound();
   $('theme-btn').textContent = `TEMA: ${theme.toUpperCase()}`;
 
   // ---------- Boot ----------
@@ -277,12 +337,15 @@
   const timer = setInterval(() => {
     if (i < BOOT.length) {
       log.textContent += `${BOOT[i]}\n`;
+      if (BOOT[i]) sound.play('line');
       i++;
       return;
     }
     clearInterval(timer);
     $('boot').classList.add('done');
     $('ui').classList.remove('hidden');
+    $('ui').classList.add('scan');
+    sound.play('boot');
     requestAnimationFrame(startTerminal);
   }, reduce ? 0 : 110);
 })();

@@ -10,9 +10,13 @@
   const status = $('web-status');
   const toggle = $('web-btn');
   let hasPage = false;
+  let animating = false; // durante a animação a view nativa fica escondida (ela não anima)
+  const sound = window.NexusSound;
+  const noMotion = () => document.documentElement.classList.contains('snapshot')
+    || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function sync() {
-    if (box.hidden || !hasPage) {
+    if (box.hidden || !hasPage || animating) {
       api.bounds(null);
       return;
     }
@@ -20,15 +24,36 @@
     api.bounds({ x: r.left, y: r.top, width: r.width, height: r.height });
   }
 
+  // Abre/fecha como um monitor CRT ligando e desligando.
   function show(visible) {
-    box.hidden = !visible;
+    const isOpen = !box.hidden && !box.classList.contains('closing');
+    if (visible === isOpen) return;
     toggle.setAttribute('aria-pressed', String(visible));
+    sound.play(visible ? 'open' : 'close');
+    box.classList.remove('opening', 'closing');
     if (visible) {
+      box.hidden = false;
       clamp();
       if (!hasPage) input.focus();
     }
+    if (noMotion()) {
+      box.hidden = !visible;
+      animating = false;
+      sync();
+      return;
+    }
+    animating = true;
     sync();
+    void box.offsetWidth; // reinicia a animação
+    box.classList.add(visible ? 'opening' : 'closing');
   }
+  box.addEventListener('animationend', (e) => {
+    if (e.target !== box) return;
+    if (box.classList.contains('closing')) box.hidden = true;
+    box.classList.remove('opening', 'closing');
+    animating = false;
+    sync();
+  });
 
   // Mantém a janela dentro da tela (depois de arrastar ou redimensionar o app).
   function clamp() {
