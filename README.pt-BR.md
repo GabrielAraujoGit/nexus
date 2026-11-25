@@ -31,6 +31,9 @@ reescrito do zero com dependências atuais e foco em segurança.
   </tr>
 </table>
 
+![NEXUS com o mini navegador aberto neste repositório](docs/screenshots/nexus-web.png)
+<p align="center"><b>Mini navegador</b>: página isolada, em sandbox, flutuando sobre os painéis</p>
+
 ## O que tem
 
 - **Terminal de verdade**: seu shell (`$SHELL`) via `node-pty` + [xterm.js](https://xtermjs.org/), com WebGL,
@@ -144,8 +147,9 @@ src/
 
 ## Capturas de tela
 
-As imagens acima são geradas por `npm run screenshots`, que roda o app em **modo demo**:
-usuário, máquina, IP, processos e pasta pessoal são fictícios, então dá para regerar sem expor nada seu.
+As imagens acima são geradas por `npm run screenshots`, que roda o app em **modo demo**: usuário, máquina, IP,
+dados de rede, processos, memória, temperatura e pasta pessoal são fictícios, e ele usa um perfil temporário próprio,
+então dá para regerar sem expor nada seu. A captura do mini navegador carrega a página pública deste repositório.
 
 ## Próximos passos
 

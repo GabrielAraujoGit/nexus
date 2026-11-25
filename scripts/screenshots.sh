@@ -38,22 +38,29 @@ alias ls='eza --icons=auto --group-directories-first' 2>/dev/null
 command -v starship >/dev/null && eval "$(starship init bash)" || PS1='\[\e[1;36m\]\w\[\e[0m\] ❯ '
 EOF
 
-FETCH='fastfetch -s OS:Kernel:Uptime:Packages:Shell:DE:WM:Terminal:CPU:GPU:Memory:Disk:Break:Colors'
+FETCH='fastfetch -s OS:Kernel:Uptime:Packages:Shell:DE:WM:Terminal:CPU:GPU:Disk:Break:Colors'
 BAT=$(command -v batcat || command -v bat || echo cat)
 TREE='eza --tree --level=3 --icons=always'
 command -v eza >/dev/null || TREE='find . -maxdepth 3 -not -path "*/.*"'
 
-shot() { # tema arquivo comando
-    local theme=$1 file=$2 cmd=$3
+shot() { # tema arquivo comando [js extra] [espera ms]
+    local theme=$1 file=$2 cmd=$3 extra=${4:-} wait=${5:-3500}
     echo "==> $file ($theme)"
     NEXUS_DEMO=1 NEXUS_DEMO_HOME="$DEMO_HOME" NEXUS_THEME="$theme" \
     NEXUS_SNAPSHOT="$OUT/$file" NEXUS_SNAPSHOT_DELAY=4000 \
-    NEXUS_SNAPSHOT_JS="new Promise(r => { nexus.write($(printf '%s' "$cmd" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))') + '\r'); setTimeout(() => r('ok'), 3500); })" \
+    NEXUS_SNAPSHOT_JS="new Promise(r => { nexus.write($(printf '%s' "$cmd" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))') + '\r'); $extra; setTimeout(() => r('ok'), $wait); })" \
         ./node_modules/.bin/electron . >/dev/null 2>&1
 }
+
+# Mini navegador aberto na página pública do próprio repositório (única captura que acessa a internet).
+WEB_JS="const b = document.getElementById('web'); document.getElementById('web-btn').click();
+Object.assign(b.style, { left: '380px', top: '70px', width: '860px', height: '520px', right: 'auto' });
+document.getElementById('web-url').value = 'github.com/GabrielAraujoGit/nexus';
+document.getElementById('web-form').requestSubmit()"
 
 shot tron      nexus-tron.png      "clear && cd ~/projetos/nexus && $FETCH"
 shot cyberpunk nexus-cyberpunk.png "clear && cd ~/projetos/nexus && $TREE"
 shot ambar     nexus-ambar.png     "clear && cd ~/projetos/nexus && $BAT --paging=never README.md"
+shot tron      nexus-web.png       "clear && cd ~/projetos/nexus" "$WEB_JS" 8000
 
 echo "Pronto: $(ls "$OUT")"

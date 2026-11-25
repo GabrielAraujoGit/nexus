@@ -108,6 +108,16 @@
     show(false);
   });
 
+  // Modo de capturas: a página chega como imagem e é desenhada dentro da moldura.
+  api.onSnapshot((dataUrl) => {
+    if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/png')) return;
+    const img = document.createElement('img');
+    img.className = 'web-shot';
+    img.alt = '';
+    img.src = dataUrl;
+    slot.replaceChildren(img);
+  });
+
   // ---------- Estado vindo da página ----------
   api.onState((s) => {
     slot.classList.toggle('has-page', !s.closed);

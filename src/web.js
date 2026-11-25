@@ -68,6 +68,9 @@ function setupWeb(getWin) {
         nodeIntegration: false,
         webviewTag: false,
         spellcheck: false,
+        offscreen: Boolean(process.env.NEXUS_SNAPSHOT), // capturas: a página também renderiza fora da tela
+        // capturas em 2x: a página acompanha o zoom da interface (zoomFactor vale para toda navegação)
+        zoomFactor: process.env.NEXUS_SNAPSHOT ? Number(process.env.NEXUS_SNAPSHOT_SCALE) || 2 : 1,
       },
     });
     view.setBackgroundColor('#ffffff');
@@ -143,6 +146,14 @@ function setupWeb(getWin) {
   });
 
   ipcMain.on('web:close', () => closeView());
+
+  // Capturas de tela: o capturePage da janela não inclui esta view, então ela é fotografada à parte.
+  return {
+    async capture() {
+      if (!view || !view.getVisible()) return null;
+      return view.webContents.capturePage();
+    },
+  };
 }
 
 module.exports = { setupWeb, toURL };

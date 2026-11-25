@@ -97,6 +97,12 @@ function createWindow() {
         if (process.env.NEXUS_SNAPSHOT_JS) {
           console.log(await win.webContents.executeJavaScript(process.env.NEXUS_SNAPSHOT_JS));
         }
+        // mini navegador aberto: a imagem da página vai para dentro da moldura antes da captura
+        const page = await web.capture();
+        if (page) {
+          send('web:snapshot', page.toDataURL());
+          await new Promise((r) => setTimeout(r, 500));
+        }
         const img = await win.webContents.capturePage();
         await fs.writeFile(snapshot, img.toPNG());
         app.quit();
@@ -249,13 +255,14 @@ async function fastTick() {
     uptime: os.uptime(),
     cores: load.cpus.map((c) => c.load),
     load: load.currentLoad,
-    temp: cache.temp,
-    memUsed: mem.active,
-    memAvailable: mem.available,
+    // modo demo (capturas do README): memória e temperatura fictícias, não as da máquina de quem roda
+    temp: DEMO ? 54 : cache.temp,
+    memUsed: DEMO ? mem.total * 0.42 : mem.active,
+    memAvailable: DEMO ? mem.total * 0.55 : mem.available,
     memTotal: mem.total,
     ghz: speed.avg,
     loadavg: os.loadavg(),
-    swapUsed: mem.swapused,
+    swapUsed: DEMO ? 512 * 1024 ** 2 : mem.swapused,
     net: iface ? {
       iface: iface.iface, rx, tx, rxTotal: iface.rx_bytes, txTotal: iface.tx_bytes,
     } : null,
@@ -392,7 +399,7 @@ function loop(fn, ms) {
 }
 
 ipcMain.handle('sys:static', () => staticInfo());
-setupWeb(() => win);
+const web = setupWeb(() => win);
 
 app.whenReady().then(() => {
   createWindow();
