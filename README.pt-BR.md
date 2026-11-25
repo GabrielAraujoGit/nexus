@@ -24,6 +24,7 @@ em segurança e desempenho.
 [Tour visual](#tour-visual) ·
 [Instalar](#instalar) ·
 [Segurança](#segurança-e-privacidade) ·
+[Wiki](https://github.com/gabterm/nexus/wiki/In%C3%ADcio) ·
 [Próximos passos](#próximos-passos)
 
 </div>
@@ -232,7 +233,7 @@ src/
 
 ## Contribuir
 
-Contribuições são bem-vindas! Veja o [CONTRIBUTING.pt-BR.md](CONTRIBUTING.pt-BR.md). Se você curtiu o NEXUS, uma ⭐
+Contribuições são bem-vindas! Veja o [CONTRIBUTING.pt-BR.md](CONTRIBUTING.pt-BR.md) e a [wiki](https://github.com/gabterm/nexus/wiki/In%C3%ADcio), com guias detalhados (uso, solução de problemas, arquitetura). Se você curtiu o NEXUS, uma ⭐
 ajuda outras pessoas a encontrarem o projeto.
 
 ## Créditos

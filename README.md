@@ -24,6 +24,7 @@ security and performance in mind.
 [Visual tour](#visual-tour) ·
 [Install](#install) ·
 [Security](#security-and-privacy) ·
+[Wiki](https://github.com/gabterm/nexus/wiki) ·
 [Roadmap](#roadmap)
 
 </div>
@@ -233,7 +234,7 @@ src/
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md). If you like NEXUS, a ⭐ helps other people
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md), and the [wiki](https://github.com/gabterm/nexus/wiki) for detailed guides (usage, troubleshooting, architecture). If you like NEXUS, a ⭐ helps other people
 find it.
 
 ## Credits
