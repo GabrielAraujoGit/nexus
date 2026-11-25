@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Gera os vídeos de divulgação (dist/nexus-promo.mp4 em inglês e dist/nexus-promo-pt.mp4 em português):
-# 1920x1080, 30 fps, H.264, ~22 s, sem áudio. Uma gravação só, duas montagens.
+# 1920x1080, 30 fps, H.264, ~18 s, sem áudio. Uma gravação só, duas montagens.
 # Grava a cena (scripts/promo-scene.js) em modo demo, monta legendas e cartela final
 # (scripts/promo-compose.js) e remuxa para MP4 padrão com índice no início (aceito pelo X).
 #   npm run promo        (precisa do gst-launch-1.0 para o remux)
