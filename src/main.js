@@ -8,6 +8,7 @@ const net = require('node:net');
 const { execFile } = require('node:child_process');
 const si = require('systeminformation');
 const { setupWeb } = require('./web');
+const { setupMusic } = require('./music');
 
 let pty = null;
 try {
@@ -456,6 +457,7 @@ function loop(fn, ms) {
 
 ipcMain.handle('sys:static', () => staticInfo());
 const web = setupWeb(() => win);
+if (!CAPTURE) setupMusic(() => win); // capturas não abrem o player (usam perfil temporário)
 
 // Uma janela só: rodar `nexus` de novo traz a janela aberta para a frente (e a restaura se minimizada).
 // Capturas usam perfil próprio, então não esbarram na janela de quem está usando o app.

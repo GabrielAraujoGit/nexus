@@ -30,6 +30,25 @@ function toURL(input) {
   }
 }
 
+// Posiciona uma view nativa sobre o retângulo (em pixels CSS) que a interface mandou; null esconde.
+function placeView(win, view, rect) {
+  if (!rect) {
+    view.setVisible(false);
+    return;
+  }
+  const nums = ['x', 'y', 'width', 'height'].map((k) => Number(rect[k]));
+  if (!nums.every(Number.isFinite)) return;
+  // Com zoom (capturas em 2x) a view precisa da escala.
+  const zoom = win.webContents.getZoomFactor();
+  const [cw, ch] = win.getContentSize();
+  const x = Math.min(Math.max(Math.round(nums[0] * zoom), 0), cw);
+  const y = Math.min(Math.max(Math.round(nums[1] * zoom), 0), ch);
+  const width = Math.min(Math.max(Math.round(nums[2] * zoom), 1), cw - x);
+  const height = Math.min(Math.max(Math.round(nums[3] * zoom), 1), ch - y);
+  view.setBounds({ x, y, width, height });
+  view.setVisible(true);
+}
+
 function setupWeb(getWin) {
   let view = null;
 
@@ -118,22 +137,12 @@ function setupWeb(getWin) {
 
   ipcMain.on('web:bounds', (_e, rect) => {
     const win = getWin();
-    if (!view || !win || win.isDestroyed()) return;
-    if (!rect) {
-      view.setVisible(false);
-      return;
-    }
-    const nums = ['x', 'y', 'width', 'height'].map((k) => Number(rect[k]));
-    if (!nums.every(Number.isFinite)) return;
-    // A interface manda em pixels CSS; com zoom (capturas em 2x) a view precisa da escala.
-    const zoom = win.webContents.getZoomFactor();
-    const [cw, ch] = win.getContentSize();
-    const x = Math.min(Math.max(Math.round(nums[0] * zoom), 0), cw);
-    const y = Math.min(Math.max(Math.round(nums[1] * zoom), 0), ch);
-    const width = Math.min(Math.max(Math.round(nums[2] * zoom), 1), cw - x);
-    const height = Math.min(Math.max(Math.round(nums[3] * zoom), 1), ch - y);
-    view.setBounds({ x, y, width, height });
-    view.setVisible(true);
+    if (view && win && !win.isDestroyed()) placeView(win, view, rect);
+  });
+
+  ipcMain.on('web:front', () => {
+    const win = getWin();
+    if (view && win && !win.isDestroyed()) win.contentView.addChildView(view); // readicionar põe no topo
   });
 
   ipcMain.on('web:nav', (_e, action) => {
@@ -158,4 +167,4 @@ function setupWeb(getWin) {
   };
 }
 
-module.exports = { setupWeb, toURL };
+module.exports = { setupWeb, toURL, placeView };

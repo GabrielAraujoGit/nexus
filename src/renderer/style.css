@@ -616,6 +616,56 @@ button:focus-visible, input:focus-visible { outline: 2px solid rgba(var(--accent
   opacity: 0.75;
 }
 
+/* ---------- Música ---------- */
+.musicwin { top: 90px; right: 60px; width: 620px; height: 440px; }
+.musicwin .webwin-slot { background: #030303; }
+.webwin-spacer { flex: 1; }
+.webwin-bar button.wide { width: auto; padding: 0 8px; }
+
+.np {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  margin-bottom: 6px;
+  border-top: 1px solid rgba(var(--rgb), 0.25);
+  min-width: 0;
+}
+.np[hidden] { display: none; }
+.np-art {
+  width: 44px; height: 44px;
+  object-fit: cover;
+  border: 1px solid rgba(var(--rgb), 0.4);
+  border-radius: var(--radius-sm);
+  filter: saturate(0.6);
+}
+.np-art[hidden] { display: none; }
+.np-info { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.np-title, .np-artist { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.np-title { font-weight: 600; color: rgba(var(--rgb), var(--text-strong)); }
+.np-artist { opacity: 0.65; font-size: 12px; }
+.np-track { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+.np-track .bar { flex: 1; }
+.np-track small { opacity: 0.6; flex-shrink: 0; }
+.np-ctl { display: flex; gap: 2px; }
+.np-ctl button {
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  width: 26px; height: 26px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.np-ctl button:hover { border-color: rgba(var(--rgb), 0.45); background: rgba(var(--rgb), 0.08); }
+#np-toggle { border-color: rgba(var(--accent-rgb), 0.6); color: rgb(var(--accent-rgb)); }
+.np.playing .np-title::before { content: "♪ "; color: rgb(var(--accent-rgb)); }
+.np.changed { animation: np-in 0.6s ease-out; }
+@keyframes np-in { from { opacity: 0.2; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
 /* ---------- Teclado ---------- */
 .keyboard { display: flex; flex-direction: column; gap: 5px; height: 100%; justify-content: flex-end; }
 .kb-row { display: flex; gap: 5px; flex: 1; max-height: 46px; }

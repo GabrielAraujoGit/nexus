@@ -6,7 +6,7 @@
 
 ### Your shell, inside a sci-fi command center.
 
-A Linux terminal wrapped in live panels for CPU, memory, network and files, plus a mini browser.<br>
+A Linux terminal wrapped in live panels for CPU, memory, network and files, plus a mini browser and YouTube Music.<br>
 Inspired by movie interfaces and [eDEX-UI](https://github.com/GitSquared/edex-ui), rebuilt from scratch with
 security and performance in mind.
 
@@ -72,6 +72,13 @@ security and performance in mind.
 **Mini browser**
 - A floating window (**Web** button) you can drag and resize, with address/search bar, back, forward and reload.
 - Runs isolated: sandboxed, no access to the app, in-memory session, permissions and downloads denied.
+
+**Music**
+- The **Música** button opens the official [YouTube Music](https://music.youtube.com) site in its own floating
+  window. Hide it and the music keeps playing.
+- A mini player in the files panel shows cover, track, artist and progress, with previous, play/pause and next.
+- No API key and no unofficial API: the mini player reads what the site publishes about the current track and
+  presses the site's own buttons. Your login is kept in a separate session only this window uses.
 
 **Look and feel**
 - HUD-style layout: thin rules instead of boxes, a dot-grid backdrop, an angled terminal tab and floating keys.
@@ -202,9 +209,12 @@ sudo bash scripts/apparmor-dev.sh            # undo: sudo bash scripts/apparmor-
 - The UI runs with `sandbox` and `contextIsolation`, without `nodeIntegration`, and talks to the main process only
   through a minimal IPC bridge (`src/preload.js`). A strict CSP blocks external scripts and connections.
 - **No internet calls on its own.** Ping and packet loss only go to your local gateway, fonts are bundled, and the
-  globe geolocates nothing. The network is only used when you open a page in the mini browser.
+  globe geolocates nothing. The network is only used when you open a page in the mini browser or the music window.
 - The mini browser is a separate, sandboxed view: no Node, no access to the app's bridge, in-memory session
   (cookies are gone when you quit), permissions and downloads denied, http/https only.
+- The music window is another sandboxed view with its own saved session (so you stay signed in), separate from the
+  mini browser and the app. It only navigates to YouTube and Google sign-in, and **Sair da conta** erases that
+  session.
 - Screenshots and the demo run in **demo mode** with fake user, host, network, processes, memory and files, in a
   temporary profile, so nothing of yours ends up in an image.
 
@@ -214,6 +224,7 @@ sudo bash scripts/apparmor-dev.sh            # undo: sudo bash scripts/apparmor-
 src/
 ├── main.js          window, shell (node-pty), metrics (systeminformation), capture modes
 ├── web.js           mini browser (isolated WebContentsView)
+├── music.js         YouTube Music view and now-playing reader
 ├── preload.js       IPC bridge exposed as window.nexus
 └── renderer/
     ├── index.html   panel layout
@@ -223,7 +234,9 @@ src/
     ├── globe.js     wireframe globe (batched rendering)
     ├── keyboard.js  on-screen ABNT2 keyboard
     ├── sound.js     synthesized UI sounds (Web Audio)
-    └── web.js       mini browser floating window
+    ├── floatwin.js  floating window frame (drag, CRT open/close, stacking)
+    ├── web.js       mini browser window
+    └── music.js     music window and mini player
 ```
 
 ## Roadmap
@@ -231,6 +244,7 @@ src/
 - [x] Live system and network panels, alerts and toasts
 - [x] Themes, sounds and animations
 - [x] `.deb` and AppImage packages
+- [x] YouTube Music window with a mini player
 - [ ] File explorer: path bar, search, list view, sorting, hidden files, right-click menu
 - [ ] Customization: theme picker, more themes, color intensity, panel transparency
 - [ ] English interface and more keyboard layouts (US, ISO)

@@ -6,7 +6,7 @@
 
 ### Seu shell dentro de uma central de comando sci-fi.
 
-Um terminal para Linux cercado de painéis ao vivo de CPU, memória, rede e arquivos, com mini navegador.<br>
+Um terminal para Linux cercado de painéis ao vivo de CPU, memória, rede e arquivos, com mini navegador e YouTube Music.<br>
 Inspirado em interfaces de filme e no [eDEX-UI](https://github.com/GitSquared/edex-ui), reescrito do zero com foco
 em segurança e desempenho.
 
@@ -73,6 +73,13 @@ em segurança e desempenho.
 - Janela flutuante (botão **Web**) que dá para arrastar e redimensionar, com endereço/busca, voltar, avançar e
   recarregar.
 - Roda isolado: sandbox, sem acesso ao app, sessão só em memória, permissões e downloads negados.
+
+**Música**
+- O botão **Música** abre o site oficial do [YouTube Music](https://music.youtube.com) numa janela flutuante própria.
+  Esconda a janela e a música continua.
+- Um mini player no painel de arquivos mostra capa, faixa, artista e progresso, com anterior, tocar/pausar e próxima.
+- Sem chave de API e sem API não oficial: o mini player lê o que o site publica sobre a faixa atual e aperta os
+  botões do próprio site. O login fica numa sessão separada, usada só por essa janela.
 
 **Visual**
 - Visual de HUD: linhas finas no lugar de caixas, fundo com grade de pontos, aba angulada no terminal e teclas flutuantes.
@@ -201,9 +208,12 @@ sudo bash scripts/apparmor-dev.sh            # para desfazer: sudo bash scripts/
 - A interface roda com `sandbox` e `contextIsolation`, sem `nodeIntegration`, e só fala com o processo principal por
   uma ponte IPC mínima (`src/preload.js`). Uma CSP rígida bloqueia scripts e conexões externas.
 - **Nenhuma chamada para a internet por conta própria.** Ping e perda de pacotes vão só até o gateway local, as fontes
-  vêm embutidas e o globo não geolocaliza nada. A rede só é usada quando você abre uma página no mini navegador.
+  vêm embutidas e o globo não geolocaliza nada. A rede só é usada quando você abre uma página no mini navegador ou
+  a janela de música.
 - O mini navegador é uma view separada e em sandbox: sem Node, sem acesso à ponte do app, sessão só em memória
   (cookies somem ao fechar), permissões e downloads negados, só http/https.
+- A janela de música é outra view em sandbox, com sessão salva própria (para você continuar logado), separada do mini
+  navegador e do app. Só navega no YouTube e no login do Google, e **Sair da conta** apaga essa sessão.
 - Capturas e a demo rodam em **modo demo**, com usuário, máquina, rede, processos, memória e arquivos fictícios, num
   perfil temporário: nada seu vai parar numa imagem.
 
@@ -213,6 +223,7 @@ sudo bash scripts/apparmor-dev.sh            # para desfazer: sudo bash scripts/
 src/
 ├── main.js          janela, shell (node-pty), métricas (systeminformation), modos de captura
 ├── web.js           mini navegador (WebContentsView isolada)
+├── music.js         view do YouTube Music e leitura da faixa atual
 ├── preload.js       ponte IPC exposta como window.nexus
 └── renderer/
     ├── index.html   layout dos painéis
@@ -222,7 +233,9 @@ src/
     ├── globe.js     globo wireframe (desenho em lote)
     ├── keyboard.js  teclado ABNT2 na tela
     ├── sound.js     sons de interface sintetizados (Web Audio)
-    └── web.js       janela flutuante do mini navegador
+    ├── floatwin.js  moldura das janelas flutuantes (arrastar, abrir/fechar como CRT, ordem)
+    ├── web.js       janela do mini navegador
+    └── music.js     janela de música e mini player
 ```
 
 ## Próximos passos
@@ -230,6 +243,7 @@ src/
 - [x] Painéis de sistema e rede ao vivo, alertas e avisos
 - [x] Temas, sons e animações
 - [x] Pacotes `.deb` e AppImage
+- [x] Janela do YouTube Music com mini player
 - [ ] Explorador de arquivos: barra de caminho, busca, lista, ordenação, ocultos, menu de contexto
 - [ ] Personalização: seletor de temas, mais temas, intensidade das cores, transparência dos painéis
 - [ ] Interface em inglês e outros layouts de teclado (US, ISO)

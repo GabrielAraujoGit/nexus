@@ -21,8 +21,19 @@ contextBridge.exposeInMainWorld('nexus', {
     open: (url) => ipcRenderer.send('web:open', String(url)),
     bounds: (rect) => ipcRenderer.send('web:bounds', rect),
     nav: (action) => ipcRenderer.send('web:nav', String(action)),
+    front: () => ipcRenderer.send('web:front'),
     close: () => ipcRenderer.send('web:close'),
     onState: (cb) => on('web:state', cb),
     onSnapshot: (cb) => on('web:snapshot', cb), // só no modo de capturas
+  },
+  music: {
+    open: () => ipcRenderer.send('music:open'),
+    bounds: (rect) => ipcRenderer.send('music:bounds', rect),
+    front: () => ipcRenderer.send('music:front'),
+    control: (action) => ipcRenderer.send('music:control', String(action)),
+    nav: (action) => ipcRenderer.send('music:nav', String(action)),
+    quit: () => ipcRenderer.send('music:quit'),
+    forget: () => ipcRenderer.invoke('music:forget'),
+    onState: (cb) => on('music:state', cb),
   },
 });

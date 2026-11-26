@@ -142,11 +142,27 @@
     <section class="col col-files">
       <header class="panel-head"><span>ARQUIVOS</span><span id="cwd">~</span></header>
       <div id="files" class="files"></div>
+      <!-- Mini player: aparece quando o YouTube Music está tocando algo -->
+      <div id="np" class="np" hidden aria-label="Tocando agora">
+        <img id="np-art" class="np-art" width="44" height="44" alt="" hidden>
+        <div class="np-info">
+          <b id="np-title" class="np-title"></b>
+          <small id="np-artist" class="np-artist"></small>
+          <div class="np-track"><div class="bar"><div id="np-bar"></div></div><small id="np-time" class="num"></small></div>
+        </div>
+        <div class="np-ctl">
+          <button id="np-prev" type="button" aria-label="Faixa anterior">&#9198;</button>
+          <button id="np-toggle" type="button" aria-label="Tocar">&#9654;</button>
+          <button id="np-next" type="button" aria-label="Próxima faixa">&#9197;</button>
+          <button id="np-show" type="button" aria-label="Mostrar o YouTube Music">&#9776;</button>
+        </div>
+      </div>
       <footer class="mount">
         <span id="mount-text">Disco —</span>
         <div class="bar"><div id="mount-bar"></div></div>
         <button id="sound-btn" class="foot-btn" type="button" aria-pressed="true">Som</button>
         <button id="web-btn" class="foot-btn" type="button" aria-pressed="false">Web</button>
+        <button id="music-btn" class="foot-btn" type="button" aria-pressed="false">Música</button>
         <button id="theme-btn" class="foot-btn" type="button" aria-label="Trocar tema">Tema</button>
       </footer>
     </section>
@@ -178,6 +194,24 @@
     <footer id="web-status" class="webwin-status">Pronto</footer>
   </section>
 
+  <!-- Música: o YouTube Music oficial numa view isolada com login salvo, desenhada sobre #music-slot -->
+  <section id="music" class="webwin musicwin" hidden aria-label="YouTube Music">
+    <header id="music-bar" class="webwin-bar">
+      <span class="webwin-title">Música</span>
+      <button id="music-back" type="button" aria-label="Voltar">&#9664;</button>
+      <button id="music-home" type="button" aria-label="Início do YouTube Music">&#8962;</button>
+      <button id="music-reload" type="button" aria-label="Recarregar">&#10227;</button>
+      <span class="webwin-spacer"></span>
+      <button id="music-forget" class="wide" type="button">Sair da conta</button>
+      <button id="music-off" type="button" aria-label="Desligar o player">&#9211;</button>
+      <button id="music-close" type="button" aria-label="Esconder (a música continua)">&#8211;</button>
+    </header>
+    <div id="music-slot" class="webwin-slot">
+      <p>Carregando o YouTube Music…<br><small>O login fica salvo só nesta janela.</small></p>
+    </div>
+    <footer id="music-status" class="webwin-status">YouTube Music</footer>
+  </section>
+
   <script src="../../node_modules/@xterm/xterm/lib/xterm.js"></script>
   <script src="../../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
   <script src="../../node_modules/@xterm/addon-webgl/lib/addon-webgl.js"></script>
@@ -186,6 +220,8 @@
   <script src="keyboard.js"></script>
   <script src="sound.js"></script>
   <script src="app.js"></script>
+  <script src="floatwin.js"></script>
   <script src="web.js"></script>
+  <script src="music.js"></script>
 </body>
 </html>
