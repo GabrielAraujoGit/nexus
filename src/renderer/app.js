@@ -118,6 +118,7 @@
     window.nexus.onData((d) => term.write(d));
     term.onData((d) => window.nexus.write(d));
     term.onResize(({ cols, rows }) => window.nexus.resize(cols, rows));
+    term.onBell(() => sound.play('bell'));
     term.onTitleChange((t) => {
       $('term-title').textContent = t || 'SHELL PRINCIPAL';
       $('term-tab').textContent = t || 'shell';
@@ -138,8 +139,18 @@
   window.addEventListener('keydown', (e) => {
     if (e.repeat || e.ctrlKey || e.metaKey) return;
     if (e.key === 'Enter') sound.play('enter');
-    else if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Tab') sound.play('key');
+    else if (e.key === ' ') sound.play('space');
+    else if (e.key === 'Backspace' || e.key === 'Delete') sound.play('back');
+    else if (e.key.length === 1 || e.key === 'Tab') sound.play('key');
   }, true);
+
+  // Tique ao passar o mouse em botões e arquivos (só ao entrar num elemento novo).
+  let hovered = null;
+  document.addEventListener('pointerover', (e) => {
+    const el = e.target instanceof Element ? e.target.closest('button:not(:disabled), .file') : null;
+    if (el && el !== hovered) sound.play('hover');
+    hovered = el;
+  });
 
   // ---------- Relógio ----------
   function clock() {
@@ -303,6 +314,8 @@
     d.textContent = text;
     el.append(icon, t, d);
     box.prepend(el);
+    if (tone === 'warn') sound.play('warn');
+    else if (tone !== 'crit') sound.play('notify'); // o crítico já toca o 'alert'
     while (box.children.length > 3) box.lastElementChild.remove();
     setTimeout(() => {
       el.classList.add('leaving');
@@ -419,7 +432,10 @@
     label.textContent = name;
     btn.append(label);
     btn.addEventListener('mousedown', (e) => e.preventDefault());
-    btn.addEventListener('click', onClick);
+    btn.addEventListener('click', (e) => {
+      if (kind === 'file') sound.play('select'); // pasta troca a lista e já toca 'files'
+      onClick(e);
+    });
     return btn;
   }
 
@@ -463,7 +479,7 @@
 
   // ---------- Teclado ----------
   new window.NexusKeyboard($('keyboard'), (seq) => {
-    sound.play(seq === '\r' ? 'enter' : 'key');
+    sound.play(seq === '\r' ? 'enter' : seq === ' ' ? 'space' : seq === '\x7f' ? 'back' : 'key');
     window.nexus.write(seq);
     term.focus();
   });

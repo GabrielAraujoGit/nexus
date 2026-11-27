@@ -8,6 +8,8 @@
   const input = $('web-url');
   const status = $('web-status');
   let hasPage = false;
+  let wasLoading = false;
+  const sound = window.NexusSound;
 
   const frame = window.NexusFloat({
     box: $('web'),
@@ -52,6 +54,8 @@
       hasPage = false;
       frame.setHasPage(false);
       if (!s.error) input.value = '';
+      if (s.error) sound.play('error');
+      wasLoading = false;
       status.textContent = s.error ? `Erro: ${s.error}` : 'Pronto';
       status.dataset.loading = '0';
       $('web-back').disabled = true;
@@ -66,6 +70,9 @@
     status.dataset.loading = s.loading ? '1' : '0';
     $('web-reload').textContent = s.loading ? '✕' : '⟳';
     $('web-reload').setAttribute('aria-label', s.loading ? 'Parar' : 'Recarregar');
+    if (s.error) sound.play('error');
+    else if (wasLoading && !s.loading) sound.play('loaded');
+    wasLoading = s.loading;
     if (s.error) status.textContent = `Erro: ${s.error}`;
     else status.textContent = s.loading ? 'Carregando…' : (s.title || s.url || 'Pronto');
   });

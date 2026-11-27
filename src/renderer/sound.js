@@ -81,11 +81,33 @@
     files: (ac) => tone(ac, { type: 'triangle', f0: 1320, f1: 1980, dur: 0.05, gain: 0.18 }),
     alert: (ac) => { tone(ac, { type: 'square', f0: 220, dur: 0.14, gain: 0.3 }); tone(ac, { type: 'square', f0: 220, at: 0.22, dur: 0.14, gain: 0.3 }); },
     toggle: (ac) => tone(ac, { type: 'triangle', f0: 990, f1: 1320, dur: 0.08, gain: 0.35 }),
+    // digitação: espaço mais grave, apagar com um "recuo"
+    space: (ac) => click(ac, { freq: 900, dur: 0.035, gain: 0.4 }),
+    back: (ac) => { click(ac, { freq: 2400, gain: 0.28 }); tone(ac, { type: 'sine', f0: 700, f1: 420, dur: 0.04, gain: 0.08 }); },
+    // passar o mouse em botões e arquivos: um tique quase inaudível
+    hover: (ac) => tone(ac, { type: 'sine', f0: 2600, dur: 0.015, gain: 0.05 }),
+    select: (ac) => { click(ac, { freq: 2600, gain: 0.25 }); tone(ac, { type: 'triangle', f0: 1760, at: 0.01, dur: 0.04, gain: 0.12 }); },
+    // avisos: duas notas subindo (ok/info) ou descendo (atenção); o crítico continua sendo o "alert"
+    notify: (ac) => [880, 1320].forEach((f, i) => tone(ac, { type: 'triangle', f0: f, at: i * 0.08, dur: 0.14, gain: 0.22 })),
+    warn: (ac) => [988, 740].forEach((f, i) => tone(ac, { type: 'triangle', f0: f, at: i * 0.1, dur: 0.16, gain: 0.26 })),
+    // sino do terminal (\a): nota com um harmônico
+    bell: (ac) => { tone(ac, { type: 'triangle', f0: 1568, dur: 0.3, gain: 0.25 }); tone(ac, { type: 'sine', f0: 3136, dur: 0.2, gain: 0.08 }); },
+    // página carregada / erro no mini navegador e na música
+    loaded: (ac) => tone(ac, { type: 'sine', f0: 1500, f1: 1800, dur: 0.05, gain: 0.14 }),
+    error: (ac) => { tone(ac, { type: 'square', f0: 150, dur: 0.09, gain: 0.18 }); tone(ac, { type: 'square', f0: 120, at: 0.12, dur: 0.12, gain: 0.18 }); },
+    // troca de faixa: arpejo curto
+    track: (ac) => [659, 880, 1175].forEach((f, i) => tone(ac, { type: 'sine', f0: f, at: i * 0.06, dur: 0.18, gain: 0.16 })),
   };
+  // intervalo mínimo entre repetições (ms): passar o mouse rápido por vários botões não vira metralhadora
+  const MIN_GAP = { hover: 70, notify: 400, warn: 400, bell: 150, error: 300 };
+  const lastPlayed = {};
 
   function play(name) {
     const ac = audio();
     if (!ac || !SOUNDS[name]) return;
+    const now = performance.now();
+    if (now - (lastPlayed[name] || 0) < (MIN_GAP[name] || 0)) return;
+    lastPlayed[name] = now;
     try {
       SOUNDS[name](ac);
     } catch (err) {

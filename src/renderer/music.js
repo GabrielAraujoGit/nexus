@@ -6,6 +6,7 @@
   const api = window.nexus.music;
   const status = $('music-status');
   const np = $('np');
+  const sound = window.NexusSound;
 
   const frame = window.NexusFloat({
     box: $('music'),
@@ -39,9 +40,12 @@
   });
 
   // ---------- Mini player ----------
-  $('np-prev').addEventListener('click', () => api.control('prev'));
-  $('np-toggle').addEventListener('click', () => api.control('toggle'));
-  $('np-next').addEventListener('click', () => api.control('next'));
+  for (const [id, action] of [['np-prev', 'prev'], ['np-toggle', 'toggle'], ['np-next', 'next']]) {
+    $(id).addEventListener('click', () => {
+      sound.play('toggle');
+      api.control(action);
+    });
+  }
   $('np-show').addEventListener('click', () => frame.show(true));
 
   let lastTitle = '';
@@ -54,13 +58,17 @@
       return;
     }
     frame.setHasPage(true);
-    if (s.error) status.textContent = `Erro: ${s.error}`;
+    if (s.error) {
+      if (status.textContent !== `Erro: ${s.error}`) sound.play('error');
+      status.textContent = `Erro: ${s.error}`;
+    }
     else if (s.title) status.textContent = `${s.playing ? '▶' : '❚❚'} ${s.title}${s.artist ? ` · ${s.artist}` : ''}`;
     else status.textContent = 'YouTube Music';
 
     np.hidden = !s.title;
     if (!s.title) return;
     if (s.title !== lastTitle) {
+      if (lastTitle) sound.play('track'); // a primeira faixa não toca: o 'open' da janela já soou
       lastTitle = s.title;
       np.classList.remove('changed');
       void np.offsetWidth; // reinicia o brilho de troca de faixa
