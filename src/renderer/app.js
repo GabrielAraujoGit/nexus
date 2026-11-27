@@ -531,6 +531,7 @@
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&*<>/\\';
   let introDone = false;
+  let stopHum = () => {};
 
   function finishIntro() {
     if (introDone) return;
@@ -540,6 +541,8 @@
     $('boot').classList.add('done');
     $('ui').classList.remove('hidden');
     $('ui').classList.add('scan');
+    stopHum();
+    sound.play('reveal');
     sound.play('boot');
     if (term.element) { // o terminal já abriu (startTerminal roda no próximo quadro)
       fit.fit();
@@ -556,13 +559,16 @@
   // letras trocando até cada uma travar no lugar, da esquerda para a direita
   async function decode(el, word, ms) {
     const start = performance.now();
+    let lastLocked = 0;
     while (!introDone) {
       const t = (performance.now() - start) / ms;
       const locked = Math.min(word.length, Math.floor(t * word.length));
       el.textContent = word.slice(0, locked)
         + [...word.slice(locked)].map(() => GLYPHS[Math.floor(Math.random() * GLYPHS.length)]).join('');
+      if (locked > lastLocked) sound.play('lock'); // cada letra que trava faz um clique
+      lastLocked = locked;
       if (locked >= word.length) return;
-      if (Math.random() < 0.5) sound.play('line');
+      sound.play('glyph');
       await sleep(40);
     }
   }
@@ -570,6 +576,7 @@
   async function typeText(el, text, perChar) {
     for (let k = 1; k <= text.length && !introDone; k++) {
       el.textContent = text.slice(0, k);
+      if (text[k - 1] !== ' ') sound.play('type');
       await sleep(perChar);
     }
   }
@@ -590,10 +597,12 @@
     window.addEventListener('pointerdown', skipIntro, true);
 
     $('boot').classList.add('crt');
-    sound.play('open');
+    sound.play('poweron');
+    stopHum = sound.startHum();
     await sleep(450);
     if (introDone) return;
     box.classList.add('on');
+    sound.play('scan'); // o ícone sendo traçado
     await sleep(200);
     await decode($('intro-word'), 'NEXUS', 650);
     await typeText($('intro-tag'), tag, 14);
@@ -601,9 +610,10 @@
     for (let k = 0; k < BOOT.length && !introDone; k++) {
       log.textContent += `${BOOT[k]}\n`;
       $('intro-bar').style.width = `${((k + 1) / BOOT.length) * 100}%`;
-      sound.play('line');
+      sound.play('data');
       await sleep(70);
     }
+    if (!introDone) sound.play('granted');
     await sleep(220);
     finishIntro();
   }
