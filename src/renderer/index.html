@@ -85,16 +85,55 @@
 
     </section>
 
-    <!-- Terminal -->
+    <!-- Hub: Terminal e Web -->
     <section class="col col-center">
-      <header class="panel-head"><span>TERMINAL</span><span id="term-title">SHELL PRINCIPAL</span></header>
+      <header class="panel-head"><span>HUB</span><span id="term-title">SHELL PRINCIPAL</span></header>
       <div class="term-frame" id="term-frame" data-app="shell">
         <svg class="term-moldura" id="term-moldura" aria-hidden="true"></svg>
         <div class="term-tabs">
-          <div id="hub-tabs" class="hub-tabs" role="tablist" aria-label="Apps abertos no centro"></div>
+          <div class="hub-strip">
+            <div id="hub-tabs" class="hub-tabs" role="tablist" aria-label="Apps abertos no hub"></div>
+            <button id="hub-plus" class="hub-plus" type="button" aria-label="Abrir app" aria-haspopup="menu" aria-expanded="false">+</button>
+          </div>
           <span class="term-side" aria-hidden="true"><span id="term-atv" class="term-atv"></span><span class="term-size dim" id="term-size">—</span></span>
         </div>
+        <div id="hub-menu" class="hub-menu" role="menu" aria-label="Abrir app" hidden></div>
         <div id="terminal"></div>
+        <section id="web" class="webwin docked" hidden aria-label="Mini navegador">
+          <header id="web-bar" class="webwin-bar">
+            <span class="webwin-title">Web</span>
+            <button id="web-back" type="button" aria-label="Voltar" disabled>&#9664;</button>
+            <button id="web-fwd" type="button" aria-label="Avançar" disabled>&#9654;</button>
+            <button id="web-reload" type="button" aria-label="Recarregar">&#10227;</button>
+            <form id="web-form" class="webwin-form">
+              <input id="web-url" type="text" spellcheck="false" autocomplete="off"
+                     placeholder="endereço ou busca" aria-label="Endereço ou busca">
+            </form>
+            <button id="web-adblock" class="wide" type="button" aria-pressed="true"
+                    title="Bloqueia anúncios e rastreadores">AdBlock</button>
+          </header>
+          <div id="web-slot" class="webwin-slot">
+            <p>Digite um endereço ou uma busca.<br><small>Nada é carregado até você pedir.</small></p>
+          </div>
+          <footer class="webwin-status web-foot"><span id="web-status">Pronto</span><span id="web-blocked" class="web-blocked"></span></footer>
+        </section>
+        <!-- tela inicial do hub: aparece com tudo fechado -->
+        <div id="hub-home" class="hub-home">
+          <svg id="hub-core" class="core-svg" viewBox="-100 -100 200 200" aria-hidden="true"></svg>
+          <div class="hub-apps">
+            <button id="hub-open-shell" class="hub-app" type="button">
+              <span class="hub-ico" aria-hidden="true">&#9656;_</span><b>Terminal</b>
+              <small>o shell continua rodando ao fechar</small><kbd>Ctrl+Shift+T</kbd>
+            </button>
+            <form id="hub-web-form" class="hub-app">
+              <span class="hub-ico" aria-hidden="true">&#9678;</span><b>Web</b>
+              <small>navegador isolado com AdBlock</small><kbd>Ctrl+Shift+B</kbd>
+              <input id="hub-web-url" type="text" spellcheck="false" autocomplete="off"
+                     placeholder="endereço ou busca" aria-label="Abrir no Web: endereço ou busca">
+            </form>
+          </div>
+          <p class="hub-hint">Clique num app ou digite um endereço</p>
+        </div>
       </div>
     </section>
 
@@ -179,8 +218,6 @@
         <span id="mount-text">Disco —</span>
         <div id="mount-seg" class="seg" aria-hidden="true"></div>
         <button id="sound-btn" class="foot-btn" type="button" aria-pressed="true">Som</button>
-        <button id="term-btn" class="foot-btn" type="button" hidden title="Mostra o terminal de novo (o shell continuou rodando)">Terminal</button>
-        <button id="web-btn" class="foot-btn" type="button" aria-pressed="false">Web</button>
         <button id="music-btn" class="foot-btn" type="button" aria-pressed="false">Música</button>
         <button id="theme-btn" class="foot-btn" type="button" aria-label="Trocar tema">Tema</button>
       </footer>
@@ -195,26 +232,6 @@
   <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
 
   <!-- Mini navegador: a página é uma view isolada que o processo principal desenha sobre #web-slot -->
-  <section id="web" class="webwin" hidden aria-label="Mini navegador">
-    <header id="web-bar" class="webwin-bar">
-      <span class="webwin-title">Web</span>
-      <button id="web-back" type="button" aria-label="Voltar" disabled>&#9664;</button>
-      <button id="web-fwd" type="button" aria-label="Avançar" disabled>&#9654;</button>
-      <button id="web-reload" type="button" aria-label="Recarregar">&#10227;</button>
-      <form id="web-form" class="webwin-form">
-        <input id="web-url" type="text" spellcheck="false" autocomplete="off"
-               placeholder="endereço ou busca" aria-label="Endereço ou busca">
-      </form>
-      <button id="web-adblock" class="wide" type="button" aria-pressed="true"
-              title="Bloqueia anúncios e rastreadores">AdBlock</button>
-      <button id="web-dock" class="wide" type="button" title="Encaixa o navegador no lugar do terminal, como uma aba">&#8690; Encaixar</button>
-      <button id="web-close" type="button" aria-label="Fechar">&#10005;</button>
-    </header>
-    <div id="web-slot" class="webwin-slot">
-      <p>Digite um endereço ou uma busca.<br><small>Nada é carregado até você pedir.</small></p>
-    </div>
-    <footer class="webwin-status web-foot"><span id="web-status">Pronto</span><span id="web-blocked" class="web-blocked"></span></footer>
-  </section>
 
   <!-- Visualizador de arquivos: abre ao clicar num arquivo do painel (Shift+clique cola o nome no prompt) -->
   <section id="viewer" class="webwin viewer" hidden aria-label="Visualizador de arquivos">

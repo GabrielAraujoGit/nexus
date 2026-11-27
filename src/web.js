@@ -136,6 +136,15 @@ function setupWeb(getWin) {
     const guard = (e, url) => {
       if (!isWeb(e.url ?? url)) e.preventDefault();
     };
+    // atalhos do hub (Ctrl+Shift+T / Ctrl+Shift+B) também valem com o foco na página
+    wc.on('before-input-event', (e, input) => {
+      if (input.type !== 'keyDown' || !input.control || !input.shift || input.alt) return;
+      const key = input.code === 'KeyT' ? 'T' : input.code === 'KeyB' ? 'B' : null;
+      if (!key) return;
+      e.preventDefault();
+      const win = getWin();
+      if (win && !win.isDestroyed()) win.webContents.send('web:hubkey', key);
+    });
     wc.on('will-navigate', guard);
     wc.on('will-redirect', guard);
     // nova página: zera o contador; pronta: esconde os espaços de anúncio que sobraram

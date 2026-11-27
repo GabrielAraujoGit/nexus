@@ -34,6 +34,7 @@ contextBridge.exposeInMainWorld('nexus', {
     adblock: (on) => ipcRenderer.send('web:adblock', Boolean(on)),
     onState: (cb) => on('web:state', cb),
     onSnapshot: (cb) => on('web:snapshot', cb), // só no modo de capturas
+    onHubKey: (cb) => on('web:hubkey', cb), // atalho do hub apertado com o foco na página
   },
   music: {
     open: () => ipcRenderer.send('music:open'),

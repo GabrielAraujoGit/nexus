@@ -40,13 +40,12 @@ read -r -d '' SCENE <<'JS' || true
   await sleep(1500);
   $('theme-btn').click();
   await sleep(1400);
-  Object.assign($('web').style, { left: '560px', top: '90px', width: '720px', height: '430px', right: 'auto' });
-  $('web-btn').click();
+  NexusHub.open('web');
   await sleep(500);
   $('web-url').value = 'github.com/gabterm/nexus';
   $('web-form').requestSubmit();
   await sleep(3600);
-  $('web-close').click();
+  NexusHub.close('web');
   await sleep(800);
   $('theme-btn').click();
 })();

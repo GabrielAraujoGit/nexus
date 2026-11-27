@@ -25,8 +25,7 @@ shot() { # tema arquivo comando [js extra] [espera ms]
 }
 
 # Mini navegador aberto na página pública do próprio repositório (única captura que acessa a internet).
-WEB_JS="const b = document.getElementById('web'); document.getElementById('web-btn').click();
-Object.assign(b.style, { left: '380px', top: '70px', width: '860px', height: '520px', right: 'auto' });
+WEB_JS="NexusHub.open('web');
 document.getElementById('web-url').value = 'github.com/gabterm/nexus';
 document.getElementById('web-form').requestSubmit()"
 

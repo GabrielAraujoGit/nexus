@@ -29,11 +29,10 @@
   await sleep(1700);
   $('theme-btn').click(); // Tron
   await sleep(500);
-  Object.assign($('web').style, { left: '620px', top: '110px', width: '860px', height: '520px', right: 'auto' });
-  $('web-btn').click();
+  NexusHub.open('web');
   await sleep(450);
   $('web-url').value = 'github.com/gabterm/nexus';
   $('web-form').requestSubmit();
   await sleep(4200);
-  $('web-close').click();
+  NexusHub.close('web');
 })();

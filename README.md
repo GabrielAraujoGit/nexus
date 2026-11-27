@@ -70,11 +70,14 @@ security and performance in mind.
 - Latency and packet loss to your gateway (local network only).
 - 90 s download/upload chart with peaks and totals.
 
+**App hub**
+- The center is a hub with two apps in tabs, **Terminal** and **Web**; **+** opens whichever is closed
+  (so do `Ctrl+Shift+T` and `Ctrl+Shift+B`). Closing the Terminal only hides it: the shell keeps running.
+- With everything closed you get the hub's home screen, with an address field that opens the Web right away.
+
 **Mini browser**
-- A floating window (**Web** button) you can drag and resize, with address/search bar, back, forward and reload.
-- **Dock** puts it in the terminal's place as a tab (`shell · Web`), with the HUD frame; **Undock** turns it back
-  into a floating window. Closing the shell tab only hides it (the shell keeps running) and the **Terminal** button
-  brings it back. With the browser in front, the on-screen keyboard types into the page.
+- The hub's **Web** tab, with address/search bar, back, forward and reload. While it's in front, the on-screen
+  keyboard types into the page.
 - Runs isolated: sandboxed, no access to the app, in-memory session, permissions and downloads denied.
 - Built-in ad and tracker blocker (**AdBlock** button, on by default) with a per-page counter. It cuts requests to
   known ad networks and trackers and hides the usual ad slots; no extension or filter list download.
@@ -210,6 +213,7 @@ sudo bash scripts/apparmor-dev.sh            # undo: sudo bash scripts/apparmor-
 |---|---|
 | `F11` | Fullscreen |
 | `Ctrl+Shift+C` / `Ctrl+Shift+V` | Copy / paste |
+| `Ctrl+Shift+T` / `Ctrl+Shift+B` | Open or bring up the Terminal / the Web in the hub |
 | `Ctrl+Shift+F12` | DevTools |
 | `exit` or `Alt+F4` | Quit |
 
@@ -247,7 +251,7 @@ src/
     ├── keyboard.js  on-screen ABNT2 keyboard
     ├── sound.js     synthesized UI sounds (Web Audio)
     ├── floatwin.js  floating window frame (drag, CRT open/close, stacking)
-    ├── hub.js       app tabs in the center (shell and docked browser)
+    ├── hub.js       app hub in the center (Terminal and Web tabs, + button, home screen)
     ├── web.js       mini browser window
     ├── viewer.js    file viewer window
     └── music.js     music window and mini player

@@ -70,12 +70,14 @@ em segurança e desempenho.
 - Latência e perda de pacotes até o gateway (só a rede local).
 - Gráfico de 90 s de download/upload com picos e totais.
 
+**Hub de apps**
+- O centro é um hub com dois apps em abas, **Terminal** e **Web**; o **+** abre o que estiver fechado
+  (`Ctrl+Shift+T` e `Ctrl+Shift+B` também). Fechar o Terminal só esconde: o shell continua rodando.
+- Com tudo fechado aparece a tela inicial do hub, com um campo de endereço que já abre o Web.
+
 **Mini navegador**
-- Janela flutuante (botão **Web**) que dá para arrastar e redimensionar, com endereço/busca, voltar, avançar e
-  recarregar.
-- **Encaixar** põe o navegador no lugar do terminal, como uma aba (`shell · Web`), com a moldura do HUD; **Soltar**
-  volta a janela flutuante. Fechar a aba do shell só esconde (o shell continua rodando) e o botão **Terminal** traz
-  de volta. Com o navegador na frente, o teclado na tela digita na página.
+- Aba **Web** do hub, com endereço/busca, voltar, avançar e recarregar. Com ela na frente, o teclado na tela
+  digita na página.
 - Roda isolado: sandbox, sem acesso ao app, sessão só em memória, permissões e downloads negados.
 - Bloqueador de anúncios e rastreadores embutido (botão **AdBlock**, ligado por padrão) com contador por página.
   Corta as requisições para redes de anúncio e rastreadores conhecidos e esconde os espaços de anúncio comuns;
@@ -210,6 +212,7 @@ sudo bash scripts/apparmor-dev.sh            # para desfazer: sudo bash scripts/
 |---|---|
 | `F11` | Tela cheia |
 | `Ctrl+Shift+C` / `Ctrl+Shift+V` | Copiar / colar |
+| `Ctrl+Shift+T` / `Ctrl+Shift+B` | Abrir ou trazer o Terminal / o Web no hub |
 | `Ctrl+Shift+F12` | DevTools |
 | `exit` ou `Alt+F4` | Fechar |
 
@@ -247,7 +250,7 @@ src/
     ├── keyboard.js  teclado ABNT2 na tela
     ├── sound.js     sons de interface sintetizados (Web Audio)
     ├── floatwin.js  moldura das janelas flutuantes (arrastar, abrir/fechar como CRT, ordem)
-    ├── hub.js       abas de apps no centro (shell e navegador encaixado)
+    ├── hub.js       hub de apps no centro (abas Terminal e Web, botão +, tela inicial)
     ├── web.js       janela do mini navegador
     ├── viewer.js    janela do visualizador de arquivos
     └── music.js     janela de música e mini player

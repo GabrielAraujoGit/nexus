@@ -94,9 +94,10 @@
   term.loadAddon(fit);
   // aba do shell no hub do centro (hub.js); esconder é só CSS, o processo segue rodando
   const hub = window.NexusHub;
+  let shellTitle = '';
   hub.register('shell', {
-    label: () => ['shell'],
-    title: 'SHELL PRINCIPAL',
+    label: () => ['Terminal', shellTitle],
+    get title() { return shellTitle || 'SHELL PRINCIPAL'; },
     show: (on) => { if (on && term.element) requestAnimationFrame(() => fit.fit()); },
     focus: () => term.focus(),
     close: () => {},
@@ -132,7 +133,10 @@
     term.onData((d) => window.nexus.write(d));
     term.onResize(({ cols, rows }) => window.nexus.resize(cols, rows));
     term.onBell(() => sound.play('bell'));
-    term.onTitleChange((t) => hub.setShellTitle(t));
+    term.onTitleChange((t) => {
+      shellTitle = t || '';
+      hub.refresh();
+    });
     const showSize = () => { $('term-size').textContent = `${term.cols}×${term.rows}`; };
     term.onResize(showSize);
     showSize();
@@ -511,10 +515,17 @@
   });
 
   // ---------- Teclado ----------
+  function homeKey(seq) {
+    const input = $('hub-web-url');
+    if (seq === '\r') $('hub-web-form').requestSubmit();
+    else if (seq === '\x7f') input.value = input.value.slice(0, -1);
+    else if ([...seq].length === 1 && seq >= ' ') input.value += seq;
+  }
   new window.NexusKeyboard($('keyboard'), (seq) => {
     sound.play(seq === '\r' ? 'enter' : seq === ' ' ? 'space' : seq === '\x7f' ? 'back' : 'key');
-    if (hub.active() === 'web') window.nexus.web.key(seq); // navegador encaixado na frente: digita na página
-    else window.nexus.write(seq);
+    if (hub.active() === 'web') window.nexus.web.key(seq); // Web na frente: digita na página
+    else if (hub.active() === 'shell') window.nexus.write(seq);
+    else homeKey(seq); // tela inicial: digita no endereço do Web
     hub.focus();
   });
 
