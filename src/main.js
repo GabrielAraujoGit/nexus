@@ -9,6 +9,7 @@ const { execFile } = require('node:child_process');
 const si = require('systeminformation');
 const { setupWeb } = require('./web');
 const { setupMusic } = require('./music');
+const { readForView } = require('./viewer');
 
 let pty = null;
 try {
@@ -262,6 +263,9 @@ async function pollCwd() {
     send('fs:list', { cwd, home: homeDir(), total: 0, items: [], error: err.code || 'erro' });
   }
 }
+
+// Visualizador: lê um arquivo da pasta que o painel mostra (só o nome; o caminho é montado aqui).
+ipcMain.handle('fs:read', (_e, name) => readForView(lastCwd || homeDir(), name));
 
 // ---------- Métricas ----------
 async function staticInfo() {

@@ -451,7 +451,7 @@
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = `file ${kind}`;
-    btn.title = name;
+    btn.title = kind === 'file' ? `${name}\nClique: abrir · Shift+clique: colar o nome no prompt` : name;
     btn.innerHTML = kind === 'up' ? ICON_UP : kind === 'dir' ? ICON_DIR : ICON_FILE; // SVG fixo, sem dado do usuário
     const label = document.createElement('span');
     label.textContent = name;
@@ -477,9 +477,10 @@
       nodes.push(fileButton('..', 'up', () => window.nexus.write('\x15cd ..\r')));
     }
     for (const it of f.items) {
-      nodes.push(fileButton(it.name, it.dir ? 'dir' : 'file', () => {
+      nodes.push(fileButton(it.name, it.dir ? 'dir' : 'file', (e) => {
         if (it.dir) window.nexus.write(`\x15cd -- ${shellQuote(it.name)}\r`);
-        else window.nexus.write(`${shellQuote(it.name)} `); // arquivo: só cola o nome no prompt
+        else if (e.shiftKey || !window.NexusViewer) window.nexus.write(`${shellQuote(it.name)} `); // Shift: cola o nome
+        else window.NexusViewer.open(it.name); // arquivo: abre no visualizador
         term.focus();
       }));
     }

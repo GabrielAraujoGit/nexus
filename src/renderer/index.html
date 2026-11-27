@@ -214,6 +214,20 @@
     <footer class="webwin-status web-foot"><span id="web-status">Pronto</span><span id="web-blocked" class="web-blocked"></span></footer>
   </section>
 
+  <!-- Visualizador de arquivos: abre ao clicar num arquivo do painel (Shift+clique cola o nome no prompt) -->
+  <section id="viewer" class="webwin viewer" hidden aria-label="Visualizador de arquivos">
+    <header id="viewer-bar" class="webwin-bar">
+      <span class="webwin-title">Arquivo</span>
+      <b id="viewer-name" class="viewer-name"></b>
+      <span class="webwin-spacer"></span>
+      <button id="viewer-wrap" class="wide" type="button" aria-pressed="false">Quebrar linhas</button>
+      <button id="viewer-paste" class="wide" type="button" title="Cola o nome do arquivo no prompt">Colar no terminal</button>
+      <button id="viewer-close" type="button" aria-label="Fechar">&#10005;</button>
+    </header>
+    <div id="viewer-body" class="viewer-body" tabindex="0"></div>
+    <footer id="viewer-status" class="webwin-status">—</footer>
+  </section>
+
   <!-- Música: o YouTube Music oficial numa view isolada com login salvo, desenhada sobre #music-slot -->
   <section id="music" class="webwin musicwin" hidden aria-label="YouTube Music">
     <header id="music-bar" class="webwin-bar">
@@ -244,5 +258,6 @@
   <script src="floatwin.js"></script>
   <script src="web.js"></script>
   <script src="music.js"></script>
+  <script src="viewer.js"></script>
 </body>
 </html>

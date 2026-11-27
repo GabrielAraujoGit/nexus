@@ -1,6 +1,6 @@
 'use strict';
-// NEXUS — moldura das janelas flutuantes (mini navegador e música). O conteúdo é uma view nativa do processo
-// principal posicionada sobre o "slot"; aqui ficam abrir/fechar como CRT, arrastar, manter na tela,
+// NEXUS — moldura das janelas flutuantes (mini navegador, música e visualizador). O conteúdo é uma view nativa
+// do processo principal posicionada sobre o "slot" (ou HTML comum, no visualizador); aqui ficam abrir/fechar como CRT, arrastar, manter na tela,
 // trazer para a frente e avisar a posição.
 (function () {
   const RECORD = new URLSearchParams(location.search).has('record');
@@ -8,7 +8,7 @@
     || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let top = 30; // z-index da janela da frente
 
-  // opts: { box, bar, slot, toggle, bounds(rect|null), front(), onOpen() }
+  // opts: { box, bar, slot, toggle?, bounds(rect|null), front(), onOpen() }
   window.NexusFloat = function (opts) {
     const { box, bar, slot, toggle } = opts;
     const sound = window.NexusSound;
@@ -46,7 +46,7 @@
     // Abre/fecha como um monitor CRT ligando e desligando.
     function show(visible) {
       if (visible === isOpen()) return;
-      toggle.setAttribute('aria-pressed', String(visible));
+      toggle?.setAttribute('aria-pressed', String(visible));
       sound.play(visible ? 'open' : 'close');
       box.classList.remove('opening', 'closing');
       if (visible) {
@@ -99,7 +99,7 @@
     window.addEventListener('resize', () => {
       if (!box.hidden) { clamp(); sync(); }
     });
-    toggle.addEventListener('click', () => show(box.hidden));
+    toggle?.addEventListener('click', () => show(box.hidden));
 
     return {
       show,

@@ -720,6 +720,61 @@ button:focus-visible, input:focus-visible { outline: 2px solid rgba(var(--accent
 .web-blocked { flex-shrink: 0; font-family: var(--font-num); color: rgb(var(--accent-rgb)); }
 .webwin-bar button[aria-pressed="true"] { background: rgba(var(--hud-rgb), 0.16); border-color: rgba(var(--hud-rgb), 0.6); color: rgb(var(--hud-rgb)); }
 
+/* ---------- Visualizador de arquivos ---------- */
+.viewer { top: 70px; left: 26%; right: auto; width: 760px; height: 520px; }
+.viewer-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-num); font-weight: 400; font-size: 13px; color: rgb(var(--hud-rgb)); }
+.viewer-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: color-mix(in srgb, var(--bg) 94%, rgb(var(--rgb)));
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--rgb), 0.4) transparent;
+  outline: none;
+  user-select: text;
+}
+.viewer-msg { margin: 0; padding: 24px; text-align: center; opacity: 0.6; }
+.viewer-text, .viewer-hex {
+  margin: 0;
+  padding: 8px 12px 8px 0;
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(var(--rgb), 0.9);
+  tab-size: 4;
+  white-space: pre;
+  counter-reset: ln;
+}
+.viewer-hex { padding-left: 12px; color: rgba(var(--rgb), 0.8); }
+.viewer-body.wrap .viewer-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* número de linha: régua à esquerda, apagada, fora da seleção */
+.viewer-text .ln { display: block; padding-left: calc(var(--gutter, 4ch) + 20px); text-indent: calc(-1 * (var(--gutter, 4ch) + 14px)); }
+.viewer-text .ln::before {
+  counter-increment: ln;
+  content: counter(ln);
+  display: inline-block;
+  width: var(--gutter, 4ch);
+  margin-right: 14px;
+  padding-right: 6px;
+  text-align: right;
+  text-indent: 0;
+  color: rgba(var(--rgb), 0.3);
+  border-right: 1px solid rgba(var(--hud-rgb), 0.25);
+  user-select: none;
+}
+.viewer-text .ln:hover { background: rgba(var(--rgb), 0.05); }
+.viewer-text .ln:hover::before { color: rgb(var(--hud-rgb)); }
+.viewer-imgbox {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: repeating-conic-gradient(rgba(var(--rgb), 0.06) 0 25%, transparent 0 50%) 0 0 / 16px 16px;
+}
+.viewer-img { max-width: 100%; max-height: 100%; min-width: 0; min-height: 0; object-fit: contain; image-rendering: auto; box-shadow: 0 0 0 1px rgba(var(--rgb), 0.25); }
+.webwin-bar button.wide[aria-pressed="true"] { background: rgba(var(--hud-rgb), 0.16); border-color: rgba(var(--hud-rgb), 0.6); color: rgb(var(--hud-rgb)); }
+
 /* ---------- Música ---------- */
 .musicwin { top: 90px; right: 60px; width: 620px; height: 440px; }
 .musicwin .webwin-slot { background: #030303; }

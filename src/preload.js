@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld('nexus', {
   onTick: (cb) => on('sys:tick', cb),
   onSlow: (cb) => on('sys:slow', cb),
   onFiles: (cb) => on('fs:list', cb),
+  readFile: (name) => ipcRenderer.invoke('fs:read', String(name)),
   staticInfo: () => ipcRenderer.invoke('sys:static'),
   web: {
     open: (url) => ipcRenderer.send('web:open', String(url)),
