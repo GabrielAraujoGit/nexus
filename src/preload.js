@@ -17,6 +17,11 @@ contextBridge.exposeInMainWorld('nexus', {
   onSlow: (cb) => on('sys:slow', cb),
   onFiles: (cb) => on('fs:list', cb),
   readFile: (name) => ipcRenderer.invoke('fs:read', String(name)),
+  pdf: {
+    bounds: (rect) => ipcRenderer.send('pdf:bounds', rect),
+    front: () => ipcRenderer.send('pdf:front'),
+    close: () => ipcRenderer.send('pdf:close'),
+  },
   staticInfo: () => ipcRenderer.invoke('sys:static'),
   web: {
     open: (url) => ipcRenderer.send('web:open', String(url)),

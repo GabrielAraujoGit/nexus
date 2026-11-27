@@ -55,7 +55,7 @@ em segurança e desempenho.
 - Seu shell via `node-pty` + [xterm.js](https://xtermjs.org/): WebGL, cores 24 bits, Nerd Fonts.
 - Teclado na tela (ABNT2) que acende enquanto você digita e também digita no clique.
 - Painel de arquivos que segue o seu `cd`: clique numa pasta para entrar, num arquivo para abrir no visualizador
-  (texto com números de linha, imagens e hexadecimal para binários), ou Shift+clique para colar o nome.
+  (texto com números de linha, imagens, PDF e hexadecimal para binários), ou Shift+clique para colar o nome.
 
 **Painéis de sistema**
 - **CPU**: núcleo animado (carga, com arco de aviso quando esquenta), gráfico de área de 60 s, blocos por núcleo, médias de 1/5/15 min, frequência e temperatura
@@ -231,6 +231,7 @@ src/
 ├── main.js          janela, shell (node-pty), métricas (systeminformation), modos de captura
 ├── web.js           mini navegador (WebContentsView isolada)
 ├── viewer.js        lê um arquivo da pasta atual para o visualizador
+├── pdfview.js       PDF no visualizador (leitor embutido do Chromium, view isolada)
 ├── adblock.js       bloqueador de anúncios e rastreadores do mini navegador
 ├── music.js         view do YouTube Music e leitura da faixa atual
 ├── preload.js       ponte IPC exposta como window.nexus

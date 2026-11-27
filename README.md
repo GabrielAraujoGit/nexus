@@ -55,7 +55,7 @@ security and performance in mind.
 - Your shell through `node-pty` + [xterm.js](https://xtermjs.org/): WebGL, 24-bit color, Nerd Fonts.
 - On-screen keyboard (Brazilian ABNT2) that lights up as you type and also types on click.
 - Files panel that follows your `cd`: click a folder to enter it, click a file to open it in the built-in viewer
-  (text with line numbers, images, and a hex view for binaries), or Shift+click to paste its name.
+  (text with line numbers, images, PDFs, and a hex view for binaries), or Shift+click to paste its name.
 
 **System panels**
 - **CPU**: animated core gauge (load, with a warning arc when it runs hot), 60 s area chart, segmented per-core bars, 1/5/15 min averages, frequency and temperature
@@ -231,6 +231,7 @@ src/
 ├── main.js          window, shell (node-pty), metrics (systeminformation), capture modes
 ├── web.js           mini browser (isolated WebContentsView)
 ├── viewer.js        reads a file of the current folder for the viewer
+├── pdfview.js       PDF in the viewer (Chromium's built-in reader, isolated view)
 ├── adblock.js       ad and tracker blocker for the mini browser
 ├── music.js         YouTube Music view and now-playing reader
 ├── preload.js       IPC bridge exposed as window.nexus

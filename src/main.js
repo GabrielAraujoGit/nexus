@@ -10,6 +10,7 @@ const si = require('systeminformation');
 const { setupWeb } = require('./web');
 const { setupMusic } = require('./music');
 const { readForView } = require('./viewer');
+const { setupPdf } = require('./pdfview');
 
 let pty = null;
 try {
@@ -265,7 +266,18 @@ async function pollCwd() {
 }
 
 // Visualizador: lê um arquivo da pasta que o painel mostra (só o nome; o caminho é montado aqui).
-ipcMain.handle('fs:read', (_e, name) => readForView(lastCwd || homeDir(), name));
+// Visualizador: PDF abre na view nativa do leitor do Chromium; o caminho completo não vai para a interface.
+ipcMain.handle('fs:read', async (_e, name) => {
+  const r = await readForView(lastCwd || homeDir(), name);
+  if (r.kind !== 'pdf') {
+    pdf.close();
+    return r;
+  }
+  const { file, ...rest } = r;
+  if (await pdf.load(file)) return rest;
+  pdf.close();
+  return { ...rest, kind: undefined, error: 'não deu para abrir o PDF' };
+});
 
 // ---------- Métricas ----------
 async function staticInfo() {
@@ -462,6 +474,7 @@ function loop(fn, ms) {
 
 ipcMain.handle('sys:static', () => staticInfo());
 const web = setupWeb(() => win);
+const pdf = setupPdf(() => win);
 if (!CAPTURE) setupMusic(() => win); // capturas não abrem o player (usam perfil temporário)
 // Capturas com NEXUS_DEMO_MUSIC=1: uma faixa fictícia tocando, para o mini player aparecer.
 if (CAPTURE && process.env.NEXUS_DEMO_MUSIC === '1') {

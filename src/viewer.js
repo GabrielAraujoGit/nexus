@@ -1,7 +1,7 @@
 'use strict';
 // NEXUS — leitura de arquivo para o visualizador da interface. Só abre um nome da pasta atual do shell
 // (nada de caminho, "..", nem pasta), com limite de tamanho, e devolve texto, imagem (data URL) ou um
-// trecho em hexadecimal para binários.
+// trecho em hexadecimal para binários. PDF só é reconhecido aqui; quem mostra é o pdfview.js.
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
@@ -27,6 +27,12 @@ async function readHead(file, max) {
   } finally {
     await fh.close();
   }
+}
+
+// PDF: extensão .pdf e assinatura %PDF- no começo (o leitor do Chromium cuida do resto).
+async function isPdf(file, ext) {
+  if (ext !== 'pdf') return false;
+  return (await readHead(file, 5)).toString('latin1') === '%PDF-';
 }
 
 // Binário: tem byte nulo, ou muito caractere de controle, no começo.
@@ -67,6 +73,7 @@ async function readForView(dir, name) {
       const buf = await fs.readFile(file);
       return { ...base, kind: 'image', data: `data:${IMAGES[ext]};base64,${buf.toString('base64')}` };
     }
+    if (await isPdf(file, ext)) return { ...base, kind: 'pdf', file }; // main.js tira o caminho antes da interface
     const buf = await readHead(file, TEXT_MAX);
     if (looksBinary(buf)) return { ...base, kind: 'binary', text: hexDump(buf.subarray(0, HEX_BYTES)) };
     return { ...base, kind: 'text', text: buf.toString('utf8'), truncated: st.size > TEXT_MAX };

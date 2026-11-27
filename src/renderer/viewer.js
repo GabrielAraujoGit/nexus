@@ -1,6 +1,7 @@
 'use strict';
 // NEXUS — visualizador de arquivos: janela flutuante com texto (números de linha), imagem ou o começo de um
-// binário em hexadecimal. O conteúdo vem do processo principal e entra sempre por textContent ou data URL.
+// binário em hexadecimal, ou PDF (leitor do Chromium numa view nativa, ver src/pdfview.js). O resto do conteúdo
+// vem do processo principal e entra sempre por textContent ou data URL.
 (function () {
   const $ = (id) => document.getElementById(id);
   const body = $('viewer-body');
@@ -15,8 +16,9 @@
     box: $('viewer'),
     bar: $('viewer-bar'),
     slot: body,
-    bounds: () => {}, // conteúdo é HTML comum, não uma view nativa
-    front: () => {},
+    // texto e imagem são HTML comum; PDF é uma view nativa do processo principal posicionada sobre o corpo
+    bounds: (rect) => window.nexus.pdf.bounds(rect),
+    front: () => window.nexus.pdf.front(),
   });
 
   const size = (n) => {
@@ -67,6 +69,8 @@
     body.scrollLeft = 0;
     $('viewer-name').textContent = r.name || '';
     $('viewer-name').title = r.name || '';
+    $('viewer-wrap').hidden = Boolean(r.error) || (r.kind && r.kind !== 'text');
+    frame.setHasPage(r.kind === 'pdf');
     if (r.error) {
       message(r.error);
       status.textContent = r.size !== undefined ? `${size(r.size)} · ${when(r.mtime)}` : 'Erro';
@@ -74,7 +78,10 @@
       return;
     }
     const meta = `${size(r.size)} · modificado ${when(r.mtime)}`;
-    if (r.kind === 'image') {
+    if (r.kind === 'pdf') {
+      body.replaceChildren();
+      status.textContent = `PDF · ${meta}`;
+    } else if (r.kind === 'image') {
       const img = document.createElement('img');
       img.className = 'viewer-img';
       img.alt = r.name;
@@ -101,6 +108,7 @@
 
   async function open(name) {
     frame.show(true);
+    frame.setHasPage(false);
     $('viewer-name').textContent = name;
     message('Carregando…');
     status.textContent = '…';
@@ -112,7 +120,11 @@
     }
   }
 
-  $('viewer-close').addEventListener('click', () => frame.show(false));
+  $('viewer-close').addEventListener('click', () => {
+    frame.show(false);
+    frame.setHasPage(false);
+    window.nexus.pdf.close();
+  });
   $('viewer-wrap').addEventListener('click', () => {
     wrap = !wrap;
     try { localStorage.setItem('nexus.viewer.wrap', wrap ? 'on' : 'off'); } catch { /* ignora */ }
