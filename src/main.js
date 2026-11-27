@@ -320,6 +320,7 @@ async function fastTick() {
     ghz: speed.avg,
     loadavg: os.loadavg(),
     swapUsed: DEMO ? 512 * 1024 ** 2 : mem.swapused,
+    swapTotal: mem.swaptotal,
     net: iface ? {
       iface: iface.iface, rx, tx, rxTotal: iface.rx_bytes, txTotal: iface.tx_bytes,
     } : null,

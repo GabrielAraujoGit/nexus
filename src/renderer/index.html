@@ -30,6 +30,9 @@
     <div class="intro-skip">qualquer tecla para pular</div>
   </div>
 
+  <!-- Planta técnica de fundo (desenhada pelo hud.js) -->
+  <svg id="planta" class="planta-bg" aria-hidden="true"></svg>
+
   <main id="ui" class="hidden">
     <!-- Coluna esquerda -->
     <section class="col col-left">
@@ -47,25 +50,25 @@
 
       <div class="block grow">
         <div class="block-title"><span>Uso da CPU</span><span id="cpu-model" class="dim">—</span></div>
-        <div class="cpu-head">
-          <b id="cpu-now" class="num">0%</b>
-          <div class="cpu-meta">
-            <span><small>freq</small> <b id="cpu-freq" class="num">—</b></span>
-            <span><small>temp</small> <b id="temp" class="num">--°C</b></span>
+        <div class="core-row">
+          <svg id="cpu-core" class="core-svg" viewBox="-100 -100 200 200" role="img" aria-label="Uso da CPU"></svg>
+          <div id="cpu-avgs" class="core-side">
+            <small>freq</small><b id="cpu-freq" class="num">—</b>
+            <small>temp</small><b id="temp" class="num">--°C</b>
+            <small>média 1 min</small><b id="cpu-1" class="num">—</b>
+            <small>5 min</small><b id="cpu-5" class="num">—</b>
+            <small>15 min</small><b id="cpu-15" class="num">—</b>
           </div>
         </div>
         <canvas id="cpu-graph" class="graph chart" aria-label="Histórico de uso da CPU (60 s)"></canvas>
         <div id="core-bars" class="core-bars" aria-label="Uso por núcleo"></div>
-        <div id="cpu-avgs" class="info-grid three">
-          <div><small>média 1 min</small><b id="cpu-1">—</b></div>
-          <div><small>5 min</small><b id="cpu-5">—</b></div>
-          <div><small>15 min</small><b id="cpu-15">—</b></div>
-        </div>
       </div>
 
       <div class="block">
         <div class="block-title"><span>Memória</span><b id="mem-pct" class="num pct">0%</b></div>
-        <div id="mem-grid" class="mem-grid"></div>
+        <div id="mem-seg" class="seg" aria-hidden="true"></div>
+        <div class="regua" aria-hidden="true"></div>
+        <div id="swap-seg" class="seg fino" title="Swap em uso" aria-hidden="true"></div>
         <div class="info-grid four">
           <div><small>usada</small><b id="mem-used">—</b></div>
           <div><small>disponível</small><b id="mem-avail">—</b></div>
@@ -85,10 +88,11 @@
     <!-- Terminal -->
     <section class="col col-center">
       <header class="panel-head"><span>TERMINAL</span><span id="term-title">SHELL PRINCIPAL</span></header>
-      <div class="term-frame">
+      <div class="term-frame" id="term-frame">
+        <svg class="term-moldura" id="term-moldura" aria-hidden="true"></svg>
         <div class="term-tabs" aria-hidden="true">
           <span class="term-tab" id="term-tab">shell</span>
-          <span class="term-size dim" id="term-size">—</span>
+          <span class="term-side"><span id="term-atv" class="term-atv"></span><span class="term-size dim" id="term-size">—</span></span>
         </div>
         <div id="terminal"></div>
       </div>
@@ -122,18 +126,24 @@
       <div class="block grow globe-block">
         <div class="block-title"><span>Visão global</span><span class="dim">rede · nós ativos</span></div>
         <canvas id="globe"></canvas>
+        <div class="regua" aria-hidden="true"></div>
         <small class="dim" id="host">—</small>
       </div>
 
       <div class="block">
         <div class="block-title"><span>Tráfego de rede</span><span class="dim">últimos 90 s</span></div>
-        <div class="info-grid four">
-          <div><small class="down">↓ agora</small><b id="rx">0 B/s</b></div>
-          <div><small class="up">↑ agora</small><b id="tx">0 B/s</b></div>
-          <div><small>↓ pico</small><b id="rx-peak">—</b></div>
-          <div><small>↑ pico</small><b id="tx-peak">—</b></div>
+        <div class="core-row">
+          <svg id="net-core" class="core-svg" viewBox="-100 -100 200 200" role="img"
+               aria-label="Download (faixa externa), upload (faixa interna) e latência (centro)"></svg>
+          <div class="core-side">
+            <small class="down">↓ agora</small><b id="rx" class="num">0 B/s</b>
+            <small class="up">↑ agora</small><b id="tx" class="num">0 B/s</b>
+            <small>↓ pico</small><b id="rx-peak" class="num">—</b>
+            <small>↑ pico</small><b id="tx-peak" class="num">—</b>
+          </div>
         </div>
         <canvas id="net-graph" class="graph tall" aria-label="Tráfego de rede: download e upload"></canvas>
+        <div class="regua" aria-hidden="true"></div>
         <small class="dim" id="net-total">Total —</small>
       </div>
     </section>
@@ -159,7 +169,7 @@
       </div>
       <footer class="mount">
         <span id="mount-text">Disco —</span>
-        <div class="bar"><div id="mount-bar"></div></div>
+        <div id="mount-seg" class="seg" aria-hidden="true"></div>
         <button id="sound-btn" class="foot-btn" type="button" aria-pressed="true">Som</button>
         <button id="web-btn" class="foot-btn" type="button" aria-pressed="false">Web</button>
         <button id="music-btn" class="foot-btn" type="button" aria-pressed="false">Música</button>
@@ -216,6 +226,7 @@
   <script src="../../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
   <script src="../../node_modules/@xterm/addon-webgl/lib/addon-webgl.js"></script>
   <script src="graphs.js"></script>
+  <script src="hud.js"></script>
   <script src="globe.js"></script>
   <script src="keyboard.js"></script>
   <script src="sound.js"></script>

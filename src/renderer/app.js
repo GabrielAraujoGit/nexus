@@ -3,6 +3,7 @@
 (function () {
   const $ = (id) => document.getElementById(id);
   const { LineGraph, themeRGB } = window.NexusGraphs;
+  const hud = window.NexusHud;
 
   const THEMES = ['tron', 'cyberpunk', 'ambar'];
   const THEME_NAMES = { tron: 'Tron', cyberpunk: 'Cyberpunk', ambar: 'Âmbar' };
@@ -115,7 +116,10 @@
       term.loadAddon(webgl);
     } catch { /* sem WebGL: usa o renderizador padrão */ }
     fit.fit();
-    window.nexus.onData((d) => term.write(d));
+    window.nexus.onData((d) => {
+      termBytes += d.length;
+      term.write(d);
+    });
     term.onData((d) => window.nexus.write(d));
     term.onResize(({ cols, rows }) => window.nexus.resize(cols, rows));
     term.onBell(() => sound.play('bell'));
@@ -162,11 +166,24 @@
   clock();
   setInterval(clock, 1000);
 
-  // ---------- Memória (grade de pontos) ----------
-  const MEM_DOTS = 40 * 4;
-  const memGrid = $('mem-grid');
-  for (let i = 0; i < MEM_DOTS; i++) memGrid.append(document.createElement('i'));
-  const memCells = [...memGrid.children];
+  // ---------- Peças do HUD (núcleos, faixas de blocos, planta e moldura) ----------
+  hud.planta($('planta'));
+  hud.moldura($('term-moldura'), $('term-frame'));
+  const cpuCore = hud.nucleo($('cpu-core'), { rotulo: 'CPU' });
+  const netCore = hud.nucleo($('net-core'), { rotulo: 'MS', interna: true });
+  const memSeg = hud.faixa($('mem-seg'), 30);
+  const swapSeg = hud.faixa($('swap-seg'), 30);
+  const mountSeg = hud.faixa($('mount-seg'), 40);
+  const termAtv = hud.faixa($('term-atv'), 12);
+  // atividade do terminal: bytes recebidos do shell, com decaimento (escala log: 10 B a 100 KB)
+  let termBytes = 0;
+  let termLevel = 0;
+  setInterval(() => {
+    const now = termBytes ? Math.min(1, Math.log10(termBytes + 1) / 5) : 0;
+    termBytes = 0;
+    termLevel = Math.max(now, termLevel * 0.6);
+    termAtv(termLevel < 0.03 ? 0 : termLevel);
+  }, 200);
 
   // Cor por faixa: normal, atenção e crítico (temperatura, memória, disco).
   function level(el, value, warn, crit) {
@@ -201,13 +218,12 @@
     for (let i = 0; i < n; i++) {
       const col = document.createElement('div');
       col.className = 'core';
-      const bar = document.createElement('i');
-      const label = document.createElement('small');
-      label.textContent = i + 1;
-      col.append(bar, label);
+      const stack = document.createElement('div');
+      stack.className = 'core-stack';
+      col.append(stack);
       col.title = `Núcleo ${i + 1}`;
       box.append(col);
-      coreBars.push(bar);
+      coreBars.push({ col, set: hud.faixa(stack, 8) });
     }
   }
 
@@ -261,21 +277,22 @@
     if (cpuHistory.length > CPU_HISTORY) cpuHistory.shift();
     cpuAverages();
     $('cpu-avgs').title = `Carga do sistema (load average 1/5/15 min): ${t.loadavg.map((v) => v.toFixed(2)).join(' / ')}`;
-    $('cpu-now').textContent = `${t.load.toFixed(0)}%`;
-    level($('cpu-now'), t.load, 70, 90);
+    cpuCore.set(t.load / 100);
+    cpuCore.valor(`${t.load.toFixed(0)}%`);
+    cpuCore.sinal(t.temp >= 70);
     $('cpu-freq').textContent = Number.isFinite(t.ghz) && t.ghz > 0 ? `${t.ghz.toFixed(2)} GHz` : '—';
     ensureCoreBars(t.cores.length);
     t.cores.forEach((v, i) => {
-      coreBars[i].style.setProperty('--h', `${Math.max(2, Math.min(100, v))}%`);
-      coreBars[i].classList.toggle('hot', v >= 90);
+      coreBars[i].set(v / 100);
+      coreBars[i].col.classList.toggle('hot', v >= 90);
     });
     $('temp').textContent = t.temp ? `${t.temp.toFixed(0)}°C` : '--°C';
     level($('temp'), t.temp || 0, 70, 85);
     $('uptime').textContent = duration(t.uptime);
 
     const ratio = t.memUsed / t.memTotal;
-    const on = Math.round(ratio * MEM_DOTS);
-    memCells.forEach((c, i) => c.classList.toggle('on', i < on));
+    memSeg(ratio);
+    swapSeg(t.swapTotal ? t.swapUsed / t.swapTotal : 0);
     $('mem-pct').textContent = `${Math.round(ratio * 100)}%`;
     level($('mem-pct'), ratio * 100, 75, 90);
     $('mem-used').textContent = bytes(t.memUsed);
@@ -289,6 +306,7 @@
       txPeak = Math.max(...netGraph.data[1]);
       $('rx').textContent = bytes(t.net.rx, '/s');
       $('tx').textContent = bytes(t.net.tx, '/s');
+      netCore.set(rxPeak ? t.net.rx / rxPeak : 0, txPeak ? t.net.tx / txPeak : 0);
       $('rx-peak').textContent = bytes(rxPeak, '/s');
       $('tx-peak').textContent = bytes(txPeak, '/s');
       $('net-total').textContent = `Total desde o boot ↓ ${bytes(t.net.rxTotal)} · ↑ ${bytes(t.net.txTotal)}`;
@@ -326,7 +344,7 @@
   window.NexusToast = toast;
 
   // Alerta: painel pulsa e toca um aviso (no máximo uma vez por minuto para cada tipo).
-  const ALERT_BLOCKS = { cpu: $('cpu-graph').closest('.block'), temp: $('temp').closest('span'), mem: $('mem-grid').closest('.block') };
+  const ALERT_BLOCKS = { cpu: $('cpu-graph').closest('.block'), temp: $('temp'), mem: $('mem-seg').closest('.block') };
   const ALERT_TEXT = {
     cpu: ['CPU no limite', 'Uso acima de 90%.'],
     temp: ['Temperatura alta', 'Processador acima de 85 °C.'],
@@ -367,11 +385,9 @@
       pct.textContent = `${Math.round(d.use)}%`;
       level(pct, d.use, 80, 95);
       const bar = document.createElement('div');
-      bar.className = 'bar';
-      const fill = document.createElement('div');
-      fill.style.width = `${Math.min(100, d.use)}%`;
-      level(fill, d.use, 80, 95);
-      bar.append(fill);
+      bar.className = 'seg fino';
+      hud.faixa(bar, 40)(d.use / 100);
+      level(bar, d.use, 80, 95);
       row.append(name, detail, pct, bar);
       return row;
     }));
@@ -383,9 +399,16 @@
     const body = $('procs');
     body.replaceChildren(...s.top.map((p) => {
       const tr = document.createElement('tr');
-      [p.pid, p.name, `${p.cpu.toFixed(1)}%`, `${p.mem.toFixed(1)}%`].forEach((v) => {
+      [p.pid, p.name, `${p.cpu.toFixed(1)}%`, `${p.mem.toFixed(1)}%`].forEach((v, i) => {
         const td = document.createElement('td');
-        td.textContent = v;
+        if (i === 2) { // cpu: 5 blocos (20% cada) e o valor
+          const mini = document.createElement('span');
+          mini.className = 'mini';
+          hud.faixa(mini, 5)(p.cpu / 100);
+          td.append(mini, v);
+        } else {
+          td.textContent = v;
+        }
         tr.append(td);
       });
       return tr;
@@ -406,6 +429,8 @@
     $('gw').textContent = n.gw || '—';
     $('dns').textContent = n.dns.length ? n.dns.join(' · ') : '—';
     $('ping').textContent = ms(n.ping);
+    netCore.valor(!Number.isFinite(n.ping) || n.ping < 0 ? '—' : n.ping < 1 ? '<1' : String(Math.round(n.ping)));
+    netCore.sinal(n.loss >= 1);
     $('loss').textContent = Number.isFinite(n.loss) ? `${n.loss.toFixed(0)}%` : '—';
     level($('loss'), n.loss || 0, 1, 10);
 
@@ -413,7 +438,7 @@
     renderGpu(s.gpu);
     if (s.mount) {
       $('mount-text').textContent = `Disco ${s.mount.mount}: ${Math.round(s.mount.use)}% usado`;
-      $('mount-bar').style.width = `${s.mount.use}%`;
+      mountSeg(s.mount.use / 100);
     }
   });
 

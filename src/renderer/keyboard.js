@@ -24,8 +24,12 @@
       this.keys = new Map();
       this.shift = false;
       this.render();
-      window.addEventListener('keydown', (e) => this.light(e.code, true), true);
-      window.addEventListener('keyup', (e) => this.light(e.code, false), true);
+      // Caps ligado acende um sinal na tecla (o estado vem do próprio evento)
+      const caps = (e) => {
+        if (typeof e.getModifierState === 'function') this.keys.get('CapsLock')?.classList.toggle('on', e.getModifierState('CapsLock'));
+      };
+      window.addEventListener('keydown', (e) => { this.light(e.code, true); caps(e); }, true);
+      window.addEventListener('keyup', (e) => { this.light(e.code, false); caps(e); }, true);
       window.addEventListener('blur', () => this.keys.forEach((el) => el.classList.remove('down')));
     }
 
