@@ -48,6 +48,35 @@
   --hud-rgb: var(--rgb);
   --sig-rgb: var(--alert-rgb); /* âmbar sobre âmbar não se vê: aqui o sinal é a cor de alerta */
 }
+/* Matrix: fósforo verde de monitor antigo, tudo numa cor só */
+[data-theme="matrix"] {
+  --rgb: 120, 225, 140;
+  --accent-rgb: 190, 255, 200;
+  --bg: #020a05;
+  --hud-rgb: var(--rgb);
+}
+/* Ártico: branco gelado com o HUD em azul-claro */
+[data-theme="artico"] {
+  --rgb: 196, 216, 232;
+  --accent-rgb: 150, 205, 255;
+  --bg: #080b11;
+}
+/* Synthwave: texto lilás, HUD ciano neon sobre roxo escuro */
+[data-theme="synthwave"] {
+  --rgb: 196, 176, 240;
+  --accent-rgb: 90, 225, 240;
+  --bg: #0c0716;
+}
+/* Carmesim: vermelho escuro; o alerta (que seria vermelho) vira amarelo-claro para continuar se destacando */
+[data-theme="carmesim"] {
+  --rgb: 230, 120, 115;
+  --accent-rgb: 255, 165, 140;
+  --bg: #0c0404;
+  --hud-rgb: var(--rgb);
+  --alert-rgb: 255, 235, 150;
+  --warn-rgb: 255, 200, 110;
+  --sig-rgb: var(--alert-rgb);
+}
 
 * { box-sizing: border-box; }
 html, body {

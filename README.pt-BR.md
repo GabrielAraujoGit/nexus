@@ -96,7 +96,8 @@ em segurança e desempenho.
 
 **Visual**
 - Visual de HUD: linhas finas no lugar de caixas, fundo com grade de pontos, aba angulada no terminal e teclas flutuantes.
-- 3 temas com paletas suaves, de monitor: **Tron**, **Cyberpunk** e **Âmbar**.
+- 7 temas com paletas suaves, de monitor: **Tron**, **Cyberpunk**, **Âmbar**, **Matrix**, **Ártico**, **Synthwave** e
+  **Carmesim** (o botão **Tema** percorre todos; o terminal muda junto).
 - Abertura: a tela liga como um monitor CRT, o ícone se desenha e o nome é decodificado (qualquer tecla pula).
 - Sons sintetizados (sem arquivos de áudio), varredura no boot, falha de sinal ao trocar de tema e janelas estilo CRT;
   tudo respeita *reduzir movimento* e o botão **Som** desliga.

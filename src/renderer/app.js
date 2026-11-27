@@ -5,8 +5,10 @@
   const { LineGraph, themeRGB } = window.NexusGraphs;
   const hud = window.NexusHud;
 
-  const THEMES = ['tron', 'cyberpunk', 'ambar'];
-  const THEME_NAMES = { tron: 'Tron', cyberpunk: 'Cyberpunk', ambar: 'Âmbar' };
+  const THEMES = ['tron', 'cyberpunk', 'ambar', 'matrix', 'artico', 'synthwave', 'carmesim'];
+  const THEME_NAMES = {
+    tron: 'Tron', cyberpunk: 'Cyberpunk', ambar: 'Âmbar', matrix: 'Matrix', artico: 'Ártico', synthwave: 'Synthwave', carmesim: 'Carmesim',
+  };
   const ANSI = {
     // cores ANSI do terminal no mesmo tom dessaturado da interface
     tron: ['#0b1418', '#e8727c', '#7fdcaa', '#e8c98a', '#7ab4e8', '#b99ad8', '#7fd8e6', '#aacfd1',
@@ -15,6 +17,14 @@
       '#4a3b6b', '#f07a98', '#a0f2c0', '#f0dc8c', '#b490f0', '#f586d0', '#8ae0ec', '#f2f7f4'],
     ambar: ['#1a1200', '#e07a50', '#c2c86a', '#ebaa55', '#c9a060', '#e09470', '#e8c88a', '#e6c48a',
       '#4d3a10', '#eb9878', '#d6dc8c', '#f0c27a', '#dcb880', '#f0b090', '#f0dcaa', '#f6ead2'],
+    matrix: ['#03110a', '#d9776a', '#7fe08f', '#cfe07a', '#6fb8a0', '#a8c88a', '#8fe0c0', '#b8e8c0',
+      '#2a4a33', '#e8968a', '#a6f0b2', '#e0ee9c', '#92d4bc', '#c4dca6', '#b2f0d8', '#e2f8e6'],
+    artico: ['#0c121a', '#e88a96', '#94dcc0', '#e8d49a', '#8cb8f0', '#c0a8e8', '#90dcee', '#cddfed',
+      '#3c4c60', '#f2a8b2', '#b4ecd6', '#f2e2b6', '#aed0f6', '#d4c4f2', '#b4ecf6', '#f2f8fc'],
+    synthwave: ['#1a1030', '#f0708c', '#7ee8b8', '#f0d080', '#8aa0f8', '#d080f0', '#5ae0ec', '#d8c8f4',
+      '#4a3a70', '#f492aa', '#a2f2d0', '#f6e0a0', '#aabcfa', '#e0a2f6', '#8aecf4', '#f2ecfc'],
+    carmesim: ['#1a0606', '#ff8a7a', '#a8d08a', '#f0c070', '#a8a0d8', '#e08aa8', '#9ccfcf', '#e8c4c0',
+      '#4a2020', '#ffa898', '#c0e0a8', '#f6d496', '#c2bce8', '#eca8c0', '#b8e2e2', '#f8e6e4'],
   };
   const ANSI_KEYS = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white',
     'brightBlack', 'brightRed', 'brightGreen', 'brightYellow', 'brightBlue', 'brightMagenta', 'brightCyan', 'brightWhite'];

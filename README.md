@@ -95,7 +95,8 @@ security and performance in mind.
 
 **Look and feel**
 - HUD-style layout: thin rules instead of boxes, a dot-grid backdrop, an angled terminal tab and floating keys.
-- 3 themes with muted, monitor-like palettes: **Tron**, **Cyberpunk** and **Amber**.
+- 7 themes with muted, monitor-like palettes: **Tron**, **Cyberpunk**, **Amber**, **Matrix**, **Arctic**, **Synthwave**
+  and **Crimson** (the **Tema** button cycles through them; the terminal follows).
 - An opening sequence: the screen switches on like a CRT, the icon draws itself and the name decodes (any key skips it).
 - Synthesized UI sounds (no audio files), boot scan, theme glitch, CRT-style windows; all respect *reduce motion*,
   and the **Som** button mutes them.
