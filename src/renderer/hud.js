@@ -179,5 +179,43 @@
     desenha();
   }
 
-  window.NexusHud = { nucleo, faixa, planta, moldura, acende };
+  /**
+   * Disco do mini player: capa redonda no centro (gira como um disco enquanto toca), faixa de 30 blocos
+   * com o progresso da música, régua de ticks girando e anel externo grosso com entalhes.
+   */
+  let discos = 0;
+  function disco(svg) {
+    svg.replaceChildren();
+    const id = `np-clip-${++discos}`;
+    el('circle', { r: 46 }, el('clipPath', { id }, el('defs', {}, svg)));
+    const ext = el('g', {}, svg);
+    for (const [g0, g1] of [[10, 110], [130, 230], [250, 350]]) el('path', { d: arco(90, g0, g1), class: 'forte', 'stroke-width': 5 }, ext);
+    el('path', { d: arco(97, 300, 330), class: 'forte', 'stroke-width': 2 }, ext);
+    el('path', { d: arco(97, 120, 140), class: 'forte', 'stroke-width': 2 }, ext);
+    const tick = el('g', { class: 'g-tick' }, svg);
+    for (let i = 0; i < 48; i++) linha(tick, i % 4 ? 76 : 73, 81, i * 7.5, i % 4 ? 'tk f' : 'tk');
+    const blocos = [];
+    const passo = 360 / 30;
+    for (let i = 0; i < 30; i++) blocos.push(el('path', { d: setor(55, 68, i * passo + 0.8, (i + 1) * passo - 0.8), class: 'bloco' }, svg));
+    const capa = el('g', { class: 'capa' }, svg);
+    el('circle', { r: 46, class: 'fundo' }, capa);
+    const nota = el('text', { class: 'nota' }, capa);
+    nota.textContent = '♪';
+    const img = el('image', { x: -46, y: -46, width: 92, height: 92, preserveAspectRatio: 'xMidYMid slice', 'clip-path': `url(#${id})` }, capa);
+    img.style.display = 'none';
+    el('circle', { r: 46.5, class: 'fino', 'stroke-width': 1 }, capa);
+    el('circle', { r: 7, class: 'furo' }, capa); // furo do disco
+    el('circle', { r: 50.5, class: 'fino', 'stroke-width': 0.6 }, svg);
+    return {
+      set: (f) => acende(blocos, f),
+      art(src) {
+        const ok = typeof src === 'string' && src.startsWith('data:image/');
+        if (ok && img.getAttribute('href') !== src) img.setAttribute('href', src);
+        img.style.display = ok ? '' : 'none';
+        nota.style.display = ok ? 'none' : '';
+      },
+    };
+  }
+
+  window.NexusHud = { nucleo, faixa, planta, moldura, acende, disco };
 })();

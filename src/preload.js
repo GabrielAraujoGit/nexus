@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld('nexus', {
     bounds: (rect) => ipcRenderer.send('music:bounds', rect),
     front: () => ipcRenderer.send('music:front'),
     control: (action) => ipcRenderer.send('music:control', String(action)),
+    seek: (fraction) => ipcRenderer.send('music:seek', Number(fraction)),
     nav: (action) => ipcRenderer.send('music:nav', String(action)),
     quit: () => ipcRenderer.send('music:quit'),
     forget: () => ipcRenderer.invoke('music:forget'),

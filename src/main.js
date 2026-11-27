@@ -459,6 +459,27 @@ function loop(fn, ms) {
 ipcMain.handle('sys:static', () => staticInfo());
 const web = setupWeb(() => win);
 if (!CAPTURE) setupMusic(() => win); // capturas não abrem o player (usam perfil temporário)
+// Capturas com NEXUS_DEMO_MUSIC=1: uma faixa fictícia tocando, para o mini player aparecer.
+if (CAPTURE && process.env.NEXUS_DEMO_MUSIC === '1') {
+  const { nativeImage } = require('electron');
+  const icon = nativeImage.createFromPath(path.join(__dirname, '..', 'build', 'icon.png'));
+  const art = icon.isEmpty() ? '' : icon.resize({ width: 120 }).toDataURL();
+  const dur = 212;
+  let pos = 74;
+  let at = Date.now();
+  const now = () => pos + (process.env.NEXUS_DEMO_MUSIC_PAUSED === '1' ? 0 : (Date.now() - at) / 1000);
+  ipcMain.on('music:seek', (_e, f) => {
+    if (typeof f !== 'number' || !Number.isFinite(f)) return;
+    pos = Math.min(Math.max(f, 0), 1) * dur;
+    at = Date.now();
+  });
+  setInterval(() => {
+    send('music:state', {
+      open: true, title: 'Grid Runner', artist: 'Neon Circuit', album: 'Sinal', art,
+      playing: process.env.NEXUS_DEMO_MUSIC_PAUSED !== '1', pos: Math.min(now(), dur), dur,
+    });
+  }, 1000);
+}
 
 // Uma janela só: rodar `nexus` de novo traz a janela aberta para a frente (e a restaura se minimizada).
 // Capturas usam perfil próprio, então não esbarram na janela de quem está usando o app.

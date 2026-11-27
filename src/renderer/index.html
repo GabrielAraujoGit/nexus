@@ -154,11 +154,19 @@
       <div id="files" class="files"></div>
       <!-- Mini player: aparece quando o YouTube Music está tocando algo -->
       <div id="np" class="np" hidden aria-label="Tocando agora">
-        <img id="np-art" class="np-art" width="44" height="44" alt="" hidden>
+        <div class="np-head" aria-hidden="true">
+          <span id="np-state">Tocando agora</span>
+          <span id="np-eq" class="np-eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+        <svg id="np-disco" class="np-disco" viewBox="-100 -100 200 200" aria-hidden="true"></svg>
         <div class="np-info">
           <b id="np-title" class="np-title"></b>
           <small id="np-artist" class="np-artist"></small>
-          <div class="np-track"><div class="bar"><div id="np-bar"></div></div><small id="np-time" class="num"></small></div>
+          <div class="np-track">
+            <div id="np-seek" class="np-seek" role="slider" tabindex="0" aria-label="Posição na música"
+                 aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><div id="np-seg" class="seg fino"></div><i class="np-cursor"></i></div>
+            <small id="np-time" class="num"></small>
+          </div>
         </div>
         <div class="np-ctl">
           <button id="np-prev" type="button" aria-label="Faixa anterior">&#9198;</button>

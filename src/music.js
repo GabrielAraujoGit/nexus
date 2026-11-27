@@ -198,6 +198,20 @@ function setupMusic(getWin) {
     }
   });
 
+  // Timeline do mini player: vai para a fração f (0..1) da faixa. Só um número entra no script da página.
+  ipcMain.on('music:seek', (_e, f) => {
+    const wc = view?.webContents;
+    if (!wc || wc.isDestroyed() || typeof f !== 'number' || !Number.isFinite(f)) return;
+    const frac = Math.min(Math.max(f, 0), 1).toFixed(5);
+    const code = `(() => {
+      const v = document.querySelector('video');
+      if (v && Number.isFinite(v.duration) && v.duration > 0) v.currentTime = v.duration * ${frac};
+    })()`;
+    wc.executeJavaScriptInIsolatedWorld(ISOLATED_WORLD, [{ code }])
+      .then(() => setTimeout(() => { poll().catch(() => {}); }, 250))
+      .catch(() => {});
+  });
+
   ipcMain.on('music:nav', (_e, action) => {
     const wc = view?.webContents;
     if (!wc || wc.isDestroyed()) return;
