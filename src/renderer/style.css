@@ -77,8 +77,8 @@ b { font-weight: 600; color: rgba(var(--rgb), var(--text-strong)); }
 .planta-bg .pl { fill: none; stroke: rgba(var(--rgb), 0.06); stroke-width: 1; }
 .planta-bg .pl2 { fill: none; stroke: rgba(var(--rgb), 0.045); stroke-width: 1; stroke-dasharray: 4 6; }
 .planta-bg g { transform-box: view-box; transform-origin: 50% 36%; }
-.planta-bg .g-a { animation: gira 211s linear infinite reverse; }
-.planta-bg .g-b { animation: gira 149s linear infinite; }
+.planta-bg .g-a { animation: gira 211s steps(2110) infinite reverse; } /* ~10 quadros/s, como nos núcleos */
+.planta-bg .g-b { animation: gira 149s steps(1490) infinite; }
 #ui { position: relative; z-index: 1; }
 
 /* Linhas de varredura sutis por cima de tudo */
@@ -103,6 +103,9 @@ body::after {
   transition: opacity 0.5s;
 }
 #boot.done { opacity: 0; pointer-events: none; }
+#boot[hidden] { display: none; }
+/* modo econômico (janela sem foco há 1 min): rotações e respiração de enfeite param */
+.eco .planta-bg *, .eco .core-svg *, .eco .np-disco * { animation-play-state: paused !important; }
 #boot.done .intro { transform: scale(1.05); filter: blur(2px); }
 
 /* 1. CRT ligando: uma linha de luz abre no meio da tela e se apaga */
@@ -433,15 +436,17 @@ canvas.graph.tall { height: 46px; }
 .core-svg .sinal-g { opacity: 0; transition: opacity 0.4s; }
 .core-svg.sinal .sinal-g { opacity: 1; }
 .core-svg .ambar { fill: none; stroke: rgb(var(--sig-rgb)); filter: drop-shadow(0 0 2.5px rgba(var(--sig-rgb), 0.8)); }
-.core-svg .pontos circle { fill: rgb(var(--sig-rgb)); filter: drop-shadow(0 0 2px rgba(var(--sig-rgb), 0.9)); animation: pisca 2.4s ease-in-out infinite; }
+.core-svg .pontos circle { fill: rgb(var(--sig-rgb)); filter: drop-shadow(0 0 2px rgba(var(--sig-rgb), 0.9)); }
+.core-svg.sinal .pontos circle { animation: pisca 2.4s steps(12) infinite; } /* só pisca com o sinal aceso */
 .core-svg .pontos circle:nth-child(2) { animation-delay: 0.2s; }
 .core-svg .pontos circle:nth-child(3) { animation-delay: 0.4s; }
-/* rotações lentas com períodos primos: as camadas nunca se alinham */
+/* rotações lentas com períodos primos: as camadas nunca se alinham. Em degraus de ~10 quadros/s (steps = período
+   × 10): a 60 quadros/s o SVG inteiro era redesenhado o tempo todo, e o passo de 0,4 px não aparece. */
 .core-svg [class*="g-"] { transform-origin: 0 0; }
-.core-svg .g-tick { animation: gira 97s linear infinite; }
-.core-svg .g-ambar { animation: gira 23s linear infinite reverse; }
-.core-svg .g-planta { animation: gira 211s linear infinite reverse; }
-.core-svg .interno { animation: respira 3.7s ease-in-out infinite; }
+.core-svg .g-tick { animation: gira 97s steps(970) infinite; }
+.core-svg .g-ambar { animation: gira 23s steps(230) infinite reverse; }
+.core-svg .g-planta { animation: gira 211s steps(2110) infinite reverse; }
+.core-svg .interno { animation: respira 3.7s steps(19) infinite; }
 /* entrada em cascata, camada por camada, quando os painéis aparecem */
 .core-svg .entra { opacity: 0; transform-origin: 0 0; }
 #ui.scan .core-svg .entra { animation: entra 0.7s ease-out calc(var(--d0, 0.5s) + var(--de, 0s)) forwards; }
@@ -1013,7 +1018,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid rgba(var(--accent
 .np-disco .fundo { fill: rgba(var(--rgb), 0.08); }
 .np-disco .nota { fill: rgba(var(--rgb), 0.7); font-size: 44px; text-anchor: middle; dominant-baseline: central; }
 .np-disco .furo { fill: var(--bg); stroke: rgba(var(--accent-rgb), 0.6); stroke-width: 1; }
-.np-disco .g-tick, .np-disco .capa { transform-origin: 0 0; animation: gira 97s linear infinite; animation-play-state: paused; }
+.np-disco .g-tick, .np-disco .capa { transform-origin: 0 0; animation: gira 97s steps(970) infinite; animation-play-state: paused; }
 .np-disco .capa { animation-duration: 29s; }
 .np.playing .np-disco .g-tick, .np.playing .np-disco .capa { animation-play-state: running; }
 .np:not(.playing) .np-disco image { filter: saturate(0.3) brightness(0.7); }

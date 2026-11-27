@@ -46,8 +46,9 @@ security and performance in mind.
   current Electron, with a sandboxed UI and no telemetry.
 - **Useful, not just pretty.** Per-core CPU, 1/5/15-minute averages, memory, disks, GPU, full network details,
   latency and packet loss, all live and color-coded when something goes wrong.
-- **Light on your machine.** The globe renders in batches at 20 fps, slow metrics are cached, and nothing is
-  collected while the window is minimized.
+- **Light on your machine.** The globe renders in batches at 20 fps, the decorative rotations step at ~10 fps, slow
+  metrics are cached, and nothing is collected while the window is minimized. After a minute without focus the HUD
+  pauses its rotations and the fast metrics slow to every 2 s, so it can stay open all day.
 
 ## Features
 

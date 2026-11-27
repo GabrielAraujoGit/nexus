@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld('nexus', {
   onTick: (cb) => on('sys:tick', cb),
   onSlow: (cb) => on('sys:slow', cb),
   onFiles: (cb) => on('fs:list', cb),
+  onFocus: (cb) => on('win:focus', cb), // foco da janela (modo econômico)
   readFile: (name) => ipcRenderer.invoke('fs:read', String(name)),
   pdf: {
     bounds: (rect) => ipcRenderer.send('pdf:bounds', rect),

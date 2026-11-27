@@ -46,8 +46,9 @@ em segurança e desempenho.
   do zero, com Electron atual, interface em sandbox e sem telemetria.
 - **Útil, não só bonito.** CPU por núcleo, médias de 1/5/15 min, memória, discos, GPU, rede completa, latência e
   perda de pacotes, tudo ao vivo e com cor quando algo sai do normal.
-- **Leve na sua máquina.** O globo desenha em lote a 20 fps, métricas lentas ficam em cache e nada é coletado com a
-  janela minimizada.
+- **Leve na sua máquina.** O globo desenha em lote a 20 fps, as rotações de enfeite andam a ~10 fps, métricas lentas
+  ficam em cache e nada é coletado com a janela minimizada. Depois de 1 minuto sem foco o HUD pausa as rotações e
+  as métricas rápidas passam a cada 2 s, para dar para deixar aberto o dia inteiro.
 
 ## Recursos
 

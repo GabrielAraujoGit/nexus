@@ -177,6 +177,16 @@
   clock();
   setInterval(clock, 1000);
 
+  // ---------- Modo econômico ----------
+  // Janela sem foco há mais de 1 min: as rotações de enfeite param (os dados seguem atualizando). O foco vem do
+  // processo principal: clicar na página do Web não conta como sair da janela.
+  let ecoTimer = null;
+  window.nexus.onFocus((on) => {
+    clearTimeout(ecoTimer);
+    if (on) document.documentElement.classList.remove('eco');
+    else ecoTimer = setTimeout(() => document.documentElement.classList.add('eco'), 60 * 1000);
+  });
+
   // ---------- Peças do HUD (núcleos, faixas de blocos, planta e moldura) ----------
   hud.planta($('planta'));
   hud.moldura($('term-moldura'), $('term-frame'));
@@ -584,6 +594,8 @@
     window.removeEventListener('keydown', skipIntro, true);
     window.removeEventListener('pointerdown', skipIntro, true);
     $('boot').classList.add('done');
+    // depois do esmaecimento a abertura sai da página: invisível, seguia redesenhando os cursores piscando
+    setTimeout(() => { $('boot').hidden = true; }, 700);
     $('ui').classList.remove('hidden');
     $('ui').classList.add('scan');
     stopHum();

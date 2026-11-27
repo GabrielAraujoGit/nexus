@@ -137,7 +137,9 @@ function setupMusic(getWin) {
         nodeIntegration: false,
         webviewTag: false,
         spellcheck: false,
-        backgroundThrottling: false, // a música segue com a janela "Música" escondida
+        // Com a janela "Música" escondida o Chromium economiza (menos quadros e timers), mas não segura página
+        // que está tocando áudio: a música segue. Antes ficava false e o site rodava a toda o tempo todo.
+        backgroundThrottling: true,
       },
     });
     view.setBackgroundColor('#030303');

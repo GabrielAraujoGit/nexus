@@ -37,6 +37,10 @@ let win = null;
 let term = null;
 let lastCwd = null;
 const timers = [];
+// Modo econômico: janela sem foco há mais de 1 min → a coleta rápida passa a 2 s e a interface pausa as rotações.
+const ECO_MS = 60 * 1000;
+let blurredAt = 0; // 0 = com foco
+const eco = () => !CAPTURE && blurredAt > 0 && Date.now() - blurredAt > ECO_MS;
 
 // Capturas de tela usam um perfil temporário: não leem nem gravam tema, som etc. de quem roda.
 // Modo de captura (fora da tela, tamanho fixo, dados demo): print (NEXUS_SNAPSHOT) ou gravação (NEXUS_RECORD).
@@ -74,6 +78,14 @@ function createWindow() {
   });
 
   win.removeMenu();
+  win.on('focus', () => { blurredAt = 0; send('win:focus', true); });
+  win.on('blur', () => { blurredAt = Date.now(); send('win:focus', false); });
+  // abriu sem foco (acontece no Wayland): sem evento de blur, então o estado inicial vai na carga
+  win.webContents.on('did-finish-load', () => {
+    if (CAPTURE || win.isFocused()) return;
+    blurredAt = blurredAt || Date.now();
+    send('win:focus', false);
+  });
   const theme = process.env.NEXUS_THEME;
   const query = {};
   if (theme) query.theme = theme;
@@ -461,10 +473,12 @@ async function slowTick() { // 3 s: processos
 // Janela minimizada ou escondida: não coleta nada (as capturas usam janela fora da tela, então seguem).
 const idle = () => !CAPTURE && (!win || win.isDestroyed() || win.isMinimized() || !win.isVisible());
 
-function loop(fn, ms) {
+function loop(fn, ms, { slowOnEco = false } = {}) {
   let busy = false; // não empilha chamadas se uma coleta demorar mais que o intervalo
+  let n = 0;
   const run = (force = false) => {
     if (busy || (!force && idle())) return Promise.resolve();
+    if (!force && slowOnEco && eco() && n++ % 2) return Promise.resolve(); // modo econômico: metade das coletas
     busy = true;
     return fn().catch((err) => console.error(`[nexus] ${fn.name}:`, err.message)).finally(() => { busy = false; });
   };
@@ -518,7 +532,7 @@ app.whenReady().then(() => {
   loop(sensorsTick, 5000);
   loop(diskTick, 30000);
   loop(networkInfoTick, 30000).then(() => loop(pingTick, 10000)); // ping precisa do gateway
-  loop(fastTick, 1000);
+  loop(fastTick, 1000, { slowOnEco: true });
   loop(slowTick, 3000);
   loop(pollCwd, 800);
 });
