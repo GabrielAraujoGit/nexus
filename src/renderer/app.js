@@ -92,6 +92,15 @@
   });
   const fit = new window.FitAddon.FitAddon();
   term.loadAddon(fit);
+  // aba do shell no hub do centro (hub.js); esconder é só CSS, o processo segue rodando
+  const hub = window.NexusHub;
+  hub.register('shell', {
+    label: () => ['shell'],
+    title: 'SHELL PRINCIPAL',
+    show: (on) => { if (on && term.element) requestAnimationFrame(() => fit.fit()); },
+    focus: () => term.focus(),
+    close: () => {},
+  });
 
   // Ctrl+Shift+C / Ctrl+Shift+V copiam e colam, como no GNOME Terminal
   term.attachCustomKeyEventHandler((e) => {
@@ -123,20 +132,18 @@
     term.onData((d) => window.nexus.write(d));
     term.onResize(({ cols, rows }) => window.nexus.resize(cols, rows));
     term.onBell(() => sound.play('bell'));
-    term.onTitleChange((t) => {
-      $('term-title').textContent = t || 'SHELL PRINCIPAL';
-      $('term-tab').textContent = t || 'shell';
-    });
+    term.onTitleChange((t) => hub.setShellTitle(t));
     const showSize = () => { $('term-size').textContent = `${term.cols}×${term.rows}`; };
     term.onResize(showSize);
     showSize();
     window.nexus.spawn(term.cols, term.rows);
-    new ResizeObserver(() => fit.fit()).observe($('terminal'));
-    term.focus();
+    // escondido (outra aba do hub na frente): não redimensiona, senão o shell iria para 1 linha
+    new ResizeObserver(() => { if ($('terminal').offsetWidth) fit.fit(); }).observe($('terminal'));
+    hub.focus();
   }
   document.addEventListener('mouseup', (e) => {
     if (e.target instanceof Element && e.target.closest('#web')) return; // mini navegador cuida do foco
-    if (!window.getSelection()?.toString()) term.focus();
+    if (!window.getSelection()?.toString()) hub.focus();
   });
 
   // ---------- Som de digitação ----------
@@ -481,7 +488,7 @@
         if (it.dir) window.nexus.write(`\x15cd -- ${shellQuote(it.name)}\r`);
         else if (e.shiftKey || !window.NexusViewer) window.nexus.write(`${shellQuote(it.name)} `); // Shift: cola o nome
         else window.NexusViewer.open(it.name); // arquivo: abre no visualizador
-        term.focus();
+        hub.focus();
       }));
     }
     if (f.error) {
@@ -506,8 +513,9 @@
   // ---------- Teclado ----------
   new window.NexusKeyboard($('keyboard'), (seq) => {
     sound.play(seq === '\r' ? 'enter' : seq === ' ' ? 'space' : seq === '\x7f' ? 'back' : 'key');
-    window.nexus.write(seq);
-    term.focus();
+    if (hub.active() === 'web') window.nexus.web.key(seq); // navegador encaixado na frente: digita na página
+    else window.nexus.write(seq);
+    hub.focus();
   });
 
   // ---------- Tema ----------
@@ -519,7 +527,7 @@
     $('theme-btn').textContent = `Tema: ${THEME_NAMES[theme]}`;
     replay($('ui'), 'glitch');
     sound.play('theme');
-    term.focus();
+    hub.focus();
   });
   $('ui').addEventListener('animationend', (e) => {
     if (e.animationName === 'glitch') $('ui').classList.remove('glitch');
@@ -535,7 +543,7 @@
     sound.setEnabled(!sound.enabled);
     sound.play('toggle');
     paintSound();
-    term.focus();
+    hub.focus();
   });
   paintSound();
   $('theme-btn').textContent = `Tema: ${THEME_NAMES[theme]}`;
@@ -572,7 +580,7 @@
     sound.play('boot');
     if (term.element) { // o terminal já abriu (startTerminal roda no próximo quadro)
       fit.fit();
-      term.focus();
+      hub.focus();
     }
   }
   // a tecla que pula a abertura não vai para o shell

@@ -1,7 +1,7 @@
 'use strict';
 // NEXUS — moldura das janelas flutuantes (mini navegador, música e visualizador). O conteúdo é uma view nativa
 // do processo principal posicionada sobre o "slot" (ou HTML comum, no visualizador); aqui ficam abrir/fechar como CRT, arrastar, manter na tela,
-// trazer para a frente e avisar a posição.
+// trazer para a frente e avisar a posição. O mini navegador pode ser encaixado no hub do centro (classe .docked).
 (function () {
   const RECORD = new URLSearchParams(location.search).has('record');
   const noMotion = () => (document.documentElement.classList.contains('snapshot') && !RECORD)
@@ -26,6 +26,7 @@
 
     // Mantém a janela dentro da tela (depois de arrastar ou redimensionar o app).
     function clamp() {
+      if (box.classList.contains('docked')) return; // encaixado no hub: o layout do centro manda
       const r = box.getBoundingClientRect();
       const left = Math.min(Math.max(r.left, 0), Math.max(window.innerWidth - r.width, 0));
       const y = Math.min(Math.max(r.top, 0), Math.max(window.innerHeight - r.height, 0));
@@ -78,7 +79,7 @@
     // ---------- Arrastar pela barra ----------
     let drag = null;
     bar.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0 || e.target.closest('button, input')) return;
+      if (e.button !== 0 || e.target.closest('button, input') || box.classList.contains('docked')) return;
       const r = box.getBoundingClientRect();
       drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
       bar.setPointerCapture(e.pointerId);
@@ -104,6 +105,11 @@
     return {
       show,
       isOpen,
+      // reposiciona a view nativa (o app mudou a janela de lugar, ex.: encaixou no hub ou soltou)
+      refresh() {
+        clamp();
+        sync();
+      },
       setHasPage(v) {
         if (v === hasPage) return;
         hasPage = v;

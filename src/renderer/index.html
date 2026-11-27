@@ -88,11 +88,11 @@
     <!-- Terminal -->
     <section class="col col-center">
       <header class="panel-head"><span>TERMINAL</span><span id="term-title">SHELL PRINCIPAL</span></header>
-      <div class="term-frame" id="term-frame">
+      <div class="term-frame" id="term-frame" data-app="shell">
         <svg class="term-moldura" id="term-moldura" aria-hidden="true"></svg>
-        <div class="term-tabs" aria-hidden="true">
-          <span class="term-tab" id="term-tab">shell</span>
-          <span class="term-side"><span id="term-atv" class="term-atv"></span><span class="term-size dim" id="term-size">—</span></span>
+        <div class="term-tabs">
+          <div id="hub-tabs" class="hub-tabs" role="tablist" aria-label="Apps abertos no centro"></div>
+          <span class="term-side" aria-hidden="true"><span id="term-atv" class="term-atv"></span><span class="term-size dim" id="term-size">—</span></span>
         </div>
         <div id="terminal"></div>
       </div>
@@ -179,6 +179,7 @@
         <span id="mount-text">Disco —</span>
         <div id="mount-seg" class="seg" aria-hidden="true"></div>
         <button id="sound-btn" class="foot-btn" type="button" aria-pressed="true">Som</button>
+        <button id="term-btn" class="foot-btn" type="button" hidden title="Mostra o terminal de novo (o shell continuou rodando)">Terminal</button>
         <button id="web-btn" class="foot-btn" type="button" aria-pressed="false">Web</button>
         <button id="music-btn" class="foot-btn" type="button" aria-pressed="false">Música</button>
         <button id="theme-btn" class="foot-btn" type="button" aria-label="Trocar tema">Tema</button>
@@ -206,6 +207,7 @@
       </form>
       <button id="web-adblock" class="wide" type="button" aria-pressed="true"
               title="Bloqueia anúncios e rastreadores">AdBlock</button>
+      <button id="web-dock" class="wide" type="button" title="Encaixa o navegador no lugar do terminal, como uma aba">&#8690; Encaixar</button>
       <button id="web-close" type="button" aria-label="Fechar">&#10005;</button>
     </header>
     <div id="web-slot" class="webwin-slot">
@@ -254,6 +256,7 @@
   <script src="globe.js"></script>
   <script src="keyboard.js"></script>
   <script src="sound.js"></script>
+  <script src="hub.js"></script>
   <script src="app.js"></script>
   <script src="floatwin.js"></script>
   <script src="web.js"></script>

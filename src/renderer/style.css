@@ -500,7 +500,7 @@ canvas.graph.tall { height: 46px; }
   display: flex;
   flex-direction: column;
 }
-/* faixa de abas: aba ativa angulada com o título do shell; tamanho do terminal à direita */
+/* faixa de abas do hub (hub.js): aba ativa angulada e cheia, as outras apagadas; tamanho do terminal à direita */
 .term-tabs {
   display: flex;
   align-items: stretch;
@@ -510,24 +510,81 @@ canvas.graph.tall { height: 46px; }
   border-bottom: 1px solid rgba(var(--rgb), 0.4);
   flex-shrink: 0;
 }
-.term-tab {
+.hub-tabs { display: flex; gap: 4px; min-width: 0; }
+.hub-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 150px;
+  max-width: 420px;
+  background: rgba(var(--hud-rgb), 0.12);
+  color: rgb(var(--hud-rgb));
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 100%, 0 100%);
+  transition: background-color 0.15s;
+}
+.hub-tab:only-child { min-width: 180px; }
+.hub-tab.on { background: rgba(var(--hud-rgb), 0.85); color: var(--bg); }
+.hub-tab:not(.on):hover { background: rgba(var(--hud-rgb), 0.22); }
+.hub-sel {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 34px 0 14px;
-  max-width: 60%;
-  min-width: 180px;
-  background: rgba(var(--hud-rgb), 0.85);
-  color: var(--bg);
+  padding: 0 4px 0 14px;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
   font-weight: 600;
   font-size: 15px;
   letter-spacing: 0.06em;
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 100%, 0 100%);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  cursor: pointer;
 }
-.term-tab::before { content: ""; width: 6px; height: 6px; background: var(--bg); flex-shrink: 0; }
+.hub-sel::before { content: ""; width: 6px; height: 6px; background: currentColor; flex-shrink: 0; }
+.hub-sel b, .hub-sel small { color: inherit; }
+.hub-sel b { font-weight: inherit; overflow: hidden; text-overflow: ellipsis; }
+.hub-sel small { font-family: var(--font-num); font-weight: 400; font-size: 12px; opacity: 0.75; overflow: hidden; text-overflow: ellipsis; }
+.hub-sel:focus-visible, .hub-x:focus-visible { outline: 1px solid currentColor; outline-offset: -3px; }
+.hub-x {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin-right: 22px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 11px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+.hub-x:hover { opacity: 1; }
+/* outra aba na frente: o terminal e a régua de atividade saem (o shell segue rodando) */
+.term-frame:not([data-app="shell"]) #terminal,
+.term-frame:not([data-app="shell"]) .term-side { display: none; }
+/* mini navegador encaixado: ocupa o espaço do terminal, sem moldura de janela */
+.webwin.docked {
+  position: static;
+  width: auto !important;
+  height: auto !important;
+  max-width: none;
+  max-height: none;
+  flex: 1;
+  min-height: 0;
+  margin: 0 -10px -8px;
+  resize: none;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  animation: none;
+}
+.webwin.docked[hidden] { display: none; }
+.webwin.docked::before, .webwin.docked .webwin-title, .webwin.docked #web-close { display: none; }
+.webwin.docked .webwin-bar { cursor: default; }
 .term-size {
   align-self: center;
   padding-right: 10px;

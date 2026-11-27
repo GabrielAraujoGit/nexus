@@ -73,6 +73,9 @@ em segurança e desempenho.
 **Mini navegador**
 - Janela flutuante (botão **Web**) que dá para arrastar e redimensionar, com endereço/busca, voltar, avançar e
   recarregar.
+- **Encaixar** põe o navegador no lugar do terminal, como uma aba (`shell · Web`), com a moldura do HUD; **Soltar**
+  volta a janela flutuante. Fechar a aba do shell só esconde (o shell continua rodando) e o botão **Terminal** traz
+  de volta. Com o navegador na frente, o teclado na tela digita na página.
 - Roda isolado: sandbox, sem acesso ao app, sessão só em memória, permissões e downloads negados.
 - Bloqueador de anúncios e rastreadores embutido (botão **AdBlock**, ligado por padrão) com contador por página.
   Corta as requisições para redes de anúncio e rastreadores conhecidos e esconde os espaços de anúncio comuns;
@@ -244,6 +247,7 @@ src/
     ├── keyboard.js  teclado ABNT2 na tela
     ├── sound.js     sons de interface sintetizados (Web Audio)
     ├── floatwin.js  moldura das janelas flutuantes (arrastar, abrir/fechar como CRT, ordem)
+    ├── hub.js       abas de apps no centro (shell e navegador encaixado)
     ├── web.js       janela do mini navegador
     ├── viewer.js    janela do visualizador de arquivos
     └── music.js     janela de música e mini player

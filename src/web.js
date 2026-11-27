@@ -51,6 +51,20 @@ function placeView(win, view, rect) {
   view.setVisible(true);
 }
 
+// Teclado na tela → página: a sequência que iria para o shell vira evento de tecla. Só estas são aceitas.
+const KEYS = { '\r': 'Enter', '\x7f': 'Backspace', '\t': 'Tab', '\x1b': 'Escape', '\x1b[D': 'Left', '\x1b[A': 'Up', '\x1b[B': 'Down', '\x1b[C': 'Right' };
+function keyEvents(seq) {
+  if (typeof seq !== 'string') return [];
+  const key = KEYS[seq];
+  if (key) {
+    const down = { type: 'keyDown', keyCode: key };
+    const up = { type: 'keyUp', keyCode: key };
+    return key === 'Enter' ? [down, { type: 'char', keyCode: '\r' }, up] : [down, up];
+  }
+  // um caractere imprimível (o teclado na tela manda um por clique)
+  return [...seq].length === 1 && seq >= ' ' ? [{ type: 'char', keyCode: seq }] : [];
+}
+
 function setupWeb(getWin) {
   let view = null;
   let adblockReady = false;
@@ -180,6 +194,13 @@ function setupWeb(getWin) {
   });
 
   ipcMain.on('web:close', () => closeView());
+  ipcMain.on('web:focus', () => view?.webContents.focus());
+  ipcMain.on('web:key', (_e, seq) => {
+    const wc = view?.webContents;
+    if (!wc) return;
+    wc.focus();
+    for (const ev of keyEvents(seq)) wc.sendInputEvent(ev);
+  });
 
   // liga/desliga o bloqueio; com página aberta, recarrega para valer na hora
   ipcMain.on('web:adblock', (_e, on) => {
@@ -201,4 +222,4 @@ function setupWeb(getWin) {
   };
 }
 
-module.exports = { setupWeb, toURL, placeView };
+module.exports = { setupWeb, toURL, placeView, keyEvents };

@@ -72,6 +72,9 @@ security and performance in mind.
 
 **Mini browser**
 - A floating window (**Web** button) you can drag and resize, with address/search bar, back, forward and reload.
+- **Dock** puts it in the terminal's place as a tab (`shell · Web`), with the HUD frame; **Undock** turns it back
+  into a floating window. Closing the shell tab only hides it (the shell keeps running) and the **Terminal** button
+  brings it back. With the browser in front, the on-screen keyboard types into the page.
 - Runs isolated: sandboxed, no access to the app, in-memory session, permissions and downloads denied.
 - Built-in ad and tracker blocker (**AdBlock** button, on by default) with a per-page counter. It cuts requests to
   known ad networks and trackers and hides the usual ad slots; no extension or filter list download.
@@ -244,6 +247,7 @@ src/
     ├── keyboard.js  on-screen ABNT2 keyboard
     ├── sound.js     synthesized UI sounds (Web Audio)
     ├── floatwin.js  floating window frame (drag, CRT open/close, stacking)
+    ├── hub.js       app tabs in the center (shell and docked browser)
     ├── web.js       mini browser window
     ├── viewer.js    file viewer window
     └── music.js     music window and mini player
