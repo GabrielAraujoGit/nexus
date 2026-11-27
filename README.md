@@ -81,6 +81,9 @@ security and performance in mind.
 - A mini player in the files panel shows cover, track, artist and progress, with previous, play/pause and next.
 - No API key and no unofficial API: the mini player reads what the site publishes about the current track and
   presses the site's own buttons. Your login is kept in a separate session only this window uses.
+- The mini player has a clickable timeline (click, drag or arrow keys) to jump through the track.
+- The **AdBlock** button also covers this window: ad and tracker requests are cut, and audio/video ads are
+  muted and skipped as soon as the player starts one.
 
 **Look and feel**
 - HUD-style layout: thin rules instead of boxes, a dot-grid backdrop, an angled terminal tab and floating keys.

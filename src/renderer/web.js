@@ -38,7 +38,7 @@
   try { adblock = localStorage.getItem('nexus.adblock') !== 'off'; } catch { /* sem localStorage: ligado */ }
   const paintAdblock = () => {
     adBtn.setAttribute('aria-pressed', String(adblock));
-    adBtn.title = adblock ? 'Bloqueando anúncios e rastreadores (clique para desligar)' : 'Bloqueador desligado (clique para ligar)';
+    adBtn.title = adblock ? 'Bloqueando anúncios e rastreadores no navegador e na música (clique para desligar)' : 'Bloqueador desligado (clique para ligar)';
   };
   paintAdblock();
   api.adblock(adblock);

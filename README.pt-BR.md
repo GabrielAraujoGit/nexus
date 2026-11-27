@@ -83,6 +83,9 @@ em segurança e desempenho.
 - Um mini player no painel de arquivos mostra capa, faixa, artista e progresso, com anterior, tocar/pausar e próxima.
 - Sem chave de API e sem API não oficial: o mini player lê o que o site publica sobre a faixa atual e aperta os
   botões do próprio site. O login fica numa sessão separada, usada só por essa janela.
+- O mini player tem timeline clicável (clique, arraste ou setas) para andar pela faixa.
+- O botão **AdBlock** vale também para essa janela: requisições de anúncio e rastreamento são cortadas, e
+  anúncio em áudio/vídeo é emudecido e pulado assim que o player começa um.
 
 **Visual**
 - Visual de HUD: linhas finas no lugar de caixas, fundo com grade de pontos, aba angulada no terminal e teclas flutuantes.

@@ -1,5 +1,5 @@
 'use strict';
-// NEXUS — bloqueador de anúncios e rastreadores do mini navegador, sem dependências.
+// NEXUS — bloqueador de anúncios e rastreadores do mini navegador e do YouTube Music, sem dependências.
 // Corta na rede as requisições para domínios conhecidos de anúncio e rastreamento (e seus subdomínios)
 // e esconde os espaços de anúncio mais comuns. A página principal nunca é bloqueada: só o que ela carrega.
 
@@ -37,6 +37,11 @@ const DOMAINS = new Set([
   'mc.yandex.ru',
 ]);
 
+// Endereços de anúncio dentro de domínios que também servem conteúdo (o YouTube não pode ser bloqueado inteiro).
+const PATH_RULES = [
+  { host: /(^|\.)youtube\.com$/i, path: /^\/(pagead\/|api\/stats\/ads|ptracking|get_midroll_|youtubei\/v1\/player\/ad_break)/ },
+];
+
 // Espaços de anúncio comuns: escondidos para não sobrar buraco onde o anúncio foi cortado.
 const HIDE_CSS = `
 ins.adsbygoogle, .adsbygoogle, [id^="google_ads_iframe"], [id^="div-gpt-ad"], [id^="taboola-"],
@@ -59,28 +64,53 @@ function shouldBlock(url, resourceType) {
   try {
     const u = new URL(url);
     if (u.protocol !== 'http:' && u.protocol !== 'https:') return false;
-    return isBlockedHost(u.hostname);
+    if (isBlockedHost(u.hostname)) return true;
+    return PATH_RULES.some((r) => r.host.test(u.hostname) && r.path.test(u.pathname));
   } catch {
     return false;
   }
 }
 
-/**
- * Liga o bloqueio numa sessão. onBlocked(webContentsId) avisa cada corte (para o contador da barra).
- * Devolve { setEnabled(bool), enabled(), css }.
- */
-function attachAdblock(ses, onBlocked) {
-  let enabled = true;
+// Um botão só (AdBlock, na barra do mini navegador) liga e desliga o bloqueio em todas as sessões.
+let enabled = true;
+const setEnabled = (on) => { enabled = Boolean(on); };
+const isEnabled = () => enabled;
+
+// Liga o bloqueio numa sessão. onBlocked(webContentsId) avisa cada corte (para o contador da barra).
+function attachAdblock(ses, onBlocked = () => {}) {
   ses.webRequest.onBeforeRequest({ urls: ['http://*/*', 'https://*/*'] }, (details, cb) => {
     const cancel = enabled && shouldBlock(details.url, details.resourceType);
     cb({ cancel });
     if (cancel) onBlocked(details.webContentsId);
   });
-  return {
-    setEnabled(on) { enabled = Boolean(on); },
-    enabled: () => enabled,
-    css: HIDE_CSS,
-  };
 }
 
-module.exports = { attachAdblock, shouldBlock, isBlockedHost };
+// Anúncio em áudio/vídeo do YouTube vem dos mesmos servidores da música: não dá para cortar na rede.
+// Este script (mundo isolado da página) vê quando o player entra em modo anúncio, emudece, pula para o fim,
+// aperta "Pular" e devolve o som quando a música volta. Instala uma vez por página; NEXUS liga/desliga.
+const yt = (on) => `(() => {
+  window.__nexusAdOn = ${on ? 'true' : 'false'};
+  if (window.__nexusAdSkip) return;
+  window.__nexusAdSkip = true;
+  const SKIP = '.ytp-ad-skip-button, .ytp-ad-skip-button-modern, .ytp-skip-ad-button, .ytp-ad-overlay-close-button';
+  let muted = null;
+  setInterval(() => {
+    const p = document.querySelector('#movie_player');
+    const v = document.querySelector('video');
+    if (!v) return;
+    const ad = window.__nexusAdOn && p && (p.classList.contains('ad-showing') || p.classList.contains('ad-interrupting'));
+    if (ad) {
+      if (muted === null) muted = v.muted;
+      v.muted = true;
+      v.playbackRate = 16;
+      if (Number.isFinite(v.duration) && v.duration > 0) v.currentTime = Math.max(v.duration - 0.1, 0);
+      document.querySelectorAll(SKIP).forEach((b) => b.click());
+    } else if (muted !== null) {
+      v.muted = muted;
+      v.playbackRate = 1;
+      muted = null;
+    }
+  }, 250);
+})()`;
+
+module.exports = { attachAdblock, shouldBlock, isBlockedHost, setEnabled, isEnabled, HIDE_CSS, youtubeAdSkip: yt };

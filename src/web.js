@@ -4,7 +4,7 @@
 // (cookies somem ao fechar o app), e permissões (câmera, microfone, localização...) e downloads são negados.
 // Anúncios e rastreadores são cortados na rede (adblock.js), com botão para desligar.
 const { WebContentsView, session, ipcMain } = require('electron');
-const { attachAdblock } = require('./adblock');
+const adblock = require('./adblock');
 
 const MAX_URL = 2048;
 const isWeb = (url) => /^https?:\/\//i.test(String(url));
@@ -53,7 +53,7 @@ function placeView(win, view, rect) {
 
 function setupWeb(getWin) {
   let view = null;
-  let adblock = null;
+  let adblockReady = false;
   let adblockOn = true; // a interface manda a preferência salva ao abrir
   let blocked = 0; // cortes na página atual
   let blockedTimer = null;
@@ -92,8 +92,10 @@ function setupWeb(getWin) {
       e.preventDefault();
       emit({ error: 'downloads desativados no mini navegador' });
     });
-    if (!adblock) adblock = attachAdblock(ses, countBlocked); // a sessão é a mesma ao reabrir a view
-    adblock.setEnabled(adblockOn);
+    if (!adblockReady) { // a sessão é a mesma ao reabrir a view
+      adblock.attachAdblock(ses, countBlocked);
+      adblockReady = true;
+    }
 
     view = new WebContentsView({
       webPreferences: {
@@ -127,7 +129,7 @@ function setupWeb(getWin) {
       if (details.isMainFrame && !details.isSameDocument) blocked = 0;
     });
     wc.on('dom-ready', () => {
-      if (adblockOn) wc.insertCSS(adblock.css).catch(() => {});
+      if (adblockOn) wc.insertCSS(adblock.HIDE_CSS).catch(() => {});
     });
     for (const ev of ['did-start-loading', 'did-stop-loading', 'did-navigate', 'did-navigate-in-page', 'page-title-updated']) {
       wc.on(ev, () => emit());
@@ -183,7 +185,7 @@ function setupWeb(getWin) {
   ipcMain.on('web:adblock', (_e, on) => {
     if (typeof on !== 'boolean' || on === adblockOn) return;
     adblockOn = on;
-    adblock?.setEnabled(on);
+    adblock.setEnabled(on); // vale também para o YouTube Music
     if (view) view.webContents.reload();
     emit();
   });

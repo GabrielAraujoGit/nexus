@@ -9,6 +9,7 @@
 // aos domínios do YouTube/Google (login incluso); permissões e downloads são negados.
 const { WebContentsView, session, ipcMain } = require('electron');
 const { placeView } = require('./web');
+const adblock = require('./adblock');
 
 const HOME = 'https://music.youtube.com/';
 const PARTITION = 'persist:nexus-music';
@@ -80,6 +81,7 @@ function setupMusic(getWin) {
     ses.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
     ses.setPermissionCheckHandler(() => false);
     ses.on('will-download', (e) => e.preventDefault());
+    adblock.attachAdblock(ses); // anúncios e rastreadores na rede (o botão AdBlock vale aqui também)
     return ses;
   }
 
@@ -106,6 +108,8 @@ function setupMusic(getWin) {
   async function poll() {
     const wc = view?.webContents;
     if (!wc || wc.isDestroyed() || wc.isLoading()) return;
+    // pula anúncio em áudio/vídeo (instala uma vez por página; aqui só repassa liga/desliga)
+    wc.executeJavaScriptInIsolatedWorld(ISOLATED_WORLD, [{ code: adblock.youtubeAdSkip(adblock.isEnabled()) }]).catch(() => {});
     const raw = await wc.executeJavaScriptInIsolatedWorld(ISOLATED_WORLD, [{ code: READ_STATE }]).catch(() => null);
     if (!raw || typeof raw !== 'object') return;
     last = {
