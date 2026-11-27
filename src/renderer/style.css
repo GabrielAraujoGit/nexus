@@ -48,34 +48,45 @@
   --hud-rgb: var(--rgb);
   --sig-rgb: var(--alert-rgb); /* âmbar sobre âmbar não se vê: aqui o sinal é a cor de alerta */
 }
-/* Matrix: fósforo verde de monitor antigo, tudo numa cor só */
-[data-theme="matrix"] {
-  --rgb: 120, 225, 140;
-  --accent-rgb: 190, 255, 200;
-  --bg: #020a05;
+/* Temas de cores complementares, como o Cyberpunk: o texto e os blocos do HUD numa cor, núcleos, moldura e cantos
+   na complementar. */
+/* Ártico: azul-gelo com destaque laranja (o par azul/laranja de filme de ficção) */
+[data-theme="artico"] {
+  --rgb: 150, 200, 240;
+  --accent-rgb: 255, 150, 70;
+  --bg: #070b12;
   --hud-rgb: var(--rgb);
 }
-/* Ártico: branco gelado com o HUD em azul-claro */
-[data-theme="artico"] {
-  --rgb: 196, 216, 232;
-  --accent-rgb: 150, 205, 255;
-  --bg: #080b11;
+/* Tóxico: verde-limão com destaque violeta */
+[data-theme="toxico"] {
+  --rgb: 190, 235, 95;
+  --accent-rgb: 175, 120, 255;
+  --bg: #0a0810;
+  --hud-rgb: var(--rgb);
 }
-/* Synthwave: texto lilás, HUD ciano neon sobre roxo escuro */
+/* Synthwave: lilás com destaque ciano neon sobre roxo escuro */
 [data-theme="synthwave"] {
-  --rgb: 196, 176, 240;
-  --accent-rgb: 90, 225, 240;
+  --rgb: 205, 170, 245;
+  --accent-rgb: 80, 225, 240;
   --bg: #0c0716;
+  --hud-rgb: var(--rgb);
 }
-/* Carmesim: vermelho escuro; o alerta (que seria vermelho) vira amarelo-claro para continuar se destacando */
+/* Carmesim: vermelho com destaque turquesa; o alerta (que seria vermelho) vira amarelo-claro para se destacar */
 [data-theme="carmesim"] {
-  --rgb: 230, 120, 115;
-  --accent-rgb: 255, 165, 140;
-  --bg: #0c0404;
+  --rgb: 235, 115, 115;
+  --accent-rgb: 80, 220, 200;
+  --bg: #0c0405;
   --hud-rgb: var(--rgb);
   --alert-rgb: 255, 235, 150;
   --warn-rgb: 255, 200, 110;
   --sig-rgb: var(--alert-rgb);
+}
+/* Imperial: dourado com destaque azul-royal */
+[data-theme="imperial"] {
+  --rgb: 230, 195, 115;
+  --accent-rgb: 95, 145, 255;
+  --bg: #05070f;
+  --hud-rgb: var(--rgb);
 }
 
 * { box-sizing: border-box; }
