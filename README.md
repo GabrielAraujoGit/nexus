@@ -30,7 +30,7 @@ security and performance in mind.
 </div>
 
 <p align="center">
-  <img src="docs/demo.webp" width="100%" alt="NEXUS demo: boot, typing with the on-screen keyboard lighting up, a theme glitch and the mini browser opening like a CRT">
+  <img src="docs/demo.webp" width="100%" alt="NEXUS demo: boot, typing with the on-screen keyboard lighting up, a theme glitch and the Web opening as a hub tab next to the Terminal">
 </p>
 
 <p align="center">
@@ -141,7 +141,7 @@ security and performance in mind.
 <table>
   <tr>
     <td><img src="docs/screenshots/nexus-tron.png" alt="NEXUS with the Tron theme running fastfetch"></td>
-    <td><img src="docs/screenshots/nexus-web.png" alt="NEXUS with the mini browser open on this repository"></td>
+    <td><img src="docs/screenshots/nexus-web.png" alt="NEXUS with the hub's Web tab open on this repository, next to the Terminal tab"></td>
   </tr>
   <tr>
     <td align="center"><b>Tron</b></td>

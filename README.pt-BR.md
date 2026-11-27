@@ -30,7 +30,7 @@ em segurança e desempenho.
 </div>
 
 <p align="center">
-  <img src="docs/demo.webp" width="100%" alt="Demo do NEXUS: inicialização, digitação com o teclado na tela acendendo, falha de sinal ao trocar de tema e o mini navegador abrindo como um monitor CRT">
+  <img src="docs/demo.webp" width="100%" alt="Demo do NEXUS: inicialização, digitação com o teclado na tela acendendo, falha de sinal ao trocar de tema e o Web abrindo como aba no hub, ao lado do Terminal">
 </p>
 
 <p align="center">
@@ -140,7 +140,7 @@ em segurança e desempenho.
 <table>
   <tr>
     <td><img src="docs/screenshots/nexus-tron.png" alt="NEXUS no tema Tron rodando o fastfetch"></td>
-    <td><img src="docs/screenshots/nexus-web.png" alt="NEXUS com o mini navegador aberto neste repositório"></td>
+    <td><img src="docs/screenshots/nexus-web.png" alt="NEXUS com a aba Web do hub aberta neste repositório, ao lado da aba Terminal"></td>
   </tr>
   <tr>
     <td align="center"><b>Tron</b></td>

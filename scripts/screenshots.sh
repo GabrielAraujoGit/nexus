@@ -32,7 +32,7 @@ document.getElementById('web-form').requestSubmit()"
 shot tron      nexus-tron.png      "clear && cd ~/projetos/nexus && $FETCH"
 shot cyberpunk nexus-cyberpunk.png "clear && cd ~/projetos/nexus && $TREE"
 shot ambar     nexus-ambar.png     "clear && cd ~/projetos/nexus && $BAT --paging=never README.md"
-shot tron      nexus-web.png       "clear && cd ~/projetos/nexus" "$WEB_JS" 8000
+shot tron      nexus-web.png       "clear && cd ~/projetos/nexus" "$WEB_JS" 16000 # a página do GitHub demora para pintar
 
 echo "Pronto: $(ls "$OUT")"
 
