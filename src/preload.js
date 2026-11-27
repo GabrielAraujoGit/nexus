@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('nexus', {
     nav: (action) => ipcRenderer.send('web:nav', String(action)),
     front: () => ipcRenderer.send('web:front'),
     close: () => ipcRenderer.send('web:close'),
+    adblock: (on) => ipcRenderer.send('web:adblock', Boolean(on)),
     onState: (cb) => on('web:state', cb),
     onSnapshot: (cb) => on('web:snapshot', cb), // só no modo de capturas
   },

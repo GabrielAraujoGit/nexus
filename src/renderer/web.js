@@ -32,6 +32,25 @@
   $('web-back').addEventListener('click', () => api.nav('back'));
   $('web-fwd').addEventListener('click', () => api.nav('forward'));
   $('web-reload').addEventListener('click', () => api.nav(status.dataset.loading === '1' ? 'stop' : 'reload'));
+  // Bloqueador: ligado por padrão; a escolha fica salva neste computador.
+  const adBtn = $('web-adblock');
+  let adblock = true;
+  try { adblock = localStorage.getItem('nexus.adblock') !== 'off'; } catch { /* sem localStorage: ligado */ }
+  const paintAdblock = () => {
+    adBtn.setAttribute('aria-pressed', String(adblock));
+    adBtn.title = adblock ? 'Bloqueando anúncios e rastreadores (clique para desligar)' : 'Bloqueador desligado (clique para ligar)';
+  };
+  paintAdblock();
+  api.adblock(adblock);
+  adBtn.addEventListener('click', () => {
+    adblock = !adblock;
+    try { localStorage.setItem('nexus.adblock', adblock ? 'on' : 'off'); } catch { /* ignora */ }
+    paintAdblock();
+    api.adblock(adblock);
+    sound.play('toggle');
+  });
+  const blockedEl = $('web-blocked');
+
   $('web-close').addEventListener('click', () => {
     api.close();
     frame.show(false);
@@ -50,6 +69,7 @@
   // ---------- Estado vindo da página ----------
   api.onState((s) => {
     slot.classList.toggle('has-page', !s.closed);
+    blockedEl.textContent = !s.closed && s.adblock && s.blocked ? `${s.blocked} bloqueados` : '';
     if (s.closed) {
       hasPage = false;
       frame.setHasPage(false);

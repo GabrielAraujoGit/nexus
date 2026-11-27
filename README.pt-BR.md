@@ -73,6 +73,9 @@ em segurança e desempenho.
 - Janela flutuante (botão **Web**) que dá para arrastar e redimensionar, com endereço/busca, voltar, avançar e
   recarregar.
 - Roda isolado: sandbox, sem acesso ao app, sessão só em memória, permissões e downloads negados.
+- Bloqueador de anúncios e rastreadores embutido (botão **AdBlock**, ligado por padrão) com contador por página.
+  Corta as requisições para redes de anúncio e rastreadores conhecidos e esconde os espaços de anúncio comuns;
+  sem extensão nem download de lista de filtros.
 
 **Música**
 - O botão **Música** abre o site oficial do [YouTube Music](https://music.youtube.com) numa janela flutuante própria.
@@ -223,6 +226,7 @@ sudo bash scripts/apparmor-dev.sh            # para desfazer: sudo bash scripts/
 src/
 ├── main.js          janela, shell (node-pty), métricas (systeminformation), modos de captura
 ├── web.js           mini navegador (WebContentsView isolada)
+├── adblock.js       bloqueador de anúncios e rastreadores do mini navegador
 ├── music.js         view do YouTube Music e leitura da faixa atual
 ├── preload.js       ponte IPC exposta como window.nexus
 └── renderer/

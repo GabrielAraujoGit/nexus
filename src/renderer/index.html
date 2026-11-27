@@ -196,12 +196,14 @@
         <input id="web-url" type="text" spellcheck="false" autocomplete="off"
                placeholder="endereço ou busca" aria-label="Endereço ou busca">
       </form>
+      <button id="web-adblock" class="wide" type="button" aria-pressed="true"
+              title="Bloqueia anúncios e rastreadores">AdBlock</button>
       <button id="web-close" type="button" aria-label="Fechar">&#10005;</button>
     </header>
     <div id="web-slot" class="webwin-slot">
       <p>Digite um endereço ou uma busca.<br><small>Nada é carregado até você pedir.</small></p>
     </div>
-    <footer id="web-status" class="webwin-status">Pronto</footer>
+    <footer class="webwin-status web-foot"><span id="web-status">Pronto</span><span id="web-blocked" class="web-blocked"></span></footer>
   </section>
 
   <!-- Música: o YouTube Music oficial numa view isolada com login salvo, desenhada sobre #music-slot -->

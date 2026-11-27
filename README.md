@@ -72,6 +72,8 @@ security and performance in mind.
 **Mini browser**
 - A floating window (**Web** button) you can drag and resize, with address/search bar, back, forward and reload.
 - Runs isolated: sandboxed, no access to the app, in-memory session, permissions and downloads denied.
+- Built-in ad and tracker blocker (**AdBlock** button, on by default) with a per-page counter. It cuts requests to
+  known ad networks and trackers and hides the usual ad slots; no extension or filter list download.
 
 **Music**
 - The **Música** button opens the official [YouTube Music](https://music.youtube.com) site in its own floating
@@ -224,6 +226,7 @@ sudo bash scripts/apparmor-dev.sh            # undo: sudo bash scripts/apparmor-
 src/
 ├── main.js          window, shell (node-pty), metrics (systeminformation), capture modes
 ├── web.js           mini browser (isolated WebContentsView)
+├── adblock.js       ad and tracker blocker for the mini browser
 ├── music.js         YouTube Music view and now-playing reader
 ├── preload.js       IPC bridge exposed as window.nexus
 └── renderer/

@@ -715,6 +715,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid rgba(var(--accent
   text-overflow: ellipsis;
   opacity: 0.75;
 }
+.web-foot { display: flex; gap: 8px; }
+.web-foot > #web-status { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.web-blocked { flex-shrink: 0; font-family: var(--font-num); color: rgb(var(--accent-rgb)); }
+.webwin-bar button[aria-pressed="true"] { background: rgba(var(--hud-rgb), 0.16); border-color: rgba(var(--hud-rgb), 0.6); color: rgb(var(--hud-rgb)); }
 
 /* ---------- Música ---------- */
 .musicwin { top: 90px; right: 60px; width: 620px; height: 440px; }
