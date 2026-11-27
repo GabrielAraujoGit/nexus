@@ -20,7 +20,8 @@
     box,
     bar: $('web-bar'),
     slot,
-    bounds: (rect) => api.bounds(rect),
+    // 3 px para dentro: a borda e os cantos do HUD em volta da página ficam à vista (a view nativa cobriria)
+    bounds: (rect) => api.bounds(rect && { x: rect.x + 3, y: rect.y + 3, width: rect.width - 6, height: rect.height - 6 }),
     front: () => api.front(),
   });
 
@@ -78,6 +79,24 @@
     sound.play('toggle');
   });
   const blockedEl = $('web-blocked');
+
+  // Modo escuro: pede aos sites a versão escura (quem não tem segue claro). Ligado por padrão; a escolha fica salva.
+  const darkBtn = $('web-dark');
+  let dark = true;
+  try { dark = localStorage.getItem('nexus.web.dark') !== 'off'; } catch { /* padrão: ligado */ }
+  const paintDark = () => {
+    darkBtn.setAttribute('aria-pressed', String(dark));
+    darkBtn.title = dark ? 'Pedindo aos sites a versão escura (clique para a clara)' : 'Sites na versão clara (clique para a escura)';
+  };
+  paintDark();
+  api.dark(dark);
+  darkBtn.addEventListener('click', () => {
+    dark = !dark;
+    try { localStorage.setItem('nexus.web.dark', dark ? 'on' : 'off'); } catch { /* ignora */ }
+    paintDark();
+    api.dark(dark);
+    sound.play('toggle');
+  });
 
 
   // Modo de capturas: a página chega como imagem e é desenhada dentro da moldura.

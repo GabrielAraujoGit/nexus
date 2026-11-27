@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('nexus', {
   onFiles: (cb) => on('fs:list', cb),
   onFocus: (cb) => on('win:focus', cb), // foco da janela (modo econômico)
   readFile: (name) => ipcRenderer.invoke('fs:read', String(name)),
+  fileInfo: (name) => ipcRenderer.invoke('fs:info', String(name)),
   pdf: {
     bounds: (rect) => ipcRenderer.send('pdf:bounds', rect),
     front: () => ipcRenderer.send('pdf:front'),
@@ -33,6 +34,7 @@ contextBridge.exposeInMainWorld('nexus', {
     focus: () => ipcRenderer.send('web:focus'),
     key: (seq) => ipcRenderer.send('web:key', String(seq)),
     adblock: (on) => ipcRenderer.send('web:adblock', Boolean(on)),
+    dark: (on) => ipcRenderer.send('web:dark', Boolean(on)),
     onState: (cb) => on('web:state', cb),
     onSnapshot: (cb) => on('web:snapshot', cb), // só no modo de capturas
     onHubKey: (cb) => on('web:hubkey', cb), // atalho do hub apertado com o foco na página

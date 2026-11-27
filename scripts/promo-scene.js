@@ -23,11 +23,11 @@
   await sleep(700);
   await type('eza --tree --level=2 --icons=always');
   await sleep(1300);
-  $('theme-btn').click(); // Cyberpunk
+  NexusTheme.set('cyberpunk');
   await sleep(1700);
-  $('theme-btn').click(); // Âmbar
+  NexusTheme.set('ambar');
   await sleep(1700);
-  $('theme-btn').click(); // Tron
+  NexusTheme.set('tron');
   await sleep(500);
   NexusHub.open('web');
   await sleep(450);

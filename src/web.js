@@ -69,6 +69,26 @@ function setupWeb(getWin) {
   let view = null;
   let adblockReady = false;
   let adblockOn = true; // a interface manda a preferência salva ao abrir
+  let darkOn = true; // pede aos sites a versão escura (prefers-color-scheme); a interface manda a preferência salva
+
+  // Modo escuro: emula prefers-color-scheme e liga o escurecimento automático pela depuração do Chromium, só nesta
+  // view (vale na hora, sem recarregar).
+  function applyDark() {
+    const wc = view?.webContents;
+    if (!wc || wc.isDestroyed()) return;
+    try {
+      if (!wc.debugger.isAttached()) wc.debugger.attach('1.3');
+    } catch (err) {
+      console.error('[nexus] web: modo escuro indisponível:', err.message);
+      return;
+    }
+    const fail = (err) => console.error('[nexus] web: modo escuro:', err.message);
+    wc.debugger.sendCommand('Emulation.setEmulatedMedia', {
+      features: [{ name: 'prefers-color-scheme', value: darkOn ? 'dark' : 'light' }],
+    }).catch(fail);
+    // site sem versão escura (ex.: Wikipédia): o modo escuro automático do Chromium escurece a página
+    wc.debugger.sendCommand('Emulation.setAutoDarkModeOverride', darkOn ? { enabled: true } : {}).catch(fail);
+  }
   let blocked = 0; // cortes na página atual
   let blockedTimer = null;
 
@@ -83,6 +103,7 @@ function setupWeb(getWin) {
       canBack: wc.navigationHistory.canGoBack(),
       canForward: wc.navigationHistory.canGoForward(),
       adblock: adblockOn,
+      dark: darkOn,
       blocked,
       ...extra,
     } : { closed: true, adblock: adblockOn, ...extra });
@@ -149,7 +170,10 @@ function setupWeb(getWin) {
     wc.on('will-redirect', guard);
     // nova página: zera o contador; pronta: esconde os espaços de anúncio que sobraram
     wc.on('did-start-navigation', (details) => {
-      if (details.isMainFrame && !details.isSameDocument) blocked = 0;
+      if (details.isMainFrame && !details.isSameDocument) {
+        blocked = 0;
+        applyDark(); // antes de a página pintar, para não piscar branco
+      }
     });
     wc.on('dom-ready', () => {
       if (adblockOn) wc.insertCSS(adblock.HIDE_CSS).catch(() => {});
@@ -203,6 +227,12 @@ function setupWeb(getWin) {
   });
 
   ipcMain.on('web:close', () => closeView());
+  ipcMain.on('web:dark', (_e, on) => {
+    if (typeof on !== 'boolean') return;
+    darkOn = on;
+    applyDark();
+    emit();
+  });
   ipcMain.on('web:focus', () => view?.webContents.focus());
   ipcMain.on('web:key', (_e, seq) => {
     const wc = view?.webContents;

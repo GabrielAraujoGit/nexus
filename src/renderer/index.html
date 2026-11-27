@@ -109,6 +109,7 @@
               <input id="web-url" type="text" spellcheck="false" autocomplete="off"
                      placeholder="endereço ou busca" aria-label="Endereço ou busca">
             </form>
+            <button id="web-dark" type="button" aria-pressed="true" aria-label="Sites no modo escuro">&#9790;</button>
             <button id="web-adblock" class="wide" type="button" aria-pressed="true"
                     title="Bloqueia anúncios e rastreadores">AdBlock</button>
           </header>
@@ -191,6 +192,7 @@
     <section class="col col-files">
       <header class="panel-head"><span>ARQUIVOS</span><span id="cwd">~</span></header>
       <div id="files" class="files"></div>
+      <div id="files-info" class="files-info" aria-live="polite"></div>
       <!-- Mini player: aparece quando o YouTube Music está tocando algo -->
       <div id="np" class="np" hidden aria-label="Tocando agora">
         <div class="np-head" aria-hidden="true">
@@ -215,11 +217,11 @@
         </div>
       </div>
       <footer class="mount">
-        <span id="mount-text">Disco —</span>
-        <div id="mount-seg" class="seg" aria-hidden="true"></div>
+        <span id="mount-text" hidden>Disco —</span>
+        <div id="mount-seg" class="seg" aria-hidden="true" hidden></div>
         <button id="sound-btn" class="foot-btn" type="button" aria-pressed="true">Som</button>
         <button id="music-btn" class="foot-btn" type="button" aria-pressed="false">Música</button>
-        <button id="theme-btn" class="foot-btn" type="button" aria-label="Trocar tema">Tema</button>
+        <button id="theme-btn" class="foot-btn" type="button" aria-label="Escolher tema" aria-haspopup="menu" aria-expanded="false">Tema</button>
       </footer>
     </section>
 
@@ -229,6 +231,7 @@
     </section>
   </main>
 
+  <div id="theme-menu" class="theme-menu" role="menu" aria-label="Temas" hidden></div>
   <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
 
   <!-- Mini navegador: a página é uma view isolada que o processo principal desenha sobre #web-slot -->

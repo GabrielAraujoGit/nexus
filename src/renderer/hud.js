@@ -93,13 +93,15 @@
     el('circle', { r: 42.5, class: 'fino', 'stroke-width': 0.6 }, interno);
     const valor = el('text', { y: -2, class: 'valor entra e4' }, svg);
     valor.textContent = '—';
-    el('text', { y: 18, class: 'rot entra e4' }, svg).textContent = rotulo;
+    const rot = el('text', { y: 18, class: 'rot entra e4' }, svg);
+    rot.textContent = rotulo;
     return {
       set(f, f2) {
         acende(blocos, f);
         if (interna) acende(blocos2, f2);
       },
       valor(txt) { valor.textContent = txt; },
+      rotulo(txt) { rot.textContent = txt; },
       sinal(on) { svg.classList.toggle('sinal', Boolean(on)); },
     };
   }

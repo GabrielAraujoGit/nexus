@@ -56,7 +56,6 @@
     plus.hidden = open.size === ORDER.length; // tudo aberto: nada para o + oferecer
     if (open.size === ORDER.length) showMenu(false);
     title.textContent = active ? apps[active].title : 'INÍCIO';
-    homeCore?.valor(`${open.size}/${ORDER.length}`);
   }
 
   function emit() {
@@ -66,6 +65,7 @@
   // null = tela inicial
   function activate(name) {
     if (name && (!open.has(name) || !apps[name])) return;
+    if (name !== active) troca();
     active = name;
     frame.dataset.app = name || 'home';
     for (const n of Object.keys(apps)) apps[n].show(n === name);
@@ -73,6 +73,16 @@
     emit();
     focus();
   }
+
+  // Troca de aba: varredura CRT curta sobre o conteúdo (a view nativa do Web aparece por cima, sem animar).
+  function troca() {
+    frame.classList.remove('troca');
+    void frame.offsetWidth; // reinicia a animação
+    frame.classList.add('troca');
+  }
+  frame.addEventListener('animationend', (e) => {
+    if (e.animationName === 'troca-scan') frame.classList.remove('troca');
+  });
 
   function focus() {
     if (active) apps[active].focus();
@@ -137,7 +147,16 @@
   });
 
   // ---------- Tela inicial ----------
-  homeCore = window.NexusHud.nucleo($('hub-core'), { rotulo: 'APPS', interna: true });
+  // núcleo vivo: hora no centro, CPU na faixa externa (e no rótulo) e memória na interna; só com a tela inicial à vista
+  homeCore = window.NexusHud.nucleo($('hub-core'), { rotulo: 'CPU', interna: true });
+  const pad = (n) => String(n).padStart(2, '0');
+  window.nexus.onTick((t) => {
+    if (active) return;
+    const d = new Date();
+    homeCore.valor(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
+    homeCore.rotulo(`CPU ${Math.round(t.load)}%`);
+    homeCore.set(t.load / 100, t.memUsed / t.memTotal);
+  });
   $('hub-open-shell').addEventListener('click', () => openApp('shell'));
   // clicar no cartão (fora do campo) abre o Web vazio
   $('hub-web-form').addEventListener('click', (e) => {

@@ -82,4 +82,18 @@ async function readForView(dir, name) {
   }
 }
 
-module.exports = { readForView, validName };
+// Detalhes para o painel de arquivos (passar o mouse): tamanho e data; pasta diz quantos itens tem.
+async function infoForPanel(dir, name) {
+  if (!validName(name)) return null;
+  const file = path.join(dir, name);
+  try {
+    const st = await fs.stat(file);
+    const out = { name, dir: st.isDirectory(), size: st.size, mtime: st.mtimeMs };
+    if (out.dir) out.count = (await fs.readdir(file)).filter((n) => !n.startsWith('.')).length;
+    return out;
+  } catch {
+    return null; // sem permissão ou sumiu: o painel mostra só o nome
+  }
+}
+
+module.exports = { readForView, validName, infoForPanel };

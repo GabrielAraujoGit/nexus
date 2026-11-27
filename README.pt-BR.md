@@ -56,7 +56,8 @@ em segurança e desempenho.
 - Seu shell via `node-pty` + [xterm.js](https://xtermjs.org/): WebGL, cores 24 bits, Nerd Fonts.
 - Teclado na tela (ABNT2) que acende enquanto você digita e também digita no clique.
 - Painel de arquivos que segue o seu `cd`: clique numa pasta para entrar, num arquivo para abrir no visualizador
-  (texto com números de linha, imagens, PDF e hexadecimal para binários), ou Shift+clique para colar o nome.
+  (texto com números de linha, imagens, PDF e hexadecimal para binários), ou Shift+clique para colar o nome. O ícone
+  mostra o tipo do arquivo e, com o mouse sobre um item, o rodapé do painel mostra tipo, tamanho e data.
 
 **Painéis de sistema**
 - **CPU**: núcleo animado (carga, com arco de aviso quando esquenta), gráfico de área de 60 s, blocos por núcleo, médias de 1/5/15 min, frequência e temperatura
@@ -79,6 +80,7 @@ em segurança e desempenho.
 **Mini navegador**
 - Aba **Web** do hub, com endereço/busca, voltar, avançar e recarregar. Com ela na frente, o teclado na tela
   digita na página.
+- **☾** pede aos sites a versão escura e escurece os que não têm (ligado por padrão).
 - Roda isolado: sandbox, sem acesso ao app, sessão só em memória, permissões e downloads negados.
 - Bloqueador de anúncios e rastreadores embutido (botão **AdBlock**, ligado por padrão) com contador por página.
   Corta as requisições para redes de anúncio e rastreadores conhecidos e esconde os espaços de anúncio comuns;
@@ -97,7 +99,7 @@ em segurança e desempenho.
 **Visual**
 - Visual de HUD: linhas finas no lugar de caixas, fundo com grade de pontos, aba angulada no terminal e teclas flutuantes.
 - 7 temas com paletas suaves, de monitor: **Tron**, **Cyberpunk**, **Âmbar**, **Matrix**, **Ártico**, **Synthwave** e
-  **Carmesim** (o botão **Tema** percorre todos; o terminal muda junto).
+  **Carmesim** (o botão **Tema** abre um menu com uma amostra de cada; o terminal muda junto).
 - Abertura: a tela liga como um monitor CRT, o ícone se desenha e o nome é decodificado (qualquer tecla pula).
 - Sons sintetizados (sem arquivos de áudio), varredura no boot, falha de sinal ao trocar de tema e janelas estilo CRT;
   tudo respeita *reduzir movimento* e o botão **Som** desliga.

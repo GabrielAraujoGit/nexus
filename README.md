@@ -56,7 +56,8 @@ security and performance in mind.
 - Your shell through `node-pty` + [xterm.js](https://xtermjs.org/): WebGL, 24-bit color, Nerd Fonts.
 - On-screen keyboard (Brazilian ABNT2) that lights up as you type and also types on click.
 - Files panel that follows your `cd`: click a folder to enter it, click a file to open it in the built-in viewer
-  (text with line numbers, images, PDFs, and a hex view for binaries), or Shift+click to paste its name.
+  (text with line numbers, images, PDFs, and a hex view for binaries), or Shift+click to paste its name. Icons show
+  the file type, and hovering an item shows its type, size and date at the bottom of the panel.
 
 **System panels**
 - **CPU**: animated core gauge (load, with a warning arc when it runs hot), 60 s area chart, segmented per-core bars, 1/5/15 min averages, frequency and temperature
@@ -79,6 +80,7 @@ security and performance in mind.
 **Mini browser**
 - The hub's **Web** tab, with address/search bar, back, forward and reload. While it's in front, the on-screen
   keyboard types into the page.
+- **☾** asks sites for their dark version and darkens the ones that don't have one (on by default).
 - Runs isolated: sandboxed, no access to the app, in-memory session, permissions and downloads denied.
 - Built-in ad and tracker blocker (**AdBlock** button, on by default) with a per-page counter. It cuts requests to
   known ad networks and trackers and hides the usual ad slots; no extension or filter list download.
@@ -96,7 +98,7 @@ security and performance in mind.
 **Look and feel**
 - HUD-style layout: thin rules instead of boxes, a dot-grid backdrop, an angled terminal tab and floating keys.
 - 7 themes with muted, monitor-like palettes: **Tron**, **Cyberpunk**, **Amber**, **Matrix**, **Arctic**, **Synthwave**
-  and **Crimson** (the **Tema** button cycles through them; the terminal follows).
+  and **Crimson** (the **Tema** button opens a menu with a swatch of each; the terminal follows).
 - An opening sequence: the screen switches on like a CRT, the icon draws itself and the name decodes (any key skips it).
 - Synthesized UI sounds (no audio files), boot scan, theme glitch, CRT-style windows; all respect *reduce motion*,
   and the **Som** button mutes them.

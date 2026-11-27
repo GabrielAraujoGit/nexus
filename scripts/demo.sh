@@ -38,7 +38,7 @@ read -r -d '' SCENE <<'JS' || true
   await sleep(900);
   await type('eza --tree --level=2 --icons=always');
   await sleep(1500);
-  $('theme-btn').click();
+  NexusTheme.next();
   await sleep(1400);
   NexusHub.open('web');
   await sleep(500);
@@ -47,7 +47,7 @@ read -r -d '' SCENE <<'JS' || true
   await sleep(3600);
   NexusHub.close('web');
   await sleep(800);
-  $('theme-btn').click();
+  NexusTheme.next();
 })();
 JS
 

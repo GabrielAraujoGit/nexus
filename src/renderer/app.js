@@ -467,7 +467,11 @@
 
     renderDisks(s.disks);
     renderGpu(s.gpu);
-    if (s.mount) {
+    // rodapé: o disco da pasta atual só quando não é o "/" (que o painel Armazenamento já mostra), ex.: um pendrive
+    const other = Boolean(s.mount && s.mount.mount !== '/');
+    $('mount-text').hidden = !other;
+    $('mount-seg').hidden = !other;
+    if (other) {
       $('mount-text').textContent = `Disco ${s.mount.mount}: ${Math.round(s.mount.use)}% usado`;
       mountSeg(s.mount.use / 100);
     }
@@ -476,6 +480,27 @@
   // ---------- Arquivos ----------
   const ICON_DIR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5a2 2 0 0 1 2-2h5l2 2h9a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/></svg>';
   const ICON_FILE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V8h4.5z"/></svg>';
+  // Tipo pela extensão: escolhe o ícone (folha com uma marca recortada) e o nome no rodapé do painel.
+  const KINDS = {
+    code: { label: 'código', mark: '<path class="mk-s" d="M9.5 12l-2.5 3 2.5 3M14.5 12l2.5 3-2.5 3"/>',
+      ext: 'js mjs cjs ts tsx jsx py sh bash zsh fish json html htm css scss c h cpp hpp go rs java kt rb php lua toml yaml yml xml sql vue svelte' },
+    image: { label: 'imagem', mark: '<path class="mk" d="M6 19l3.5-4.5 2.5 3 2-2.5 4 4z"/><circle class="mk" cx="15.5" cy="12" r="1.6"/>',
+      ext: 'png jpg jpeg gif webp svg bmp ico avif tif tiff' },
+    pdf: { label: 'PDF', mark: '<path class="mk" d="M5 14h14v5H5z"/>', ext: 'pdf' },
+    text: { label: 'texto', mark: '<path class="mk-s" d="M7 12h10M7 15h10M7 18h6"/>', ext: 'md txt rst log csv tsv ini conf cfg env' },
+    archive: { label: 'compactado', mark: '<path class="mk-s" d="M10 3v2h2v2h-2v2h2v2h-2v2"/>',
+      ext: 'zip tar gz tgz xz bz2 zst 7z rar deb rpm appimage' },
+    audio: { label: 'áudio', mark: '<path class="mk" d="M13 11v5.2a2.2 2.2 0 1 1-1.4-2V11z"/><path class="mk-s" d="M13 11.5l3-1"/>',
+      ext: 'mp3 flac ogg oga wav m4a opus aac' },
+    video: { label: 'vídeo', mark: '<path class="mk" d="M9.5 11.5v7l6-3.5z"/>', ext: 'mp4 mkv webm avi mov m4v' },
+  };
+  const EXT_KIND = {};
+  for (const [k, v] of Object.entries(KINDS)) for (const e of v.ext.split(' ')) EXT_KIND[e] = k;
+  const kindOf = (name) => EXT_KIND[(name.match(/\.([^.]+)$/)?.[1] || '').toLowerCase()] || null;
+  const fileIcon = (name) => {
+    const k = kindOf(name);
+    return k ? ICON_FILE.replace('</svg>', `${KINDS[k].mark}</svg>`) : ICON_FILE;
+  };
   const ICON_UP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l7 7h-4v9H9v-9H5z"/></svg>';
 
   function fileButton(name, kind, onClick) {
@@ -483,16 +508,52 @@
     btn.type = 'button';
     btn.className = `file ${kind}`;
     btn.title = kind === 'file' ? `${name}\nClique: abrir · Shift+clique: colar o nome no prompt` : name;
-    btn.innerHTML = kind === 'up' ? ICON_UP : kind === 'dir' ? ICON_DIR : ICON_FILE; // SVG fixo, sem dado do usuário
+    btn.innerHTML = kind === 'up' ? ICON_UP : kind === 'dir' ? ICON_DIR : fileIcon(name); // SVG fixo; o nome só escolhe qual
     const label = document.createElement('span');
     label.textContent = name;
     btn.append(label);
     btn.addEventListener('mousedown', (e) => e.preventDefault());
+    if (kind !== 'up') {
+      btn.addEventListener('pointerenter', () => showInfo(name));
+      btn.addEventListener('pointerleave', () => showInfo(null));
+    }
     btn.addEventListener('click', (e) => {
       if (kind === 'file') sound.play('select'); // pasta troca a lista e já toca 'files'
       onClick(e);
     });
     return btn;
+  }
+
+  // ---------- Rodapé do painel de arquivos ----------
+  // Sem nada sob o mouse: resumo da pasta. Com um arquivo: tipo, tamanho e data (pedidos ao processo principal).
+  const infoEl = $('files-info');
+  let summary = '';
+  let infoTimer = null;
+  let infoFor = null;
+  const fmtSize = (n) => {
+    const u = ['B', 'KB', 'MB', 'GB', 'TB'];
+    let i = 0;
+    let v = n;
+    while (v >= 1024 && i < u.length - 1) { v /= 1024; i++; }
+    return `${v.toLocaleString('pt-BR', { maximumFractionDigits: v >= 100 || i === 0 ? 0 : 1 })} ${u[i]}`;
+  };
+  const fmtWhen = (ms) => new Date(ms).toLocaleString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  function showInfo(name) {
+    clearTimeout(infoTimer);
+    infoFor = name;
+    if (!name) {
+      infoEl.textContent = summary;
+      return;
+    }
+    infoTimer = setTimeout(async () => {
+      const i = await window.nexus.fileInfo(name).catch(() => null);
+      if (infoFor !== name) return; // o mouse já saiu
+      const parts = [name];
+      if (i?.dir) parts.push('pasta', `${i.count} ${i.count === 1 ? 'item' : 'itens'}`);
+      else if (i) parts.push(KINDS[kindOf(name)]?.label || 'arquivo', fmtSize(i.size));
+      if (i) parts.push(`modificado ${fmtWhen(i.mtime)}`);
+      infoEl.textContent = parts.join(' · ');
+    }, 120);
   }
 
   let lastFilesCwd = null;
@@ -528,6 +589,11 @@
     }
     nodes.forEach((n, i) => n.style.setProperty('--i', Math.min(i, 30)));
     box.replaceChildren(...nodes);
+    const dirs = f.items.filter((it) => it.dir).length;
+    const files = f.items.length - dirs;
+    summary = f.error ? '' : `${dirs} ${dirs === 1 ? 'pasta' : 'pastas'} · ${files} ${files === 1 ? 'arquivo' : 'arquivos'}`
+      + (f.total > f.items.length ? ` · ${f.total} no total` : '') + ' · passe o mouse num item para ver detalhes';
+    if (!infoFor) infoEl.textContent = summary;
     if (changed) {
       replay(box, 'enter');
       sound.play('files');
@@ -550,8 +616,49 @@
   });
 
   // ---------- Tema ----------
-  $('theme-btn').addEventListener('click', () => {
-    theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+  // Menu de temas: uma amostra por tema (fundo, texto e destaque vêm do CSS do próprio tema via data-theme).
+  const themeMenu = $('theme-menu');
+  function showThemeMenu(on) {
+    themeMenu.hidden = !on;
+    $('theme-btn').setAttribute('aria-expanded', String(on));
+    if (!on) return;
+    const items = THEMES.map((t) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('role', 'menuitemradio');
+      b.setAttribute('aria-checked', String(t === theme));
+      const sw = document.createElement('span');
+      sw.className = 'theme-sw';
+      sw.dataset.theme = t;
+      sw.setAttribute('aria-hidden', 'true');
+      sw.append(document.createElement('i'), document.createElement('i'));
+      b.append(sw, THEME_NAMES[t]);
+      b.addEventListener('click', () => {
+        showThemeMenu(false);
+        if (t !== theme) setTheme(t);
+        hub.focus();
+      });
+      return b;
+    });
+    themeMenu.replaceChildren(...items);
+    const r = $('theme-btn').getBoundingClientRect();
+    themeMenu.style.left = `${Math.max(8, r.right - themeMenu.offsetWidth)}px`;
+    themeMenu.style.bottom = `${window.innerHeight - r.top + 6}px`;
+    themeMenu.querySelector('[aria-checked="true"]')?.focus();
+  }
+  $('theme-btn').addEventListener('click', () => showThemeMenu(themeMenu.hidden));
+  document.addEventListener('pointerdown', (e) => {
+    if (!themeMenu.hidden && !e.target.closest('#theme-menu, #theme-btn')) showThemeMenu(false);
+  });
+  themeMenu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      showThemeMenu(false);
+      hub.focus();
+    }
+  });
+
+  function setTheme(t) {
+    theme = t;
     document.documentElement.dataset.theme = theme;
     try { localStorage.setItem('nexus.theme', theme); } catch { /* ignora */ }
     term.options.theme = termTheme();
@@ -559,7 +666,9 @@
     replay($('ui'), 'glitch');
     sound.play('theme');
     hub.focus();
-  });
+  }
+  // scripts de captura (demo, promo) trocam o tema por aqui
+  window.NexusTheme = { set: setTheme, next: () => setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]) };
   $('ui').addEventListener('animationend', (e) => {
     if (e.animationName === 'glitch') $('ui').classList.remove('glitch');
   });

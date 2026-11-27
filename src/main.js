@@ -9,7 +9,7 @@ const { execFile } = require('node:child_process');
 const si = require('systeminformation');
 const { setupWeb } = require('./web');
 const { setupMusic } = require('./music');
-const { readForView } = require('./viewer');
+const { readForView, infoForPanel } = require('./viewer');
 const { setupPdf } = require('./pdfview');
 
 let pty = null;
@@ -276,6 +276,8 @@ async function pollCwd() {
     send('fs:list', { cwd, home: homeDir(), total: 0, items: [], error: err.code || 'erro' });
   }
 }
+
+ipcMain.handle('fs:info', (_e, name) => infoForPanel(lastCwd || homeDir(), name));
 
 // Visualizador: lê um arquivo da pasta que o painel mostra (só o nome; o caminho é montado aqui).
 // Visualizador: PDF abre na view nativa do leitor do Chromium; o caminho completo não vai para a interface.

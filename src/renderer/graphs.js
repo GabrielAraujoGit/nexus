@@ -105,13 +105,24 @@ class LineGraph {
     });
 
     if (this.yLabels) {
+      // rótulos da escala sobre uma plaqueta da cor do fundo: um pico alto passa por trás e o texto segue legível
       ctx.font = `${9 * dpr}px "Share Tech Mono", monospace`;
-      ctx.fillStyle = `rgba(${rgb},0.55)`;
       ctx.textAlign = 'right';
-      ctx.textBaseline = 'top';
-      ctx.fillText(this.format(max), w - 2 * dpr, 2 * dpr);
-      ctx.textBaseline = 'middle';
-      ctx.fillText(this.format(max / 2), w - 2 * dpr, h / 2);
+      const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#000';
+      const label = (text, y, base) => {
+        const tw = ctx.measureText(text).width;
+        const th = 10 * dpr;
+        const top = base === 'top' ? y - dpr : y - th / 2;
+        ctx.fillStyle = bg;
+        ctx.globalAlpha = 0.82;
+        ctx.fillRect(w - tw - 5 * dpr, top, tw + 5 * dpr, th);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = `rgba(${rgb},0.6)`;
+        ctx.textBaseline = base;
+        ctx.fillText(text, w - 2 * dpr, y);
+      };
+      label(this.format(max), 2 * dpr, 'top');
+      label(this.format(max / 2), h / 2, 'middle');
     }
   }
 }
