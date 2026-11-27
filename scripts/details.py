@@ -12,7 +12,7 @@ SCALE = 2  # capturas em 3200x1800
 # nome do arquivo: (captura de origem, caixa em pixels do layout 1600x900)
 CROPS = {
     "detail-system.png": ("nexus-tron.png", (0, 0, 340, 575)),
-    "detail-network.png": ("nexus-cyberpunk.png", (1258, 0, 1600, 525)),
+    "detail-network.png": ("nexus-cyberpunk.png", (1258, 0, 1600, 575)),
     "detail-keyboard.png": ("nexus-ambar.png", (735, 630, 1600, 895)),
 }
 

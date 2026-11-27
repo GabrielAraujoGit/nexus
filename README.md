@@ -57,7 +57,7 @@ security and performance in mind.
 - Files panel that follows your `cd`: click a folder to enter it, click a file to paste its name.
 
 **System panels**
-- **CPU**: 60 s area chart, per-core bars, 1/5/15 min averages, frequency and temperature
+- **CPU**: animated core gauge (load, with a warning arc when it runs hot), 60 s area chart, segmented per-core bars, 1/5/15 min averages, frequency and temperature
   (yellow at 70 °C, red at 85 °C).
 - **Memory**: usage %, used, available, total and swap.
 - **Storage and GPU**: every real disk with used/total; GPU model and VRAM (usage and temperature on drivers that
@@ -102,12 +102,12 @@ security and performance in mind.
   </tr>
   <tr>
     <td width="50%" align="center" valign="top">
-      <img src="docs/screenshots/detail-system.png" alt="System panel: clock, CPU chart with per-core bars and 1/5/15 min averages, memory and storage"><br>
-      <sub><b>System</b>: CPU history, per-core bars, 1/5/15 min averages, memory dot grid, disks and GPU</sub>
+      <img src="docs/screenshots/detail-system.png" alt="System panel: clock, CPU core gauge with tick rings and segmented load band, CPU chart, segmented per-core bars, memory and storage"><br>
+      <sub><b>System</b>: CPU core gauge, history, segmented per-core bars, 1/5/15 min averages, memory and swap bands, disks and GPU</sub>
     </td>
     <td width="50%" align="center" valign="top">
-      <img src="docs/screenshots/detail-network.png" alt="Network panel: connection, IPv4, IPv6, gateway, DNS, latency, top processes and traffic chart"><br>
-      <sub><b>Network</b>: full addresses, DNS, latency and packet loss, top processes and live traffic</sub>
+      <img src="docs/screenshots/detail-network.png" alt="Network panel: connection, IPv4, IPv6, gateway, DNS, latency, top processes with CPU blocks, traffic gauge and chart"><br>
+      <sub><b>Network</b>: full addresses, DNS, latency and packet loss, top processes and a traffic gauge (download outside, upload inside, latency in the middle)</sub>
     </td>
   </tr>
   <tr>

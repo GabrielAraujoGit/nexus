@@ -57,7 +57,7 @@ em segurança e desempenho.
 - Painel de arquivos que segue o seu `cd`: clique numa pasta para entrar, num arquivo para colar o nome.
 
 **Painéis de sistema**
-- **CPU**: gráfico de área de 60 s, barra por núcleo, médias de 1/5/15 min, frequência e temperatura
+- **CPU**: núcleo animado (carga, com arco de aviso quando esquenta), gráfico de área de 60 s, blocos por núcleo, médias de 1/5/15 min, frequência e temperatura
   (amarelo a 70 °C, vermelho a 85 °C).
 - **Memória**: % de uso, usada, disponível, total e swap.
 - **Armazenamento e GPU**: cada disco real com usado/total; modelo e VRAM da GPU (uso e temperatura nos drivers que
@@ -101,12 +101,12 @@ em segurança e desempenho.
   </tr>
   <tr>
     <td width="50%" align="center" valign="top">
-      <img src="docs/screenshots/detail-system.png" alt="Painel de sistema: relógio, gráfico de CPU com barra por núcleo e médias de 1/5/15 min, memória e armazenamento"><br>
-      <sub><b>Sistema</b>: histórico de CPU, barra por núcleo, médias de 1/5/15 min, grade de memória, discos e GPU</sub>
+      <img src="docs/screenshots/detail-system.png" alt="Painel de sistema: relógio, núcleo da CPU com réguas de ticks e faixa de carga em blocos, gráfico de CPU, blocos por núcleo, memória e armazenamento"><br>
+      <sub><b>Sistema</b>: núcleo da CPU, histórico, blocos por núcleo, médias de 1/5/15 min, faixas de memória e swap, discos e GPU</sub>
     </td>
     <td width="50%" align="center" valign="top">
-      <img src="docs/screenshots/detail-network.png" alt="Painel de rede: conexão, IPv4, IPv6, gateway, DNS, latência, processos e gráfico de tráfego"><br>
-      <sub><b>Rede</b>: endereços completos, DNS, latência e perda de pacotes, processos e tráfego ao vivo</sub>
+      <img src="docs/screenshots/detail-network.png" alt="Painel de rede: conexão, IPv4, IPv6, gateway, DNS, latência, processos com blocos de CPU, núcleo e gráfico de tráfego"><br>
+      <sub><b>Rede</b>: endereços completos, DNS, latência e perda de pacotes, processos e um núcleo de tráfego (download por fora, upload por dentro, latência no centro)</sub>
     </td>
   </tr>
   <tr>
